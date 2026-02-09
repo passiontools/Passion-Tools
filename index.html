@@ -667,6 +667,21 @@
             box-shadow: var(--shadow-md);
         }
         
+        /* Text Highlight Styles */
+        .search-highlight {
+            background-color: #FFFB00;
+            color: #1f2937;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-weight: 700;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tool-card.highlight-match {
+            border: 2px solid var(--purple);
+            box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.1), var(--shadow-xl);
+        }
+        
         /* Information Stats Bar */
         .stats-bar {
             background-color: #ffffff;
@@ -1408,7 +1423,7 @@
         // Comprehensive tool data - ALL 100 TOOLS INCLUDED WITH BRAND LOGOS
         const toolsData = {
             image: [
-                { name: "Image Converter", desc: "Convert between JPG, PNG, WebP, and more formats", icon: "image-converter.html", color: "image", badge: "image-converter.html" },
+                { name: "Image Converter", desc: "Convert between JPG, PNG, WebP, and more formats", icon: "fa-images", color: "image", badge: "FREE" },
                 { name: "Image Compressor", desc: "Reduce image size without losing visual quality", icon: "fa-compress", color: "image", badge: "FREE" },
                 { name: "Image Resizer", desc: "Resize images to exact dimensions with precision", icon: "fa-expand", color: "image", badge: "FREE" },
                 { name: "Image Cropper", desc: "Crop images to your desired aspect ratio", icon: "fa-crop-simple", color: "image", badge: "FREE" },
@@ -1540,6 +1555,9 @@
         // Current filter category
         let currentCategory = 'all';
         
+        // Store original tool names and descriptions for highlighting
+        const originalToolData = new Map();
+        
         // Create tool sections in the DOM
         function createToolSections() {
             const mainElement = document.getElementById('tools');
@@ -1598,8 +1616,21 @@
             });
         }
         
+        // Function to highlight text in a string
+        function highlightText(text, searchTerm) {
+            if (!searchTerm || searchTerm.trim() === '') return text;
+            
+            const regex = new RegExp(`(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+            return text.replace(regex, '<span class="search-highlight">$1</span>');
+        }
+        
+        // Function to remove highlighting
+        function removeHighlight(text) {
+            return text.replace(/<span class="search-highlight">(.*?)<\/span>/gi, '$1');
+        }
+        
         // Function to render tools for a category
-        function renderTools(categoryId, tools) {
+        function renderTools(categoryId, tools, searchTerm = '') {
             const container = document.getElementById(categoryId);
             if (!container) return;
             
@@ -1626,13 +1657,24 @@
                 toolCard.setAttribute('data-tool-desc', tool.desc.toLowerCase());
                 toolCard.setAttribute('data-tool-category', categoryId.replace('Tools', '').toLowerCase());
                 
+                // Store original data for highlighting
+                const toolId = `${categoryId}-${tool.name.replace(/\s+/g, '-')}`;
+                originalToolData.set(toolId, {
+                    name: tool.name,
+                    desc: tool.desc
+                });
+                
+                // Apply highlighting if there's a search term
+                const highlightedName = searchTerm ? highlightText(tool.name, searchTerm) : tool.name;
+                const highlightedDesc = searchTerm ? highlightText(tool.desc, searchTerm) : tool.desc;
+                
                 toolCard.innerHTML = `
                     ${tool.badge ? `<span class="tool-badge ${badgeClass}">${tool.badge}</span>` : ''}
                     <div class="tool-icon ${tool.color}">
                         <i class="${iconClass}"></i>
                     </div>
-                    <h3 class="tool-title">${tool.name}</h3>
-                    <p class="tool-desc">${tool.desc}</p>
+                    <h3 class="tool-title">${highlightedName}</h3>
+                    <p class="tool-desc">${highlightedDesc}</p>
                     <a href="#" class="tool-button">
                         Use Tool
                         <i class="fas fa-arrow-right"></i>
@@ -1640,6 +1682,43 @@
                 `;
                 
                 container.appendChild(toolCard);
+            });
+        }
+        
+        // Function to update highlighting for all visible tools
+        function updateHighlighting(searchTerm) {
+            const allToolCards = document.querySelectorAll('.tool-card');
+            
+            allToolCards.forEach(card => {
+                const titleElement = card.querySelector('.tool-title');
+                const descElement = card.querySelector('.tool-desc');
+                const toolName = card.getAttribute('data-tool-name');
+                const toolCategory = card.getAttribute('data-tool-category');
+                
+                // Find the original data
+                const toolId = `${toolCategory}Tools-${toolName.replace(/\s+/g, '-')}`;
+                const originalData = originalToolData.get(toolId);
+                
+                if (originalData) {
+                    if (searchTerm && searchTerm.trim() !== '') {
+                        // Apply highlighting
+                        titleElement.innerHTML = highlightText(originalData.name, searchTerm);
+                        descElement.innerHTML = highlightText(originalData.desc, searchTerm);
+                        
+                        // Add special border if it matches
+                        if (originalData.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                            originalData.desc.toLowerCase().includes(searchTerm.toLowerCase())) {
+                            card.classList.add('highlight-match');
+                        } else {
+                            card.classList.remove('highlight-match');
+                        }
+                    } else {
+                        // Remove highlighting
+                        titleElement.innerHTML = originalData.name;
+                        descElement.innerHTML = originalData.desc;
+                        card.classList.remove('highlight-match');
+                    }
+                }
             });
         }
         
@@ -1700,6 +1779,9 @@
         function applySearchFilter(searchTerm) {
             const allToolCards = Array.from(document.querySelectorAll('.tool-card'));
             const allToolSections = Array.from(document.querySelectorAll('.tools-section'));
+            
+            // Update highlighting for all cards
+            updateHighlighting(searchTerm);
             
             // Count matches per section
             const sectionMatches = {};
