@@ -1,0 +1,1900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Passion Tools - Free Online Tools for Professionals</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            /* Primary Colors */
+            --red: #ef4444;
+            --purple: #a855f7;
+            
+            /* Secondary Colors */
+            --dark-purple: #a855f7;
+            --light-red: #ef4444;
+            --red-400: #f87171;
+            
+            /* UI Colors */
+            --bg-color: #f9fafb;
+            --card-bg: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --hover-gray: #f3f4f6;
+            
+            /* Status Colors */
+            --blue: #3b82f6;
+            --green: #10b981;
+            --yellow: #f59e0b;
+            --pink: #db2777;
+            --indigo: #6366f1;
+            --orange: #f97316;
+            --teal: #14b8a6;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            
+            /* Transitions */
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* UPDATED: Wider Container for "Full Size" feel */
+        .container {
+            width: 100%;
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+        
+        /* Header */
+        header {
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-color);
+            padding: 20px 0;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+        
+        .logo-text {
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+        
+        .logo-passion {
+            color: #1f2937;
+        }
+        
+        .logo-tools {
+            background: linear-gradient(to right, #ef4444, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+        }
+        
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 16px;
+            transition: var(--transition);
+            position: relative;
+        }
+        
+        .nav-link:hover {
+            color: var(--red);
+        }
+        
+        .nav-link.active {
+            color: var(--red);
+            font-weight: 600;
+        }
+        
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(to right, var(--red), var(--purple));
+            border-radius: 2px;
+        }
+        
+        .contact-link {
+            color: var(--purple);
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background-color: rgba(168, 85, 247, 0.1);
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+        
+        .contact-link:hover {
+            background-color: rgba(168, 85, 247, 0.2);
+            color: var(--purple);
+        }
+        
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+        
+        .mobile-menu-btn:hover {
+            background-color: var(--hover-gray);
+        }
+        
+        /* Mobile Menu */
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 81px;
+            left: 0;
+            right: 0;
+            background-color: white;
+            padding: 32px;
+            box-shadow: var(--shadow-xl);
+            z-index: 999;
+            flex-direction: column;
+            gap: 24px;
+            border-top: 1px solid var(--border-color);
+            animation: slideDown 0.3s ease;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .mobile-menu.active {
+            display: flex;
+        }
+        
+        .mobile-menu .nav-link {
+            font-size: 18px;
+            display: block;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        /* UPDATED: Full Screen Hero Section */
+        .hero {
+            min-height: 90vh;
+            display: flex;
+            align-items: center;
+            padding: 60px 0;
+            position: relative;
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.03) 0%, rgba(168, 85, 247, 0.03) 100%);
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 800px;
+            height: 800px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(168, 85, 247, 0.05) 0%, rgba(168, 85, 247, 0) 70%);
+            z-index: 0;
+        }
+        
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -10%;
+            width: 700px;
+            height: 700px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(239, 68, 68, 0.05) 0%, rgba(239, 68, 68, 0) 70%);
+            z-index: 0;
+        }
+        
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 100px;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            width: 100%;
+        }
+        
+        .hero-text h1 {
+            font-size: 64px;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 32px;
+            letter-spacing: -1.5px;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(to right, var(--red), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero-text p {
+            font-size: 22px;
+            color: var(--text-secondary);
+            margin-bottom: 48px;
+            max-width: 550px;
+            line-height: 1.6;
+        }
+        
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: linear-gradient(to right, var(--red), var(--purple));
+            color: white;
+            padding: 18px 42px;
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .hero-visual {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        
+        .visual-card {
+            background-color: white;
+            border-radius: 20px;
+            padding: 30px 20px;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+        
+        .visual-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .visual-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 32px;
+        }
+        
+        .visual-icon.image { background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.2) 100%); color: var(--red); }
+        .visual-icon.pdf { background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.2) 100%); color: var(--blue); }
+        .visual-icon.security { background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.2) 100%); color: var(--green); }
+        .visual-icon.text { background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.2) 100%); color: var(--yellow); }
+        .visual-icon.code { background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(168, 85, 247, 0.2) 100%); color: var(--purple); }
+        
+        .visual-card p {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        /* Search Section */
+        .search-section {
+            padding: 50px 0;
+            background-color: white;
+            border-radius: 24px;
+            margin: 0 24px;
+            position: relative;
+            top: -50px;
+            box-shadow: var(--shadow-lg);
+            z-index: 2;
+        }
+        
+        .search-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .search-box {
+            position: relative;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 24px 32px;
+            padding-left: 72px;
+            border: 2px solid var(--border-color);
+            border-radius: 18px;
+            font-size: 18px;
+            font-family: 'Inter', sans-serif;
+            background-color: white;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--purple);
+            box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.1);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 32px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 24px;
+        }
+        
+        .search-hint {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 15px;
+            margin-top: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        /* 🧰 All Tools Section Header */
+        .all-tools-header {
+            padding: 60px 0 30px;
+            background-color: var(--bg-color);
+        }
+        
+        .all-tools-title {
+            font-size: 42px;
+            font-weight: 700;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+        
+        .all-tools-subtitle {
+            color: var(--text-secondary);
+            font-size: 18px;
+            max-width: 700px;
+        }
+        
+        /* 🏷 Category Filter Chips */
+        .category-filter {
+            padding: 30px 0 50px;
+            background-color: var(--bg-color);
+            position: sticky;
+            top: 80px;
+            z-index: 900;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.3s;
+        }
+
+        .category-filter.stuck {
+            border-bottom-color: var(--border-color);
+            background-color: rgba(249, 250, 251, 0.95);
+            backdrop-filter: blur(5px);
+        }
+        
+        .filter-chips-container {
+            width: 100%;
+            overflow-x: auto;
+            padding-bottom: 12px;
+            scrollbar-width: thin;
+            scrollbar-color: #c7c7c7 transparent;
+        }
+        
+        .filter-chips-container::-webkit-scrollbar {
+            height: 6px;
+        }
+        
+        .filter-chips-container::-webkit-scrollbar-track {
+            background: transparent;
+            border-radius: 10px;
+        }
+        
+        .filter-chips-container::-webkit-scrollbar-thumb {
+            background-color: #c7c7c7;
+            border-radius: 10px;
+        }
+        
+        .filter-chips {
+            display: flex;
+            gap: 14px;
+            padding: 4px;
+            min-width: max-content;
+        }
+        
+        .filter-chip {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            background-color: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 9999px;
+            color: #1f2937;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+            user-select: none;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .filter-chip:hover {
+            background-color: #f3f4f6;
+            transform: translateY(-1px);
+        }
+        
+        .filter-chip.active {
+            background-color: #a855f7;
+            color: white;
+            border-color: #a855f7;
+            box-shadow: 0 4px 6px -1px rgba(168, 85, 247, 0.3);
+        }
+        
+        .filter-chip.active .chip-icon {
+            color: white;
+        }
+        
+        .chip-icon {
+            color: #1f2937;
+            font-size: 15px;
+            transition: var(--transition);
+        }
+        
+        .filter-chip.active .chip-icon {
+            color: white;
+        }
+        
+        /* Tools Sections */
+        .tools-section {
+            padding: 50px 0 90px;
+        }
+        
+        .section-header {
+            margin-bottom: 50px;
+        }
+        
+        .section-title {
+            font-size: 38px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .section-subtitle {
+            color: var(--text-secondary);
+            font-size: 19px;
+            max-width: 700px;
+        }
+        
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 32px;
+            margin-bottom: 60px;
+        }
+        
+        .tool-card {
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .tool-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-xl);
+            border-color: var(--purple);
+        }
+        
+        .tool-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .badge-free { background-color: rgba(16, 185, 129, 0.1); color: var(--green); }
+        .badge-hd { background-color: rgba(59, 130, 246, 0.1); color: var(--blue); }
+        .badge-secure { background-color: rgba(239, 68, 68, 0.1); color: var(--red); }
+        .badge-new { background-color: rgba(168, 85, 247, 0.1); color: var(--purple); }
+        
+        .tool-icon {
+            width: 72px;
+            height: 72px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            font-size: 32px;
+        }
+        
+        /* Icon Colors */
+        .tool-icon.image { background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.2) 100%); color: var(--red); }
+        .tool-icon.pdf { background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.2) 100%); color: var(--blue); }
+        .tool-icon.security { background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.2) 100%); color: var(--green); }
+        .tool-icon.calculator { background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.2) 100%); color: var(--yellow); }
+        .tool-icon.text { background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.2) 100%); color: var(--yellow); }
+        .tool-icon.code { background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(168, 85, 247, 0.2) 100%); color: var(--purple); }
+        .tool-icon.color { background: linear-gradient(135deg, rgba(219, 39, 119, 0.1) 0%, rgba(219, 39, 119, 0.2) 100%); color: var(--pink); }
+        .tool-icon.seo { background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.2) 100%); color: var(--blue); }
+        .tool-icon.utility { background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(168, 85, 247, 0.2) 100%); color: var(--purple); }
+        .tool-icon.video { background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.2) 100%); color: var(--red); }
+        
+        /* Brand Colors */
+        .tool-icon.youtube { background: linear-gradient(135deg, rgba(255, 0, 0, 0.1) 0%, rgba(255, 0, 0, 0.2) 100%); color: #FF0000; }
+        .tool-icon.instagram { background: linear-gradient(135deg, rgba(225, 48, 108, 0.1) 0%, rgba(225, 48, 108, 0.2) 100%); color: #E1306C; }
+        .tool-icon.facebook { background: linear-gradient(135deg, rgba(66, 103, 178, 0.1) 0%, rgba(66, 103, 178, 0.2) 100%); color: #4267B2; }
+        .tool-icon.twitter { background: linear-gradient(135deg, rgba(29, 161, 242, 0.1) 0%, rgba(29, 161, 242, 0.2) 100%); color: #1DA1F2; }
+        .tool-icon.tiktok { background: linear-gradient(135deg, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.2) 100%); color: #000000; }
+        .tool-icon.excel { background: linear-gradient(135deg, rgba(33, 115, 70, 0.1) 0%, rgba(33, 115, 70, 0.2) 100%); color: #217346; }
+        .tool-icon.word { background: linear-gradient(135deg, rgba(43, 87, 154, 0.1) 0%, rgba(43, 87, 154, 0.2) 100%); color: #2B579A; }
+        .tool-icon.ppt { background: linear-gradient(135deg, rgba(209, 68, 59, 0.1) 0%, rgba(209, 68, 59, 0.2) 100%); color: #D24726; }
+        
+        .tool-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+        
+        .tool-desc {
+            color: var(--text-secondary);
+            font-size: 16px;
+            margin-bottom: 24px;
+            line-height: 1.5;
+            flex-grow: 1;
+        }
+        
+        .tool-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background-color: var(--blue);
+            color: white;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            width: 100%;
+        }
+        
+        .tool-button:hover {
+            background-color: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        /* Information Stats Bar */
+        .stats-bar {
+            background-color: #ffffff;
+            border-radius: 1.5rem;
+            padding: 80px 40px;
+            margin: 80px 0;
+            box-shadow: var(--shadow-md);
+            text-align: center;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 40px;
+        }
+        
+        .stat-card {
+            padding: 20px;
+            transition: var(--transition);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-number {
+            font-size: 56px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            background: linear-gradient(90deg, #ef4444, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .stat-label {
+            color: #6b7280;
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        /* Why Choose Section */
+        .why-choose-section {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.03) 0%, rgba(168, 85, 247, 0.03) 100%);
+            border-radius: 30px;
+            padding: 100px 40px;
+            margin: 100px 0;
+            text-align: center;
+        }
+        
+        .why-choose-title {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+        }
+        
+        .why-choose-title i {
+            background: linear-gradient(90deg, #ef4444, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .why-choose-subtitle {
+            color: var(--text-secondary);
+            font-size: 20px;
+            max-width: 700px;
+            margin: 0 auto 70px;
+        }
+        
+        .why-choose-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 40px;
+        }
+        
+        .feature-card {
+            background-color: white;
+            border-radius: 24px;
+            padding: 50px 30px;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
+            border: 1px solid var(--border-color);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 24px;
+            background-color: #f3e8ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 28px;
+            color: #a855f7;
+            font-size: 36px;
+        }
+        
+        .feature-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+        
+        .feature-desc {
+            color: var(--text-secondary);
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        
+        /* Security Features */
+        .security-features {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(59, 130, 246, 0.05) 100%);
+            border-radius: 30px;
+            padding: 80px;
+            margin: 80px 0;
+            text-align: center;
+        }
+        
+        .security-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            margin-top: 50px;
+        }
+        
+        .security-card {
+            padding: 40px;
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .security-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.2) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            color: var(--green);
+            font-size: 32px;
+        }
+        
+        /* Footer */
+        footer {
+            background-color: #111827;
+            color: white;
+            padding: 100px 0 40px;
+            margin-top: auto;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 80px;
+            margin-bottom: 80px;
+        }
+        
+        .footer-logo {
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 24px;
+            letter-spacing: -0.5px;
+        }
+        
+        .footer-passion {
+            background: linear-gradient(to right, #ef4444, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .footer-tools {
+            color: #ffffff;
+        }
+        
+        .footer-tagline {
+            color: #9ca3af;
+            font-size: 18px;
+            margin-bottom: 32px;
+            line-height: 1.6;
+            max-width: 400px;
+        }
+        
+        .footer-contact {
+            margin-top: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #9ca3af;
+            font-size: 16px;
+        }
+        
+        .footer-links h3 {
+            font-size: 22px;
+            margin-bottom: 24px;
+            color: white;
+            font-weight: 700;
+        }
+        
+        .footer-links ul {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 16px;
+        }
+        
+        .footer-links a {
+            color: #9ca3af;
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .footer-links a:hover {
+            color: var(--red-400);
+            transform: translateX(5px);
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            padding-top: 40px;
+            border-top: 1px solid #374151;
+            color: #9ca3af;
+            font-size: 15px;
+        }
+        
+        .footer-bottom a {
+            color: var(--red-400);
+            text-decoration: none;
+        }
+        
+        .footer-bottom a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Responsive Styles */
+        @media (max-width: 1200px) {
+            .hero-text h1 {
+                font-size: 56px;
+            }
+            .footer-content {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+                gap: 60px;
+                text-align: center;
+            }
+            
+            .hero-text {
+                max-width: 700px;
+                margin: 0 auto;
+            }
+            
+            .hero-text p {
+                margin-left: auto;
+                margin-right: auto;
+            }
+            
+            .hero-visual {
+                max-width: 600px;
+                margin: 0 auto;
+            }
+            
+            .search-section {
+                margin: 0 24px;
+                border-radius: 24px;
+                top: 0;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .footer-content {
+                gap: 40px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .nav-links, .contact-link {
+                display: none;
+            }
+            
+            .mobile-menu-btn {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .hero {
+                padding: 60px 0;
+                min-height: auto;
+            }
+            
+            .hero-text h1 {
+                font-size: 42px;
+            }
+            
+            .hero-text p {
+                font-size: 18px;
+            }
+            
+            .section-title {
+                font-size: 32px;
+            }
+            
+            .all-tools-title {
+                font-size: 32px;
+            }
+            
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .security-features {
+                padding: 40px 20px;
+            }
+            
+            .security-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .why-choose-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filter-chips {
+                gap: 8px;
+            }
+            
+            .filter-chip {
+                padding: 10px 18px;
+                font-size: 14px;
+            }
+            
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .hero-text h1 {
+                font-size: 36px;
+            }
+            
+            .hero-visual {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .section-title {
+                font-size: 28px;
+            }
+            
+            .all-tools-title {
+                font-size: 28px;
+            }
+            
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+            
+            .security-features {
+                padding: 32px 20px;
+            }
+            
+            .stats-bar {
+                padding: 40px 20px;
+            }
+            
+            .why-choose-section {
+                padding: 40px 20px;
+            }
+            
+            .filter-chips-container {
+                padding-bottom: 8px;
+            }
+            
+            .filter-chips {
+                gap: 6px;
+            }
+            
+            .filter-chip {
+                padding: 8px 16px;
+                font-size: 13px;
+            }
+            
+            .chip-icon {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="#" class="logo">
+                    <div class="logo-text">
+                        <span class="logo-passion">Passion</span><span class="logo-tools">Tools</span>
+                    </div>
+                </a>
+                
+                <div class="nav-links">
+                    <a href="#home" class="nav-link active">Home</a>
+                    <a href="#all-tools-section" class="nav-link">Tools</a>
+                    <a href="#contact" class="nav-link">Contact</a>
+                    <a href="mailto:passiontools2@gmail.com" class="contact-link">
+                        <i class="fas fa-envelope"></i>
+                        passiontools2@gmail.com
+                    </a>
+                </div>
+                
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div class="mobile-menu" id="mobileMenu">
+            <a href="#home" class="nav-link active">Home</a>
+            <a href="#all-tools-section" class="nav-link">Tools</a>
+            <a href="#contact" class="nav-link">Contact</a>
+            <div class="footer-contact">
+                <i class="fas fa-envelope"></i>
+                <span>passiontools2@gmail.com</span>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero" id="home">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1>Your Daily Tools, <span class="gradient-text">All in One Place</span></h1>
+                    <p>Convert, calculate, compress, scan, and secure your everyday tasks — fast, free, and safe. Trusted by students, professionals, and businesses worldwide.</p>
+                    <a href="#all-tools-section" class="cta-button">
+                        Explore Tools
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                
+                <div class="hero-visual">
+                    <div class="visual-card">
+                        <div class="visual-icon image">
+                            <i class="fas fa-image"></i>
+                        </div>
+                        <p>Image Tools</p>
+                    </div>
+                    
+                    <div class="visual-card">
+                        <div class="visual-icon pdf">
+                            <i class="fas fa-file-pdf"></i>
+                        </div>
+                        <p>PDF Tools</p>
+                    </div>
+                    
+                    <div class="visual-card">
+                        <div class="visual-icon security">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <p>File Security</p>
+                    </div>
+                    
+                    <div class="visual-card">
+                        <div class="visual-icon text">
+                            <i class="fas fa-font"></i>
+                        </div>
+                        <p>Text Tools</p>
+                    </div>
+                    
+                    <div class="visual-card">
+                        <div class="visual-icon code">
+                            <i class="fas fa-code"></i>
+                        </div>
+                        <p>Developer Tools</p>
+                    </div>
+                    
+                    <div class="visual-card">
+                        <div class="visual-icon security">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <p>Privacy Focused</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="search-section" id="search">
+        <div class="container">
+            <div class="search-container">
+                <div class="search-box">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="search-input" placeholder="Search a tool... (e.g., 'PDF Compressor', 'YouTube Downloader', 'Image Converter')" id="searchInput">
+                </div>
+                <div class="search-hint">
+                    <i class="fas fa-lightbulb"></i>
+                    Try searching for "HD Background Remover", "File Scanner", or "PDF to Word"
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="all-tools-header" id="all-tools-section">
+        <div class="container">
+            <h2 class="all-tools-title">
+                <i class="fas fa-tools"></i>
+                All Tools
+            </h2>
+            <p class="all-tools-subtitle">Browse our complete collection of 100+ free online tools. Filter by category to find exactly what you need.</p>
+        </div>
+    </section>
+
+    <section class="category-filter">
+        <div class="container">
+            <div class="filter-chips-container">
+                <div class="filter-chips" id="categoryFilter">
+                    <button class="filter-chip active" data-category="all">
+                        <i class="fas fa-th chip-icon"></i>
+                        All Tools
+                    </button>
+                    <button class="filter-chip" data-category="image">
+                        <i class="fas fa-image chip-icon"></i>
+                        Image Tools
+                    </button>
+                    <button class="filter-chip" data-category="pdf">
+                        <i class="fas fa-file-pdf chip-icon"></i>
+                        PDF Tools
+                    </button>
+                    <button class="filter-chip" data-category="security">
+                        <i class="fas fa-shield-alt chip-icon"></i>
+                        Security & Privacy
+                    </button>
+                    <button class="filter-chip" data-category="video">
+                        <i class="fas fa-video chip-icon"></i>
+                        Video Download Tools
+                    </button>
+                    <button class="filter-chip" data-category="calculator">
+                        <i class="fas fa-calculator chip-icon"></i>
+                        Calculator Tools
+                    </button>
+                    <button class="filter-chip" data-category="text">
+                        <i class="fas fa-font chip-icon"></i>
+                        Text Tools
+                    </button>
+                    <button class="filter-chip" data-category="developer">
+                        <i class="fas fa-code chip-icon"></i>
+                        Web Developer Tools
+                    </button>
+                    <button class="filter-chip" data-category="color">
+                        <i class="fas fa-palette chip-icon"></i>
+                        Color & Design Tools
+                    </button>
+                    <button class="filter-chip" data-category="seo">
+                        <i class="fas fa-chart-line chip-icon"></i>
+                        SEO & Marketing Tools
+                    </button>
+                    <button class="filter-chip" data-category="utility">
+                        <i class="fas fa-tools chip-icon"></i>
+                        Utility & Daily Tools
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <main id="tools">
+        <!-- Tool sections will be populated by JavaScript -->
+    </main>
+
+    <section class="security-features">
+        <div class="container">
+            <h2 style="font-size: 36px; font-weight: 700; margin-bottom: 20px; color: var(--text-primary);">Your Privacy & Security First</h2>
+            <p style="font-size: 18px; color: var(--text-secondary); max-width: 600px; margin: 0 auto 40px;">We protect your data with military-grade privacy measures</p>
+            
+            <div class="security-grid">
+                <div class="security-card">
+                    <div class="security-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <h3 style="font-size: 20px; margin-bottom: 12px; color: var(--text-primary);">No File Storage</h3>
+                    <p style="color: var(--text-secondary);">Files are automatically deleted immediately after processing. We never store your data.</p>
+                </div>
+                
+                <div class="security-card">
+                    <div class="security-icon">
+                        <i class="fas fa-server"></i>
+                    </div>
+                    <h3 style="font-size: 20px; margin-bottom: 12px; color: var(--text-primary);">Client-Side Processing</h3>
+                    <p style="color: var(--text-secondary);">Most tools run directly in your browser. Your data never leaves your device.</p>
+                </div>
+                
+                <div class="security-card">
+                    <div class="security-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <h3 style="font-size: 20px; margin-bottom: 12px; color: var(--text-primary);">End-to-End Secure</h3>
+                    <p style="color: var(--text-secondary);">SSL encryption ensures your data is protected during any required uploads.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="stats-bar">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">100+</div>
+                    <div class="stat-label">Free Tools</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">10</div>
+                    <div class="stat-label">Tool Categories</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">0</div>
+                    <div class="stat-label">Sign-Up Required</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">Privacy Focused</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="why-choose-section">
+        <div class="container">
+            <h2 class="why-choose-title"><i class="fas fa-star"></i> Why Choose Passion Tools</h2>
+            <p class="why-choose-subtitle">Experience the difference with our premium tool collection</p>
+            
+            <div class="why-choose-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h3 class="feature-title">Fast & Lightweight</h3>
+                    <p class="feature-desc">Tools load instantly with no lag or unnecessary scripts.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <h3 class="feature-title">Secure & Private</h3>
+                    <p class="feature-desc">All processing happens locally in your browser. No tracking. No data storage.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3 class="feature-title">Fully Mobile Responsive</h3>
+                    <p class="feature-desc">Optimized for phones, tablets, and desktops.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <h3 class="feature-title">No Sign-Up Required</h3>
+                    <p class="feature-desc">Start using tools immediately — no registration, no login, no hassle.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer id="contact">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <div class="footer-logo">
+                        <span class="footer-passion">Passion</span><span class="footer-tools">Tools</span>
+                    </div>
+                    <p class="footer-tagline">Simplifying your digital life with free, secure, and privacy-focused online tools.</p>
+                    <div class="footer-contact">
+                        <i class="fas fa-envelope"></i>
+                        <span>passiontools2@gmail.com</span>
+                    </div>
+                </div>
+                
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="#home"><i class="fas fa-chevron-right"></i> Home</a></li>
+                        <li><a href="#all-tools-section"><i class="fas fa-chevron-right"></i> All Tools</a></li>
+                        <li><a href="#contact"><i class="fas fa-chevron-right"></i> Contact</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Privacy Policy</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-links">
+                    <h3>Popular Tools</h3>
+                    <ul>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> HD Background Remover</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> File Scanner</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> PDF to Word</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> QR Code Generator</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2026 Passion Tools. All rights reserved. Made with <i class="fas fa-heart" style="color: var(--red-400);"></i> for the digital world.</p>
+                <p style="margin-top: 8px;">Contact: <a href="mailto:passiontools2@gmail.com">passiontools2@gmail.com</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Comprehensive tool data - ALL 100 TOOLS INCLUDED WITH BRAND LOGOS
+        const toolsData = {
+            image: [
+                { name: "Image Converter", desc: "Convert between JPG, PNG, WebP, and more formats", icon: "fa-images", color: "image", badge: "FREE" },
+                { name: "Image Compressor", desc: "Reduce image size without losing visual quality", icon: "fa-compress", color: "image", badge: "FREE" },
+                { name: "Image Resizer", desc: "Resize images to exact dimensions with precision", icon: "fa-expand", color: "image", badge: "FREE" },
+                { name: "Image Cropper", desc: "Crop images to your desired aspect ratio", icon: "fa-crop-simple", color: "image", badge: "FREE" },
+                { name: "Image Rotator", desc: "Rotate images to any angle", icon: "fa-rotate-right", color: "image", badge: "FREE" },
+                { name: "Image Flipper", desc: "Flip images horizontally or vertically", icon: "fa-left-right", color: "image", badge: "FREE" },
+                { name: "Image to Text (OCR)", desc: "Extract text from images with high accuracy", icon: "fa-file-lines", color: "image", badge: "FREE" },
+                { name: "Background Remover", desc: "Remove background from images automatically", icon: "fa-eraser", color: "image", badge: "FREE" },
+                { name: "HD Image Background Remover", desc: "AI-powered background removal with edge preservation", icon: "fa-wand-magic-sparkles", color: "image", badge: "HD" },
+                { name: "Object Remover", desc: "Remove unwanted objects from photos", icon: "fa-stamp", color: "image", badge: "FREE" },
+                { name: "Image Enhancer", desc: "Enhance image quality and sharpness", icon: "fa-sliders", color: "image", badge: "FREE" }
+            ],
+            pdf: [
+                { name: "Merge PDF", desc: "Combine multiple PDFs into one document", icon: "fa-object-group", color: "pdf", badge: "FREE" },
+                { name: "Split PDF", desc: "Split PDF into multiple documents", icon: "fa-object-ungroup", color: "pdf", badge: "FREE" },
+                { name: "Remove PDF Pages", desc: "Delete specific pages from PDF files", icon: "fa-trash-can", color: "pdf", badge: "FREE" },
+                { name: "Extract PDF Pages", desc: "Extract specific pages from PDF files", icon: "fa-file-export", color: "pdf", badge: "FREE" },
+                { name: "Organize PDF", desc: "Rearrange pages in PDF documents", icon: "fa-arrow-down-up-across-line", color: "pdf", badge: "FREE" },
+                { name: "Scan to PDF", desc: "Convert scanned documents to PDF", icon: "fa-print", color: "pdf", badge: "FREE" },
+                { name: "Compress PDF", desc: "Reduce PDF file size for easy sharing", icon: "fa-file-zipper", color: "pdf", badge: "FREE" },
+                { name: "Repair PDF", desc: "Fix corrupted or damaged PDF files", icon: "fa-screwdriver-wrench", color: "pdf", badge: "FREE" },
+                { name: "OCR PDF", desc: "Convert scanned PDFs to searchable text", icon: "fa-glasses", color: "pdf", badge: "FREE" },
+                { name: "JPG to PDF", desc: "Convert images to PDF format", icon: "fa-image", color: "pdf", badge: "FREE" },
+                { name: "Word to PDF", desc: "Convert Word documents to PDF format", icon: "fa-file-word", color: "word", badge: "FREE" },
+                { name: "PowerPoint to PDF", desc: "Convert PowerPoint presentations to PDF", icon: "fa-file-powerpoint", color: "ppt", badge: "FREE" },
+                { name: "Excel to PDF", desc: "Convert Excel spreadsheets to PDF", icon: "fa-file-excel", color: "excel", badge: "FREE" },
+                { name: "HTML to PDF", desc: "Convert web pages to PDF documents", icon: "fab fa-html5", color: "pdf", badge: "FREE" },
+                { name: "PDF to JPG", desc: "Convert PDF pages to images", icon: "fa-images", color: "pdf", badge: "FREE" },
+                { name: "PDF to Word", desc: "Convert PDF to editable Word document", icon: "fa-file-word", color: "word", badge: "FREE" },
+                { name: "PDF to PowerPoint", desc: "Convert PDF to PowerPoint presentation", icon: "fa-file-powerpoint", color: "ppt", badge: "FREE" },
+                { name: "PDF to Excel", desc: "Convert PDF to Excel spreadsheet", icon: "fa-file-excel", color: "excel", badge: "FREE" },
+                { name: "PDF to PDF/A", desc: "Convert PDF to archival PDF/A format", icon: "fa-box-archive", color: "pdf", badge: "FREE" },
+                { name: "Rotate PDF", desc: "Rotate PDF pages to correct orientation", icon: "fa-rotate", color: "pdf", badge: "FREE" },
+                { name: "Crop PDF", desc: "Crop PDF pages to remove margins", icon: "fa-crop", color: "pdf", badge: "FREE" },
+                { name: "Add Page Numbers", desc: "Add page numbers to PDF documents", icon: "fa-list-ol", color: "pdf", badge: "FREE" },
+                { name: "Add Watermark", desc: "Add text or image watermarks to PDF", icon: "fa-copyright", color: "pdf", badge: "FREE" },
+                { name: "Edit PDF", desc: "Edit text and images in PDF files", icon: "fa-pen-to-square", color: "pdf", badge: "FREE" },
+                { name: "PDF Annotation", desc: "Add comments and annotations to PDF", icon: "fa-message", color: "pdf", badge: "FREE" },
+                { name: "PDF Form Filler", desc: "Fill out PDF forms electronically", icon: "fa-file-pen", color: "pdf", badge: "FREE" },
+                { name: "Unlock PDF", desc: "Remove password protection from PDFs", icon: "fa-unlock-keyhole", color: "pdf", badge: "SECURE" },
+                { name: "Protect PDF", desc: "Add password protection to PDF files", icon: "fa-user-shield", color: "pdf", badge: "SECURE" },
+                { name: "Sign PDF", desc: "Add electronic signatures to documents", icon: "fa-signature", color: "pdf", badge: "SECURE" },
+                { name: "Redact PDF", desc: "Permanently remove sensitive information", icon: "fa-eye-slash", color: "pdf", badge: "SECURE" },
+                { name: "Compare PDF", desc: "Compare two PDF files and highlight differences", icon: "fa-code-compare", color: "pdf", badge: "FREE" }
+            ],
+            security: [
+                { name: "File Scanner & Safety Checker", desc: "Scan files for malware and security threats", icon: "fa-virus-slash", color: "security", badge: "NEW" },
+                { name: "URL Safety Checker", desc: "Check if URLs are safe to visit", icon: "fa-globe", color: "security", badge: "SECURE" },
+                { name: "Phishing Link Detector", desc: "Detect phishing and malicious links", icon: "fa-fish-fins", color: "security", badge: "SECURE" },
+                { name: "File Hash Generator", desc: "Generate hash values for file verification", icon: "fa-hashtag", color: "security", badge: "SECURE" },
+                { name: "Password Strength Checker", desc: "Check password security strength", icon: "fa-shield-halved", color: "security", badge: "SECURE" }
+            ],
+            video: [
+                { name: "YouTube Video Downloader", desc: "Download videos from YouTube", icon: "fab fa-youtube", color: "youtube", badge: "FREE" },
+                { name: "Instagram Video & Reel Downloader", desc: "Download videos and reels from Instagram", icon: "fab fa-instagram", color: "instagram", badge: "FREE" },
+                { name: "Facebook Video Downloader", desc: "Download videos from Facebook", icon: "fab fa-facebook", color: "facebook", badge: "FREE" },
+                { name: "TikTok Video Downloader", desc: "Download videos from TikTok", icon: "fab fa-tiktok", color: "tiktok", badge: "FREE" },
+                { name: "Twitter / X Video Downloader", desc: "Download videos from Twitter/X", icon: "fab fa-twitter", color: "twitter", badge: "FREE" }
+            ],
+            calculator: [
+                { name: "Scientific Calculator", desc: "Advanced calculator with math functions", icon: "fa-calculator", color: "calculator", badge: "FREE" },
+                { name: "Age Calculator", desc: "Calculate age from birth date", icon: "fa-cake-candles", color: "calculator", badge: "FREE" },
+                { name: "BMI Calculator", desc: "Calculate Body Mass Index", icon: "fa-weight-scale", color: "calculator", badge: "FREE" },
+                { name: "Loan EMI Calculator", desc: "Calculate loan Equated Monthly Installments", icon: "fa-landmark", color: "calculator", badge: "FREE" },
+                { name: "GST Calculator", desc: "Calculate Goods and Services Tax", icon: "fa-percent", color: "calculator", badge: "FREE" },
+                { name: "Currency Converter", desc: "Convert between world currencies", icon: "fa-money-bill-transfer", color: "calculator", badge: "FREE" }
+            ],
+            text: [
+                { name: "Text Case Converter", desc: "Convert between uppercase, lowercase, title case", icon: "fa-font", color: "text", badge: "FREE" },
+                { name: "Word Counter", desc: "Count words in text", icon: "fa-list-ol", color: "text", badge: "FREE" },
+                { name: "Character Counter", desc: "Count characters in text", icon: "fa-arrow-down-1-9", color: "text", badge: "FREE" },
+                { name: "Remove Duplicate Lines", desc: "Remove duplicate lines from text", icon: "fa-copy", color: "text", badge: "FREE" },
+                { name: "Text Sorter", desc: "Sort text lines alphabetically", icon: "fa-arrow-down-a-z", color: "text", badge: "FREE" },
+                { name: "Text Reverse", desc: "Reverse text or character order", icon: "fa-repeat", color: "text", badge: "FREE" },
+                { name: "Text Encryptor / Decryptor", desc: "Encrypt and decrypt text securely", icon: "fa-file-shield", color: "text", badge: "SECURE" },
+                { name: "Whitespace Cleaner", desc: "Remove extra spaces and line breaks", icon: "fa-eraser", color: "text", badge: "FREE" }
+            ],
+            developer: [
+                { name: "HTML/CSS/JS Minifier", desc: "Minify and compress code files", icon: "fa-file-code", color: "code", badge: "FREE" },
+                { name: "HTML/CSS/JS Beautifier", desc: "Format and beautify code", icon: "fa-indent", color: "code", badge: "FREE" },
+                { name: "JSON Formatter & Validator", desc: "Format and validate JSON data", icon: "fa-code-branch", color: "code", badge: "FREE" },
+                { name: "Base64 Encoder/Decoder", desc: "Encode and decode Base64 strings", icon: "fa-shield", color: "code", badge: "FREE" },
+                { name: "URL Encoder/Decoder", desc: "Encode and decode URL strings", icon: "fa-link", color: "code", badge: "FREE" },
+                { name: "Regex Tester", desc: "Test and debug regular expressions", icon: "fa-terminal", color: "code", badge: "FREE" },
+                { name: "API Response Viewer", desc: "View and format API responses", icon: "fa-server", color: "code", badge: "FREE" }
+            ],
+            color: [
+                { name: "Color Picker from Image", desc: "Extract colors from uploaded images", icon: "fa-eye-dropper", color: "color", badge: "FREE" },
+                { name: "HEX to RGB Converter", desc: "Convert HEX colors to RGB format", icon: "fa-hashtag", color: "color", badge: "FREE" },
+                { name: "RGB to HEX Converter", desc: "Convert RGB colors to HEX format", icon: "fa-palette", color: "color", badge: "FREE" },
+                { name: "Gradient Generator", desc: "Create beautiful CSS gradients", icon: "fa-swatchbook", color: "color", badge: "FREE" },
+                { name: "Contrast Checker", desc: "Check color contrast for accessibility", icon: "fa-circle-half-stroke", color: "color", badge: "FREE" },
+                { name: "Palette Generator", desc: "Generate harmonious color palettes", icon: "fa-layer-group", color: "color", badge: "FREE" },
+                { name: "Color Blindness Simulator", desc: "Simulate different types of color blindness", icon: "fa-eye-low-vision", color: "color", badge: "FREE" },
+                { name: "Shadow Generator", desc: "Generate CSS box shadows", icon: "fa-cloud-moon", color: "color", badge: "FREE" }
+            ],
+            seo: [
+                { name: "Keyword Density Checker", desc: "Analyze keyword density in content", icon: "fa-magnifying-glass-chart", color: "seo", badge: "FREE" },
+                { name: "Meta Tag Analyzer", desc: "Check and optimize meta tags", icon: "fa-tags", color: "seo", badge: "FREE" },
+                { name: "SEO Word Counter", desc: "Word count tool optimized for SEO", icon: "fa-file-lines", color: "seo", badge: "FREE" },
+                { name: "SERP Preview Tool", desc: "Preview how your site appears in search results", icon: "fab fa-google", color: "seo", badge: "FREE" },
+                { name: "Open Graph Preview Tool", desc: "Preview Open Graph social media cards", icon: "fa-share-nodes", color: "seo", badge: "FREE" },
+                { name: "Image SEO Analyzer", desc: "Analyze images for SEO optimization", icon: "fa-images", color: "seo", badge: "FREE" }
+            ],
+            utility: [
+                { name: "QR Code Generator", desc: "Generate QR codes for URLs and text", icon: "fa-qrcode", color: "utility", badge: "FREE" },
+                { name: "QR Code Scanner", desc: "Scan QR codes from images", icon: "fa-expand", color: "utility", badge: "FREE" },
+                { name: "Barcode Generator", desc: "Create barcodes in various formats", icon: "fa-barcode", color: "utility", badge: "FREE" },
+                { name: "UUID Generator", desc: "Generate unique identifiers", icon: "fa-fingerprint", color: "utility", badge: "FREE" },
+                { name: "Unit Converter", desc: "Convert between measurement units", icon: "fa-scale-balanced", color: "utility", badge: "FREE" },
+                { name: "Time Zone Converter", desc: "Convert time between time zones", icon: "fa-earth-americas", color: "utility", badge: "FREE" },
+                { name: "Countdown Timer", desc: "Set and manage countdown timers", icon: "fa-hourglass-start", color: "utility", badge: "FREE" },
+                { name: "Stopwatch", desc: "Precision stopwatch with lap times", icon: "fa-stopwatch", color: "utility", badge: "FREE" },
+                { name: "Random Number Generator", desc: "Generate random numbers within ranges", icon: "fa-dice", color: "utility", badge: "FREE" },
+                { name: "Password Generator", desc: "Create strong, secure passwords", icon: "fa-key", color: "utility", badge: "SECURE" },
+                { name: "Internet Speed Test", desc: "Test your internet connection speed", icon: "fa-wifi", color: "utility", badge: "FREE" },
+                { name: "IP Address Checker", desc: "Check your IP address and location", icon: "fa-location-dot", color: "utility", badge: "FREE" },
+                { name: "Border Radius Generator", desc: "Generate CSS border-radius values", icon: "fa-border-all", color: "utility", badge: "FREE" }
+            ]
+        };
+        
+        // Badge color mapping
+        const badgeColors = {
+            "FREE": "badge-free",
+            "HD": "badge-hd",
+            "SECURE": "badge-secure",
+            "NEW": "badge-new"
+        };
+        
+        // Current filter category
+        let currentCategory = 'all';
+        
+        // Create tool sections in the DOM
+        function createToolSections() {
+            const mainElement = document.getElementById('tools');
+            const categories = Object.keys(toolsData);
+            
+            categories.forEach(category => {
+                const section = document.createElement('section');
+                section.className = 'tools-section';
+                section.id = `${category}-section`;
+                section.setAttribute('data-category', category);
+                
+                // Capitalize first letter for title
+                const categoryName = category.charAt(0).toUpperCase() + category.slice(1);
+                let iconClass = 'fas fa-';
+                
+                // Set appropriate icon for each category
+                switch(category) {
+                    case 'image': iconClass += 'image'; break;
+                    case 'pdf': iconClass += 'file-pdf'; break;
+                    case 'security': iconClass += 'shield-alt'; break;
+                    case 'video': iconClass += 'video'; break;
+                    case 'calculator': iconClass += 'calculator'; break;
+                    case 'text': iconClass += 'font'; break;
+                    case 'developer': iconClass += 'code'; break;
+                    case 'color': iconClass += 'palette'; break;
+                    case 'seo': iconClass += 'chart-line'; break;
+                    case 'utility': iconClass += 'tools'; break;
+                }
+                
+                // Create subtitle based on category
+                let subtitle = '';
+                switch(category) {
+                    case 'image': subtitle = 'High-quality image processing with AI-powered features'; break;
+                    case 'pdf': subtitle = 'Complete PDF suite for professionals'; break;
+                    case 'security': subtitle = 'Upload files for instant safety verification'; break;
+                    case 'video': subtitle = 'Download videos from popular platforms'; break;
+                    case 'calculator': subtitle = 'Smart calculators for every need'; break;
+                    case 'text': subtitle = 'Powerful text manipulation utilities'; break;
+                    case 'developer': subtitle = 'Essential tools for developers'; break;
+                    case 'color': subtitle = 'Professional color utilities'; break;
+                    case 'seo': subtitle = 'Boost your online presence'; break;
+                    case 'utility': subtitle = 'Essential everyday utilities'; break;
+                }
+                
+                section.innerHTML = `
+                    <div class="container">
+                        <div class="section-header">
+                            <h2 class="section-title"><i class="${iconClass}"></i> ${category === 'pdf' ? 'Document & PDF Tools' : categoryName + ' Tools'}</h2>
+                            <p class="section-subtitle">${subtitle}</p>
+                        </div>
+                        <div class="tools-grid" id="${category}Tools"></div>
+                    </div>
+                `;
+                
+                mainElement.appendChild(section);
+            });
+        }
+        
+        // Function to render tools for a category
+        function renderTools(categoryId, tools) {
+            const container = document.getElementById(categoryId);
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            tools.forEach(tool => {
+                const badgeClass = badgeColors[tool.badge] || 'badge-free';
+                
+                // Smart Icon Logic: Detect if it's a brand (fab) or standard (fas) icon
+                let iconClass = tool.icon;
+                if (!iconClass.includes('fa-')) {
+                    iconClass = `fa-${iconClass}`;
+                }
+                
+                // If it already contains 'fab' or 'fas' or 'far', leave it alone.
+                // Otherwise, default to 'fas'.
+                if (!iconClass.includes(' ') && !iconClass.startsWith('fab') && !iconClass.startsWith('fas') && !iconClass.startsWith('far')) {
+                    iconClass = `fas ${iconClass}`;
+                }
+                
+                const toolCard = document.createElement('div');
+                toolCard.className = 'tool-card';
+                toolCard.setAttribute('data-tool-name', tool.name.toLowerCase());
+                toolCard.setAttribute('data-tool-desc', tool.desc.toLowerCase());
+                toolCard.setAttribute('data-tool-category', categoryId.replace('Tools', '').toLowerCase());
+                
+                toolCard.innerHTML = `
+                    ${tool.badge ? `<span class="tool-badge ${badgeClass}">${tool.badge}</span>` : ''}
+                    <div class="tool-icon ${tool.color}">
+                        <i class="${iconClass}"></i>
+                    </div>
+                    <h3 class="tool-title">${tool.name}</h3>
+                    <p class="tool-desc">${tool.desc}</p>
+                    <a href="#" class="tool-button">
+                        Use Tool
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                `;
+                
+                container.appendChild(toolCard);
+            });
+        }
+        
+        // Function to filter tools by category
+        function filterToolsByCategory(category) {
+            currentCategory = category;
+            
+            // Update active chip
+            document.querySelectorAll('.filter-chip').forEach(chip => {
+                if (chip.getAttribute('data-category') === category) {
+                    chip.classList.add('active');
+                } else {
+                    chip.classList.remove('active');
+                }
+            });
+            
+            // Show/hide sections based on category
+            const allSections = document.querySelectorAll('.tools-section');
+            
+            if (category === 'all') {
+                // Show all sections
+                allSections.forEach(section => {
+                    section.style.display = 'block';
+                });
+            } else {
+                // Hide all sections, then show only matching category
+                allSections.forEach(section => {
+                    section.style.display = 'none';
+                });
+                
+                const targetSection = document.getElementById(`${category}-section`);
+                if (targetSection) {
+                    targetSection.style.display = 'block';
+                    
+                    // Scroll to the section smoothly
+                    setTimeout(() => {
+                        // Offset by header height
+                        const headerOffset = 150;
+                        const elementPosition = targetSection.getBoundingClientRect().top;
+                        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                        
+                        window.scrollTo({
+                            top: offsetPosition,
+                            behavior: "smooth"
+                        });
+                    }, 50);
+                }
+            }
+            
+            // Also apply search filter if there's a search term
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            if (searchTerm) {
+                applySearchFilter(searchTerm);
+            }
+        }
+        
+        // Function to apply search filter
+        function applySearchFilter(searchTerm) {
+            const allToolCards = Array.from(document.querySelectorAll('.tool-card'));
+            const allToolSections = Array.from(document.querySelectorAll('.tools-section'));
+            
+            // Count matches per section
+            const sectionMatches = {};
+            let hasMatches = false;
+            
+            // Check each tool card
+            allToolCards.forEach(card => {
+                const toolName = card.getAttribute('data-tool-name');
+                const toolDesc = card.getAttribute('data-tool-desc');
+                const toolCategory = card.getAttribute('data-tool-category');
+                
+                // Check if card matches current category filter
+                const matchesCategory = currentCategory === 'all' || toolCategory === currentCategory;
+                
+                // Check if card matches search term
+                const matchesSearch = searchTerm === '' || toolName.includes(searchTerm) || toolDesc.includes(searchTerm);
+                
+                if (matchesCategory && matchesSearch) {
+                    card.style.display = 'flex';
+                    hasMatches = true;
+                    const section = card.closest('.tools-section');
+                    if (section) {
+                        const sectionId = section.id || 'unknown';
+                        sectionMatches[sectionId] = (sectionMatches[sectionId] || 0) + 1;
+                    }
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            // Show/hide sections based on matches and current category filter
+            allToolSections.forEach(section => {
+                const sectionId = section.id || 'unknown';
+                const sectionCategory = section.getAttribute('data-category');
+                
+                // Check if section should be shown based on category filter
+                const shouldShowByCategory = currentCategory === 'all' || sectionCategory === currentCategory;
+                
+                // Check if section has matching cards
+                const sectionHasMatches = sectionMatches[sectionId] > 0;
+                
+                if (shouldShowByCategory && (searchTerm === '' || sectionHasMatches)) {
+                    section.style.display = 'block';
+                } else if (currentCategory === 'all' && !sectionHasMatches && searchTerm !== '') {
+                    section.style.display = 'none';
+                } else if (currentCategory !== 'all' && sectionCategory !== currentCategory) {
+                    section.style.display = 'none';
+                }
+            });
+            
+            // If no matches and search term is not empty, show "Tool not available" message
+            if (searchTerm !== '' && !hasMatches) {
+                // Remove any existing no-results message
+                document.querySelectorAll('.no-results-message').forEach(el => el.remove());
+                
+                const firstVisibleSection = document.querySelector('.tools-section[style="display: block"]');
+                if (firstVisibleSection) {
+                    const toolsGrid = firstVisibleSection.querySelector('.tools-grid');
+                    if (toolsGrid) {
+                        const noResultsDiv = document.createElement('div');
+                        noResultsDiv.className = 'no-results-message';
+                        noResultsDiv.style.cssText = 'grid-column: 1 / -1; text-align: center; padding: 60px;';
+                        noResultsDiv.innerHTML = `
+                            <i class="fas fa-search" style="font-size: 64px; color: #9ca3af; margin-bottom: 24px;"></i>
+                            <h3 style="color: var(--text-primary); margin-bottom: 12px; font-size: 24px;">"${searchTerm}" tool is not available</h3>
+                            <p style="color: var(--text-secondary); font-size: 16px;">Try searching for "HD Background Remover", "File Scanner", or "PDF to Word"</p>
+                        `;
+                        toolsGrid.appendChild(noResultsDiv);
+                    }
+                }
+            } else {
+                // Remove no-results message if it exists
+                document.querySelectorAll('.no-results-message').forEach(el => el.remove());
+            }
+        }
+        
+        // Sticky filter bar logic
+        window.addEventListener('scroll', function() {
+            const filterBar = document.querySelector('.category-filter');
+            if (window.scrollY > 400) {
+                filterBar.classList.add('stuck');
+            } else {
+                filterBar.classList.remove('stuck');
+            }
+        });
+        
+        // Initialize all tool sections
+        document.addEventListener('DOMContentLoaded', function() {
+            // Create tool sections in DOM
+            createToolSections();
+            
+            // Render all tool categories
+            renderTools('imageTools', toolsData.image);
+            renderTools('pdfTools', toolsData.pdf);
+            renderTools('securityTools', toolsData.security);
+            renderTools('videoTools', toolsData.video);
+            renderTools('calculatorTools', toolsData.calculator);
+            renderTools('textTools', toolsData.text);
+            renderTools('developerTools', toolsData.developer);
+            renderTools('colorTools', toolsData.color);
+            renderTools('seoTools', toolsData.seo);
+            renderTools('utilityTools', toolsData.utility);
+            
+            // Setup category filter chips
+            const filterChips = document.querySelectorAll('.filter-chip');
+            filterChips.forEach(chip => {
+                chip.addEventListener('click', function() {
+                    const category = this.getAttribute('data-category');
+                    filterToolsByCategory(category);
+                });
+            });
+            
+            // Search functionality
+            const searchInput = document.getElementById('searchInput');
+            
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase().trim();
+                applySearchFilter(searchTerm);
+            });
+            
+            // Mobile menu functionality
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const mobileMenu = document.getElementById('mobileMenu');
+            
+            if (mobileMenuBtn && mobileMenu) {
+                mobileMenuBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    mobileMenu.classList.toggle('active');
+                });
+                
+                // Close menu when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!mobileMenu.contains(e.target) && e.target !== mobileMenuBtn) {
+                        mobileMenu.classList.remove('active');
+                    }
+                });
+                
+                // Close menu when clicking on a link
+                mobileMenu.querySelectorAll('a').forEach(link => {
+                    link.addEventListener('click', function() {
+                        mobileMenu.classList.remove('active');
+                    });
+                });
+            }
+            
+            // Simple anchor link scrolling
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    const href = this.getAttribute('href');
+                    
+                    if (href === '#') return;
+                    
+                    const target = document.querySelector(href);
+                    
+                    if (target) {
+                        e.preventDefault();
+                        window.scrollTo({
+                            top: target.offsetTop - 100,
+                            behavior: 'smooth'
+                        });
+                        
+                        // Update active nav link
+                        if (this.classList.contains('nav-link')) {
+                            document.querySelectorAll('.nav-link').forEach(link => {
+                                link.classList.remove('active');
+                            });
+                            this.classList.add('active');
+                        }
+                    }
+                });
+            });
+            
+            // Focus search input on '/' key press
+            document.addEventListener('keydown', function(e) {
+                if (e.key === '/' && !e.target.matches('input, textarea')) {
+                    e.preventDefault();
+                    searchInput.focus();
+                }
+                
+                // Close mobile menu on Escape key
+                if (e.key === 'Escape' && mobileMenu.classList.contains('active')) {
+                    mobileMenu.classList.remove('active');
+                }
+            });
+            
+            // Tool button click handler (for demo purposes)
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.tool-button')) {
+                    e.preventDefault();
+                    const toolCard = e.target.closest('.tool-card');
+                    const toolName = toolCard.querySelector('.tool-title').textContent;
+                    alert(`"${toolName}" tool would open here. This is a demo - in a real implementation, this would open the specific tool interface.`);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
