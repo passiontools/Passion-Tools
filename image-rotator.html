@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Rotator - Passion Tools</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            /* Brand Colors */
+            --red: #ef4444;
+            --purple: #a855f7;
+            --blue: #3b82f6;
+            --blue-dark: #2563eb;
+            --green: #22c55e;
+            
+            /* UI Colors */
+            --bg-color: #f9fafb;
+            --card-bg: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --hover-gray: #f3f4f6;
+            
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --radius: 16px;
+            --transition: all 0.3s ease;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Header --- */
+        header {
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo { text-decoration: none; display: flex; align-items: center; gap: 10px; }
+        .logo-text { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
+        .logo-passion { color: #1f2937; }
+        .logo-tools {
+            background: linear-gradient(to right, var(--red), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .back-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+            font-size: 15px;
+        }
+        .back-link:hover { color: var(--red); }
+
+        /* --- Main Content --- */
+        .tool-container {
+            max-width: 900px;
+            margin: 60px auto;
+            padding: 0 20px;
+            flex: 1;
+        }
+
+        .tool-header { text-align: center; margin-bottom: 40px; }
+        .tool-title { font-size: 36px; font-weight: 800; margin-bottom: 12px; }
+        .tool-subtitle { color: var(--text-secondary); font-size: 18px; }
+
+        .tool-card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            box-shadow: var(--shadow-md);
+            padding: 40px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* --- Upload Area --- */
+        .upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 16px;
+            padding: 80px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            background-color: #fafafa;
+        }
+
+        .upload-area:hover { border-color: var(--blue); background-color: rgba(59, 130, 246, 0.05); }
+        .upload-icon { font-size: 48px; color: var(--blue); margin-bottom: 16px; }
+        .upload-text { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+        .upload-subtext { color: var(--text-secondary); font-size: 14px; }
+        #fileInput { display: none; }
+
+        /* --- Workspace --- */
+        .workspace { display: none; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Canvas Stage */
+        .stage-container {
+            background: #f3f4f6;
+            border-radius: 12px;
+            padding: 20px;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        /* The visual image (CSS Rotated for smoothness) */
+        .preview-img {
+            max-width: 100%;
+            max-height: 500px;
+            transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Controls */
+        .controls-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Quick Actions Grid */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .btn-quick {
+            background: white;
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .btn-quick:hover { border-color: var(--blue); color: var(--blue); background-color: rgba(59, 130, 246, 0.05); }
+
+        /* Slider Section */
+        .slider-group {
+            background: #f9fafb;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .angle-input {
+            width: 70px;
+            padding: 6px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            text-align: center;
+            font-weight: 600;
+            color: var(--blue);
+        }
+        
+        /* Custom Range Slider */
+        input[type=range] {
+            width: 100%;
+            -webkit-appearance: none;
+            background: transparent;
+        }
+        
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 4px;
+        }
+        
+        input[type=range]::-webkit-slider-thumb {
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: var(--blue);
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: -7px;
+            box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+            transition: var(--transition);
+        }
+
+        input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.1); background: var(--blue-dark); }
+
+        /* Main Actions */
+        .main-actions {
+            display: flex;
+            gap: 16px;
+            margin-top: 10px;
+        }
+
+        .btn-main {
+            flex: 1;
+            padding: 16px;
+            border-radius: 12px;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-apply { background-color: var(--blue); color: white; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
+        .btn-apply:hover { background-color: var(--blue-dark); transform: translateY(-2px); }
+
+        .btn-download { background-color: var(--green); color: white; box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3); display: none; }
+        .btn-download:hover { background-color: #16a34a; transform: translateY(-2px); }
+
+        .btn-reset {
+            width: 100%;
+            background: none;
+            border: none;
+            color: var(--red);
+            margin-top: 16px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .btn-reset:hover { text-decoration: underline; }
+
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* Footer */
+        footer {
+            background-color: #111827;
+            color: white;
+            padding: 40px 0;
+            margin-top: auto;
+            text-align: center;
+        }
+
+        @media (max-width: 600px) {
+            .quick-actions { grid-template-columns: repeat(2, 1fr); }
+            .main-actions { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">
+                    <div class="logo-text">
+                        <span class="logo-passion">Passion</span><span class="logo-tools">Tools</span>
+                    </div>
+                </a>
+                <a href="index.html" class="back-link">
+                    <i class="fas fa-arrow-left"></i> Back to Tools
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="tool-container">
+        <div class="tool-header">
+            <h1 class="tool-title">Image Rotator</h1>
+            <p class="tool-subtitle">Rotate your images to any angle instantly. Preview, process, and download.</p>
+        </div>
+
+        <div class="tool-card">
+            
+            <div class="upload-area" id="dropZone">
+                <i class="fas fa-sync-alt upload-icon"></i>
+                <div class="upload-text">Click or Drag & Drop to Upload</div>
+                <div class="upload-subtext">Supports JPG, PNG, WEBP</div>
+                <input type="file" id="fileInput" accept="image/*">
+            </div>
+
+            <div class="workspace" id="workspace">
+                
+                <div class="stage-container">
+                    <img src="" id="previewImg" class="preview-img">
+                </div>
+
+                <div class="controls-wrapper">
+                    
+                    <div class="quick-actions">
+                        <button class="btn-quick" onclick="rotateBy(-90)">
+                            <i class="fas fa-undo"></i> -90°
+                        </button>
+                        <button class="btn-quick" onclick="rotateBy(90)">
+                            <i class="fas fa-redo"></i> +90°
+                        </button>
+                        <button class="btn-quick" onclick="rotateBy(180)">
+                            <i class="fas fa-arrows-rotate"></i> 180°
+                        </button>
+                        <button class="btn-quick" onclick="resetAngle()">
+                            <i class="fas fa-compress"></i> 0°
+                        </button>
+                    </div>
+
+                    <div class="slider-group">
+                        <div class="slider-header">
+                            <label class="label">Custom Angle</label>
+                            <input type="number" id="angleInput" class="angle-input" value="0">
+                        </div>
+                        <input type="range" id="angleSlider" min="0" max="360" value="0">
+                    </div>
+
+                    <div class="main-actions">
+                        <button class="btn-main btn-apply" id="btnProcess">
+                            <i class="fas fa-cog"></i> Apply Rotation
+                        </button>
+                        <a href="#" class="btn-main btn-download" id="btnDownload" download="rotated-image.jpg">
+                            <i class="fas fa-download"></i> Download Image
+                        </a>
+                    </div>
+                </div>
+
+                <button class="btn-reset" id="btnReset">Remove Image</button>
+            </div>
+
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Passion Tools. Secure client-side processing.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Elements
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const workspace = document.getElementById('workspace');
+        const previewImg = document.getElementById('previewImg');
+        const angleInput = document.getElementById('angleInput');
+        const angleSlider = document.getElementById('angleSlider');
+        const btnProcess = document.getElementById('btnProcess');
+        const btnDownload = document.getElementById('btnDownload');
+        const btnReset = document.getElementById('btnReset');
+
+        let currentAngle = 0;
+        let originalFile = null;
+
+        // 1. Upload Logic
+        dropZone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => loadFile(e.target.files[0]));
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.style.borderColor = 'var(--blue)'; });
+        dropZone.addEventListener('dragleave', () => dropZone.style.borderColor = 'var(--border-color)');
+        dropZone.addEventListener('drop', (e) => { e.preventDefault(); loadFile(e.dataTransfer.files[0]); });
+
+        function loadFile(file) {
+            if (!file || !file.type.match('image.*')) return;
+            originalFile = file;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                previewImg.src = e.target.result;
+                dropZone.style.display = 'none';
+                workspace.style.display = 'block';
+                resetAngle();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // 2. Rotation Logic (Visual)
+        function updateUI() {
+            // Keep within 0-360 for UI cleanliness
+            let displayAngle = currentAngle % 360;
+            if (displayAngle < 0) displayAngle += 360;
+
+            angleSlider.value = displayAngle;
+            angleInput.value = displayAngle;
+            
+            // Visual rotate using CSS (smooth)
+            previewImg.style.transform = `rotate(${currentAngle}deg)`;
+            
+            // Reset download state if changed
+            btnProcess.style.display = 'flex';
+            btnDownload.style.display = 'none';
+        }
+
+        function rotateBy(deg) {
+            currentAngle += deg;
+            updateUI();
+        }
+
+        function resetAngle() {
+            currentAngle = 0;
+            updateUI();
+        }
+
+        // Inputs
+        angleSlider.addEventListener('input', (e) => {
+            currentAngle = parseInt(e.target.value);
+            updateUI();
+        });
+
+        angleInput.addEventListener('change', (e) => {
+            currentAngle = parseInt(e.target.value);
+            updateUI();
+        });
+
+        // 3. Process & Download (Canvas API)
+        btnProcess.addEventListener('click', () => {
+            btnProcess.innerHTML = '<div class="spinner"></div> Processing...';
+            
+            setTimeout(() => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const img = new Image();
+                
+                img.onload = () => {
+                    // Convert degrees to radians
+                    const radians = currentAngle * Math.PI / 180;
+                    
+                    // Calculate new canvas dimensions to fit rotated image
+                    const sin = Math.abs(Math.sin(radians));
+                    const cos = Math.abs(Math.cos(radians));
+                    const newWidth = (img.width * cos) + (img.height * sin);
+                    const newHeight = (img.width * sin) + (img.height * cos);
+
+                    canvas.width = newWidth;
+                    canvas.height = newHeight;
+
+                    // Fill white background for JPEGs (optional, prevents black background)
+                    if(originalFile.type === 'image/jpeg') {
+                        ctx.fillStyle = '#FFFFFF';
+                        ctx.fillRect(0, 0, newWidth, newHeight);
+                    }
+
+                    // Move to center, rotate, move back
+                    ctx.translate(newWidth / 2, newHeight / 2);
+                    ctx.rotate(radians);
+                    ctx.drawImage(img, -img.width / 2, -img.height / 2);
+
+                    // Export
+                    // Default to JPEG 0.9 quality for compression
+                    let mimeType = originalFile.type === 'image/png' ? 'image/png' : 'image/jpeg';
+                    const dataUrl = canvas.toDataURL(mimeType, 0.9);
+
+                    btnDownload.href = dataUrl;
+                    
+                    // Naming logic
+                    const ext = mimeType === 'image/png' ? 'png' : 'jpg';
+                    btnDownload.download = `rotated-image.${ext}`;
+
+                    // Switch buttons
+                    btnProcess.style.display = 'none';
+                    btnDownload.style.display = 'flex';
+                    btnProcess.innerHTML = '<i class="fas fa-cog"></i> Apply Rotation'; // Reset text
+                };
+
+                img.src = previewImg.src;
+            }, 300); // UI Delay
+        });
+
+        // 4. Reset
+        btnReset.addEventListener('click', () => {
+            fileInput.value = '';
+            dropZone.style.display = 'block';
+            workspace.style.display = 'none';
+            btnDownload.style.display = 'none';
+            btnProcess.style.display = 'flex';
+            currentAngle = 0;
+        });
+
+    </script>
+</body>
+</html>
