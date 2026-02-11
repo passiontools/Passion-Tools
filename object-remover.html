@@ -1,1 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Object Remover Pro | PassionTools</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            /* Branding Colors */
+            --p-charcoal: #1f2937;
+            --p-red: #ef4444;
+            --p-purple: #a855f7;
+            --p-gradient: linear-gradient(to right, #ef4444, #a855f7);
+            --p-gray: #6b7280;
+            --p-midnight: #111827;
+            
+            /* UI Colors */
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --border: #e2e8f0;
+            --primary-blue: #3b82f6;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
 
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--p-charcoal); min-height: 100vh; display: flex; flex-direction: column; }
+
+        /* --- HEADER --- */
+        header { 
+            background: rgba(255, 255, 255, 0.98); 
+            backdrop-filter: blur(10px); 
+            border-bottom: 1px solid var(--border); 
+            padding: 16px 0; 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000; 
+        }
+        .container { max-width: 1250px; margin: 0 auto; padding: 0 20px; }
+        .nav { display: flex; justify-content: space-between; align-items: center; }
+        
+        .logo { font-size: 24px; font-weight: 800; text-decoration: none; color: var(--p-charcoal); letter-spacing: -0.5px; }
+        .logo span { background: var(--p-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        .back-link { 
+            text-decoration: none; color: var(--p-gray); font-size: 15px; font-weight: 500; 
+            display: flex; align-items: center; gap: 8px; transition: color 0.3s ease;
+        }
+        .back-link:hover { color: var(--p-red); }
+
+        /* --- EDITOR UI --- */
+        main { flex: 1; padding: 40px 20px; display: flex; flex-direction: column; align-items: center; }
+        .editor-card { 
+            background: var(--surface); border-radius: 20px; box-shadow: var(--shadow); 
+            width: 100%; max-width: 1100px; border: 1px solid var(--border); overflow: hidden; 
+            display: flex; flex-direction: column; min-height: 600px;
+        }
+
+        .view-section { display: none; padding: 30px; animation: fadeIn 0.4s ease; flex: 1; }
+        .view-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Upload State */
+        .drop-zone { 
+            border: 2px dashed var(--border); border-radius: 16px; padding: 100px 20px; 
+            text-align: center; cursor: pointer; transition: 0.3s; background: #fafafa; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+        .drop-zone:hover { border-color: var(--p-purple); background: rgba(168, 85, 247, 0.05); }
+        .upload-icon { font-size: 50px; background: var(--p-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 20px; }
+
+        /* Canvas Workspace - FIXED CSS */
+        .workspace {
+            position: relative;
+            width: 100%;
+            height: 60vh;
+            background: #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            touch-action: none;
+            /* Grid Pattern for transparency */
+            background-image: linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(-45deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(-45deg, transparent 75%, #ccc 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        }
+        
+        .canvas-stack { 
+            position: relative; 
+            transition: transform 0.1s ease-out; 
+            cursor: crosshair; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        /* Ensure canvases stack correctly */
+        canvas { display: block; }
+        #mainCanvas { position: relative; z-index: 1; background: white; }
+        #uiCanvas { position: absolute; top: 0; left: 0; z-index: 2; pointer-events: none; }
+
+        /* Controls */
+        .toolbar { 
+            display: flex; align-items: center; justify-content: space-between; 
+            padding-top: 25px; margin-top: 25px; border-top: 1px solid var(--border); 
+            gap: 20px; flex-wrap: wrap; 
+        }
+        .tool-group { display: flex; gap: 10px; margin-bottom: 20px; }
+        .btn { 
+            padding: 10px 20px; border-radius: 8px; border: 1px solid var(--border); 
+            background: white; font-weight: 600; cursor: pointer; display: flex; 
+            align-items: center; gap: 8px; transition: 0.2s; 
+        }
+        .btn:hover { background: #f9fafb; border-color: var(--p-gray); }
+        .btn.active { background: var(--p-charcoal); color: white; border-color: var(--p-charcoal); }
+        .btn-main { background: var(--p-gradient); color: white; border: none; padding: 12px 28px; }
+
+        /* Result View */
+        .compare-box { position: relative; width: 100%; height: 60vh; border-radius: 12px; overflow: hidden; cursor: ew-resize; background: #e5e7eb; }
+        .compare-img { position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; }
+        .img-after { z-index: 2; width: 50%; border-right: 3px solid white; overflow: hidden; }
+        .compare-img img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .slider-bar { position: absolute; top: 50%; left: 50%; width: 44px; height: 44px; background: white; border-radius: 50%; transform: translate(-50%, -50%); z-index: 10; box-shadow: 0 4px 10px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; color: var(--primary-blue); }
+
+        footer { background-color: var(--p-midnight); color: #ffffff; padding: 40px 0; text-align: center; font-size: 14px; margin-top: auto; }
+        .loader { width: 18px; height: 18px; border: 3px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <div class="nav">
+                <a href="index.html" class="logo">Passion<span>Tools</span></a>
+                <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Tools</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="editor-card">
+            <div class="view-section active" id="viewUpload">
+                <div class="drop-zone" onclick="document.getElementById('fileInput').click()">
+                    <i class="fas fa-wand-magic-sparkles upload-icon"></i>
+                    <h2 style="margin-bottom: 10px;">Object Remover Pro</h2>
+                    <p style="color: var(--p-gray);">Clean up your photos instantly using smart pixel diffusion.</p>
+                    <input type="file" id="fileInput" hidden accept="image/*">
+                </div>
+            </div>
+
+            <div class="view-section" id="viewEditor">
+                <div class="tool-group">
+                    <button class="btn active" id="toolBrush"><i class="fas fa-paint-brush"></i> Brush</button>
+                    <button class="btn" id="toolEraser"><i class="fas fa-eraser"></i> Eraser</button>
+                    <button class="btn" onclick="Editor.undo()"><i class="fas fa-undo"></i> Undo</button>
+                    <div style="flex:1"></div>
+                    <button class="btn" onclick="Editor.zoom(1.2)"><i class="fas fa-search-plus"></i></button>
+                    <button class="btn" onclick="Editor.zoom(0.8)"><i class="fas fa-search-minus"></i></button>
+                </div>
+
+                <div class="workspace">
+                    <div class="canvas-stack" id="canvasStack">
+                        <canvas id="mainCanvas"></canvas>
+                        <canvas id="uiCanvas"></canvas>
+                    </div>
+                </div>
+
+                <div class="toolbar">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <span style="font-size: 11px; font-weight: 800; color: var(--p-gray); text-transform: uppercase;">Brush Size</span>
+                        <input type="range" id="brushSize" min="5" max="150" value="40" style="accent-color: var(--p-red); width: 150px;">
+                    </div>
+                    <button class="btn btn-main" id="btnProcess">Remove Object</button>
+                </div>
+            </div>
+
+            <div class="view-section" id="viewResult">
+                <div class="compare-box" id="compareBox">
+                    <div class="compare-img img-before"><img id="resBefore" src=""></div>
+                    <div class="compare-img img-after" id="afterWrapper"><img id="resAfter" src=""></div>
+                    <div class="slider-bar" id="sliderBar"><i class="fas fa-arrows-alt-h"></i></div>
+                </div>
+                <div style="margin-top: 30px; display: flex; justify-content: center; gap: 15px;">
+                    <button class="btn" onclick="location.reload()">New Image</button>
+                    <a id="downloadBtn" class="btn btn-main" style="text-decoration: none;"><i class="fas fa-download"></i> Download</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            &copy; 2026 PassionTools. Secure client-side pixel processing.
+        </div>
+    </footer>
+
+    <script>
+        const Editor = (function() {
+            // Internal State
+            let img = new Image();
+            let maskCanvas = document.createElement('canvas'); // Hidden canvas for red mask
+            let maskCtx = maskCanvas.getContext('2d');
+            let history = [];
+            let zoom = 1;
+            let isDrawing = false;
+            let mode = 'brush';
+
+            // Canvas References (will be set in init)
+            let canvasMain, canvasUI, canvasStack;
+            let ctxMain, ctxUI;
+
+            function init(file) {
+                if(!file) return;
+                
+                // Get DOM Elements inside init to ensure they exist
+                canvasMain = document.getElementById('mainCanvas');
+                canvasUI = document.getElementById('uiCanvas');
+                canvasStack = document.getElementById('canvasStack');
+                
+                ctxMain = canvasMain.getContext('2d', { willReadFrequently: true });
+                ctxUI = canvasUI.getContext('2d');
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    img.onload = () => setup();
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+
+            function setup() {
+                // Switch View FIRST to ensure canvas has dimensions
+                document.getElementById('viewUpload').classList.remove('active');
+                document.getElementById('viewEditor').classList.add('active');
+                
+                // Set Canvas Dimensions to match Image
+                canvasMain.width = img.width;
+                canvasMain.height = img.height;
+                canvasUI.width = img.width;
+                canvasUI.height = img.height;
+                maskCanvas.width = img.width;
+                maskCanvas.height = img.height;
+                
+                // Calculate Fit Zoom
+                const workspace = document.querySelector('.workspace');
+                const ratio = Math.min(
+                    (workspace.clientWidth - 40) / img.width, 
+                    (workspace.clientHeight - 40) / img.height, 
+                    1
+                );
+                zoom = ratio;
+                updateZoom();
+                saveHistory(); // Save initial blank state
+                render();
+            }
+
+            function render() {
+                // Clear Main Canvas
+                ctxMain.clearRect(0, 0, img.width, img.height);
+                // Draw Base Image
+                ctxMain.drawImage(img, 0, 0);
+                // Draw Mask Overlay (Red)
+                ctxMain.globalAlpha = 0.5;
+                ctxMain.drawImage(maskCanvas, 0, 0);
+                ctxMain.globalAlpha = 1.0;
+            }
+
+            function updateZoom() {
+                if(canvasStack) canvasStack.style.transform = `scale(${zoom})`;
+            }
+
+            // Mouse Coordinate Calculation
+            const getPos = (e) => {
+                const rect = canvasMain.getBoundingClientRect();
+                const clientX = e.clientX || e.touches?.[0].clientX;
+                const clientY = e.clientY || e.touches?.[0].clientY;
+                return { 
+                    x: (clientX - rect.left) / zoom, 
+                    y: (clientY - rect.top) / zoom 
+                };
+            };
+
+            // Event Listeners (Bound once, logic checks state)
+            const stack = document.getElementById('canvasStack');
+            
+            stack.onmousedown = stack.ontouchstart = (e) => {
+                isDrawing = true;
+                maskCtx.beginPath();
+                paint(e);
+            };
+
+            window.onmousemove = window.ontouchmove = (e) => {
+                if(!canvasUI) return;
+                const pos = getPos(e);
+                
+                // Draw Brush Cursor on UI Layer
+                ctxUI.clearRect(0, 0, img.width, img.height);
+                ctxUI.beginPath();
+                ctxUI.arc(pos.x, pos.y, document.getElementById('brushSize').value / 2, 0, Math.PI * 2);
+                ctxUI.strokeStyle = 'white';
+                ctxUI.lineWidth = 2 / zoom; // Keep outline thin regardless of zoom
+                ctxUI.stroke();
+                ctxUI.closePath();
+
+                if(isDrawing) paint(e);
+            };
+
+            window.onmouseup = window.ontouchend = () => {
+                if(isDrawing) {
+                    saveHistory();
+                    isDrawing = false;
+                }
+            };
+
+            function paint(e) {
+                const pos = getPos(e);
+                maskCtx.lineWidth = document.getElementById('brushSize').value;
+                maskCtx.lineCap = 'round';
+                maskCtx.lineJoin = 'round';
+                
+                if (mode === 'brush') {
+                    maskCtx.globalCompositeOperation = 'source-over';
+                    maskCtx.strokeStyle = 'rgba(239, 68, 68, 1)';
+                } else {
+                    maskCtx.globalCompositeOperation = 'destination-out';
+                }
+                
+                maskCtx.lineTo(pos.x, pos.y);
+                maskCtx.stroke();
+                maskCtx.beginPath();
+                maskCtx.moveTo(pos.x, pos.y);
+                render();
+            }
+
+            function saveHistory() {
+                if(history.length > 15) history.shift();
+                history.push(maskCanvas.toDataURL());
+            }
+
+            function undo() {
+                if(history.length > 1) {
+                    history.pop();
+                    const h = new Image();
+                    h.src = history[history.length - 1];
+                    h.onload = () => {
+                        maskCtx.clearRect(0, 0, img.width, img.height);
+                        maskCtx.globalCompositeOperation = 'source-over';
+                        maskCtx.drawImage(h, 0, 0);
+                        render();
+                    };
+                }
+            }
+
+            // Expose public methods
+            return {
+                init,
+                undo,
+                zoom: (f) => { zoom *= f; updateZoom(); },
+                setMode: (m) => mode = m,
+                getImg: () => {
+                    const t = document.createElement('canvas'); t.width=img.width; t.height=img.height;
+                    t.getContext('2d').drawImage(img,0,0);
+                    return t.getContext('2d').getImageData(0,0,img.width,img.height);
+                },
+                getMask: () => maskCtx.getImageData(0,0,img.width,img.height),
+                finalize: (data) => {
+                    const c = document.createElement('canvas'); c.width=img.width; c.height=img.height;
+                    c.getContext('2d').putImageData(data,0,0);
+                    document.getElementById('resBefore').src = img.src;
+                    document.getElementById('resAfter').src = c.toDataURL('image/jpeg', 0.95);
+                    document.getElementById('downloadBtn').href = c.toDataURL('image/jpeg', 0.95);
+                    document.getElementById('downloadBtn').download = 'PassionTools_Fixed.jpg';
+                    document.getElementById('viewEditor').classList.remove('active');
+                    document.getElementById('viewResult').classList.add('active');
+                    initCompare();
+                }
+            };
+        })();
+
+        // --- DOM Binding ---
+        document.getElementById('fileInput').onchange = (e) => Editor.init(e.target.files[0]);
+        
+        document.getElementById('toolBrush').onclick = function() { 
+            Editor.setMode('brush'); 
+            this.classList.add('active'); 
+            document.getElementById('toolEraser').classList.remove('active'); 
+        };
+        
+        document.getElementById('toolEraser').onclick = function() { 
+            Editor.setMode('eraser'); 
+            this.classList.add('active'); 
+            document.getElementById('toolBrush').classList.remove('active'); 
+        };
+
+        // --- Worker Logic ---
+        const workerBlob = new Blob([`self.onmessage=function(e){const d=e.data.img.data,m=e.data.mask.data,w=e.data.img.width,h=e.data.img.height;for(let p=0;p<100;p++){for(let i=0;i<d.length;i+=4){if(m[i+3]>0){let r=0,g=0,b=0,c=0;const n=[-4,4,-w*4,w*4,-w*4-4,-w*4+4,w*4-4,w*4+4];for(let o of n){if(i+o>=0&&i+o<d.length&&m[i+o+3]===0){r+=d[i+o];g+=d[i+o+1];b+=d[i+o+2];c++}}if(c>0){d[i]=r/c;d[i+1]=g/c;d[i+2]=b/c;m[i+3]=0}}}}self.postMessage(e.data.img)}`], {type: 'text/javascript'});
+        const worker = new Worker(URL.createObjectURL(workerBlob));
+
+        document.getElementById('btnProcess').onclick = function() {
+            this.innerHTML = '<span class="loader"></span> Removing Object...';
+            worker.postMessage({img: Editor.getImg(), mask: Editor.getMask()});
+        };
+
+        worker.onmessage = (e) => {
+            Editor.finalize(e.data);
+            document.getElementById('btnProcess').innerHTML = 'Remove Object';
+        };
+
+        // --- Comparison Slider Logic ---
+        function initCompare() {
+            let active = false;
+            const box = document.getElementById('compareBox');
+            const wrapper = document.getElementById('afterWrapper');
+            const bar = document.getElementById('sliderBar');
+            
+            const move = (e) => {
+                if(!active) return;
+                const rect = box.getBoundingClientRect();
+                let x = (e.clientX || e.touches?.[0].clientX) - rect.left;
+                x = Math.max(0, Math.min(x, rect.width));
+                const percent = (x / rect.width) * 100;
+                wrapper.style.width = percent + '%';
+                bar.style.left = percent + '%';
+            };
+            
+            box.onmousedown = box.ontouchstart = () => active = true;
+            window.onmouseup = window.ontouchend = () => active = false;
+            window.onmousemove = window.ontouchmove = move;
+        }
+    </script>
+</body>
+</html>
