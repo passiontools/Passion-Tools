@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OCR PDF - Passion Tools</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+    <script src="https://unpkg.com/tesseract.js@v2.1.0/dist/tesseract.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+    </script>
+
+    <style>
+        :root {
+            /* Branding Colors */
+            --red: #ef4444;
+            --purple: #a855f7;
+            --blue: #3b82f6;
+            --green: #22c55e;
+            
+            /* UI Colors */
+            --bg-color: #f9fafb;
+            --card-bg: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --radius: 16px;
+            --transition: all 0.3s ease;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Header --- */
+        header {
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-text { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
+        .logo-passion { color: #1f2937; }
+        .logo-tools {
+            background: linear-gradient(to right, var(--red), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        /* Fixed Navigation Style */
+        .back-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        .back-link:hover { color: var(--red); }
+
+        /* --- Tool Layout --- */
+        .tool-container {
+            max-width: 900px;
+            margin: 40px auto;
+            flex: 1;
+        }
+
+        .tool-header { text-align: center; margin-bottom: 40px; }
+        .tool-title { font-size: 36px; font-weight: 800; margin-bottom: 12px; }
+
+        .stage { display: none; animation: fadeIn 0.4s ease; }
+        .stage.active { display: block; }
+
+        /* --- Upload Card --- */
+        .upload-area {
+            background: white;
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius);
+            padding: 80px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .upload-area:hover {
+            border-color: var(--blue);
+            background-color: rgba(59, 130, 246, 0.05);
+        }
+        .upload-icon { font-size: 48px; color: var(--blue); margin-bottom: 16px; }
+
+        /* --- Processing View --- */
+        .process-card {
+            background: white;
+            padding: 30px;
+            border-radius: var(--radius);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            border: 1px solid var(--border-color);
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 10px;
+            background: #e5e7eb;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(to right, var(--blue), var(--purple));
+            transition: width 0.3s ease;
+        }
+
+        /* --- Panels --- */
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            height: 400px;
+            margin-top: 25px;
+        }
+
+        .panel {
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-header {
+            background: #f9fafb;
+            padding: 10px 15px;
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
+            font-size: 13px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            background: #fff;
+        }
+
+        .preview-img { max-width: 100%; border: 1px solid #eee; display: block; margin: 0 auto; }
+        
+        .text-output {
+            width: 100%;
+            height: 100%;
+            border: none;
+            resize: none;
+            font-family: monospace;
+            outline: none;
+            font-size: 12px;
+        }
+
+        /* --- Buttons & Feedback --- */
+        .copy-btn {
+            background: white;
+            border: 1px solid var(--border-color);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .copy-btn:hover { border-color: var(--blue); color: var(--blue); }
+        .copy-btn.success { color: var(--green); border-color: var(--green); }
+
+        .btn-action {
+            background: var(--green);
+            color: white;
+            padding: 16px;
+            border-radius: 12px;
+            font-weight: 700;
+            width: 100%;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        .btn-action:disabled { background: var(--text-secondary); cursor: not-allowed; }
+        
+        .btn-reset {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 12px;
+            border-radius: 12px;
+            margin-top: 10px;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        footer {
+            background: #111827;
+            color: white;
+            padding: 40px 0;
+            margin-top: auto;
+            text-align: center;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-text">
+                    <span class="logo-passion">Passion</span><span class="logo-tools">Tools</span>
+                </div>
+                <a href="index.html" class="back-link">
+                    <i class="fas fa-arrow-left"></i> Back to Tools
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container tool-container">
+        <div class="tool-header">
+            <h1 class="tool-title">OCR PDF Tool</h1>
+            <p>Make your scanned documents searchable and selectable instantly.</p>
+        </div>
+
+        <div class="stage active" id="stageUpload">
+            <div class="upload-area" id="uploadArea">
+                <i class="fas fa-file-export upload-icon"></i>
+                <div class="upload-text"><strong>Click or Drag & Drop PDF</strong></div>
+                <input type="file" id="fileInput" accept="application/pdf" style="display: none;">
+            </div>
+        </div>
+
+        <div class="stage" id="stageProcess">
+            <div class="process-card">
+                <div class="progress-label">
+                    <span id="statusText">Initializing...</span>
+                    <span id="progressPercent">0%</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="progressBar"></div>
+                </div>
+
+                <div class="results-grid">
+                    <div class="panel">
+                        <div class="panel-header">Document Preview</div>
+                        <div class="panel-content" id="imageContainer"></div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header">
+                            <span>Extracted Text Layer</span>
+                            <button class="copy-btn" id="copyBtn" onclick="copyToClipboard()">
+                                <i class="far fa-copy"></i> Copy
+                            </button>
+                        </div>
+                        <div class="panel-content">
+                            <textarea class="text-output" id="textOutput" readonly></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn-action" id="downloadBtn" disabled>
+                    <i class="fas fa-spinner fa-spin" id="spin"></i> <span id="btnText">Analyzing Pages...</span>
+                </button>
+                <button class="btn-reset" onclick="location.reload()">Start Over</button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Passion Tools. Secure client-side processing.</p>
+        </div>
+    </footer>
+
+    <script>
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const stageUpload = document.getElementById('stageUpload');
+        const stageProcess = document.getElementById('stageProcess');
+        const progressBar = document.getElementById('progressBar');
+        const statusText = document.getElementById('statusText');
+        const progressPercent = document.getElementById('progressPercent');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const textOutput = document.getElementById('textOutput');
+        const imageContainer = document.getElementById('imageContainer');
+        const copyBtn = document.getElementById('copyBtn');
+
+        uploadArea.onclick = () => fileInput.click();
+        fileInput.onchange = (e) => handleFile(e.target.files[0]);
+
+        // Copy Text Logic
+        function copyToClipboard() {
+            if (!textOutput.value) return;
+            textOutput.select();
+            navigator.clipboard.writeText(textOutput.value).then(() => {
+                const original = copyBtn.innerHTML;
+                copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                copyBtn.classList.add('success');
+                setTimeout(() => {
+                    copyBtn.innerHTML = original;
+                    copyBtn.classList.remove('success');
+                }, 2000);
+            });
+        }
+
+        // Main OCR Processing
+        async function handleFile(file) {
+            if (!file || file.type !== 'application/pdf') return;
+            stageUpload.classList.remove('active');
+            stageProcess.classList.add('active');
+            
+            try {
+                const { PDFDocument, rgb } = PDFLib;
+                const newPdf = await PDFDocument.create();
+                
+                const worker = Tesseract.createWorker();
+                await worker.load();
+                await worker.loadLanguage('eng');
+                await worker.initialize('eng');
+
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+                const totalPages = pdf.numPages;
+
+                let allText = "";
+
+                // Flow: Render -> Scan -> Layer
+                
+
+                for (let i = 1; i <= totalPages; i++) {
+                    const pct = Math.round((i / totalPages) * 100);
+                    statusText.innerText = `Processing Page ${i} of ${totalPages}...`;
+                    progressBar.style.width = pct + '%';
+                    progressPercent.innerText = pct + '%';
+
+                    const page = await pdf.getPage(i);
+                    const viewport = page.getViewport({ scale: 2.0 });
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = viewport.width; canvas.height = viewport.height;
+                    await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+
+                    const imgData = canvas.toDataURL('image/jpeg', 0.85);
+                    imageContainer.innerHTML = `<img src="${imgData}" class="preview-img">`;
+
+                    const { data } = await worker.recognize(imgData);
+                    allText += `--- Page ${i} ---\n` + data.text + "\n\n";
+                    textOutput.value = allText;
+                    textOutput.scrollTop = textOutput.scrollHeight;
+
+                    const imgBytes = await fetch(imgData).then(res => res.arrayBuffer());
+                    const jpgImage = await newPdf.embedJpg(imgBytes);
+                    const pdfPage = newPdf.addPage([viewport.width / 2, viewport.height / 2]);
+                    const { width, height } = pdfPage.getSize();
+
+                    pdfPage.drawImage(jpgImage, { x: 0, y: 0, width, height });
+
+                    // Overlay invisible text
+                    data.words.forEach(word => {
+                        pdfPage.drawText(word.text, {
+                            x: word.bbox.x0 / 2,
+                            y: height - (word.bbox.y1 / 2),
+                            size: Math.max(1, (word.bbox.y1 - word.bbox.y0) / 2),
+                            opacity: 0
+                        });
+                    });
+                }
+
+                await worker.terminate();
+                const finalBytes = await newPdf.save();
+                const blob = new Blob([finalBytes], { type: 'application/pdf' });
+                
+                downloadBtn.disabled = false;
+                document.getElementById('spin').style.display = 'none';
+                document.getElementById('btnText').innerText = "Download Searchable PDF";
+                downloadBtn.onclick = () => {
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = `OCR_${file.name}`;
+                    a.click();
+                };
+
+            } catch (err) {
+                console.error(err);
+                statusText.innerText = "Processing Error.";
+                alert("An error occurred during OCR. Please try a different file.");
+            }
+        }
+    </script>
+</body>
+</html>
