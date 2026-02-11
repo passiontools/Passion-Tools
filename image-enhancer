@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Enhancer - Passion Tools</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            /* --- Brand Colors --- */
+            --red: #ef4444;
+            --purple: #a855f7;
+            --blue: #3b82f6;
+            --green: #22c55e;
+            
+            /* --- UI Colors --- */
+            --bg-color: #f9fafb;
+            --card-bg: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            
+            /* --- Spacing & Shadows --- */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --radius: 16px;
+            --transition: all 0.2s ease;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Header --- */
+        header {
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-text { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
+        .logo-passion { color: #1f2937; }
+        .logo-tools {
+            background: linear-gradient(to right, var(--red), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .back-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+        }
+        .back-link:hover { color: var(--red); }
+
+        /* --- Main Layout --- */
+        .tool-container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 0 20px;
+            flex: 1;
+            width: 100%;
+        }
+
+        .tool-header { text-align: center; margin-bottom: 40px; }
+        .tool-title { font-size: 36px; font-weight: 800; margin-bottom: 12px; }
+        .tool-subtitle { color: var(--text-secondary); font-size: 18px; }
+
+        /* --- Upload State --- */
+        .upload-area {
+            background: #ffffff;
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius);
+            padding: 80px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .upload-area:hover {
+            border-color: var(--blue);
+            background-color: rgba(59, 130, 246, 0.05);
+        }
+        .upload-icon { font-size: 48px; color: var(--blue); margin-bottom: 16px; }
+        .upload-text { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+        .upload-subtext { color: var(--text-secondary); font-size: 14px; }
+        #fileInput { display: none; }
+
+        /* --- Editor Grid (Hidden by default) --- */
+        .editor-grid {
+            display: none;
+            grid-template-columns: 320px 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+
+        /* --- Controls Sidebar --- */
+        .controls-sidebar {
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+        }
+
+        .control-group { margin-bottom: 24px; }
+        .control-header { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .label { font-weight: 600; font-size: 14px; color: var(--text-secondary); display: flex; align-items: center; gap: 8px; }
+        .value { font-size: 13px; font-family: monospace; color: var(--blue); font-weight: 700; }
+
+        /* Custom Range Slider */
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 3px;
+            outline: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--blue);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.1s;
+        }
+        input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.1); }
+
+        /* Buttons */
+        .btn-group { display: flex; gap: 12px; margin-top: 32px; }
+        .btn {
+            flex: 1;
+            padding: 12px 20px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-reset {
+            background: #f3f4f6;
+            color: var(--text-primary);
+        }
+        .btn-reset:hover { background: #e5e7eb; }
+
+        .btn-download {
+            background-color: var(--green);
+            color: white;
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+        }
+        .btn-download:hover {
+            background-color: #16a34a;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(34, 197, 94, 0.4);
+        }
+
+        /* --- Preview Area --- */
+        .preview-wrapper {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            position: relative;
+            min-height: 400px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Checkerboard pattern for transparency */
+            background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+            background-size: 20px 20px;
+            overflow: hidden;
+        }
+
+        canvas {
+            max-width: 100%;
+            max-height: 70vh;
+            border-radius: 8px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Compare Badge */
+        .compare-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(17, 24, 39, 0.85);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 500;
+            backdrop-filter: blur(4px);
+            cursor: pointer;
+            user-select: none;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: var(--transition);
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .compare-badge:active, .compare-badge.active {
+            transform: scale(0.95);
+            background: var(--blue);
+        }
+
+        /* --- Footer --- */
+        footer {
+            background-color: #111827;
+            color: white;
+            padding: 40px 0;
+            margin-top: auto;
+            text-align: center;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        footer p { opacity: 0.8; font-size: 14px; }
+
+        /* Responsive */
+        @media (max-width: 850px) {
+            .editor-grid { grid-template-columns: 1fr; }
+            .controls-sidebar { order: 2; }
+            .preview-wrapper { order: 1; min-height: 300px; }
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <svg style="position: absolute; width: 0; height: 0; overflow: hidden;">
+        <defs>
+            <filter id="sharpnessFilter">
+                <feConvolveMatrix order="3" kernelMatrix="0 -1 0 -1 5 -1 0 -1 0" preserveAlpha="true"/>
+            </filter>
+        </defs>
+    </svg>
+
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-text">
+                    <span class="logo-passion">Passion</span><span class="logo-tools">Tools</span>
+                </div>
+                <a href="index.html" class="back-link">
+                    <i class="fas fa-arrow-left"></i> Back to Tools
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="tool-container">
+        <div class="tool-header">
+            <h1 class="tool-title">Image Enhancer</h1>
+            <p class="tool-subtitle">Professional grade adjustments directly in your browser.</p>
+        </div>
+
+        <div class="upload-area" id="uploadArea">
+            <i class="fas fa-sliders-h upload-icon"></i>
+            <div class="upload-text">Click or Drag & Drop Image</div>
+            <div class="upload-subtext">Supports JPG, PNG, WEBP (Max 15MB)</div>
+            <input type="file" id="fileInput" accept="image/*">
+        </div>
+
+        <div class="editor-grid" id="editorGrid">
+            
+            <aside class="controls-sidebar">
+                
+                <div class="control-group">
+                    <div class="control-header">
+                        <span class="label"><i class="fas fa-sun"></i> Brightness</span>
+                        <span class="value" id="val-brightness">100%</span>
+                    </div>
+                    <input type="range" id="brightness" min="0" max="200" value="100">
+                </div>
+
+                <div class="control-group">
+                    <div class="control-header">
+                        <span class="label"><i class="fas fa-adjust"></i> Contrast</span>
+                        <span class="value" id="val-contrast">100%</span>
+                    </div>
+                    <input type="range" id="contrast" min="0" max="200" value="100">
+                </div>
+
+                <div class="control-group">
+                    <div class="control-header">
+                        <span class="label"><i class="fas fa-palette"></i> Saturation</span>
+                        <span class="value" id="val-saturation">100%</span>
+                    </div>
+                    <input type="range" id="saturation" min="0" max="200" value="100">
+                </div>
+
+                <div class="control-group">
+                    <div class="control-header">
+                        <span class="label"><i class="fas fa-temperature-high"></i> Warmth</span>
+                        <span class="value" id="val-warmth">0%</span>
+                    </div>
+                    <input type="range" id="warmth" min="0" max="100" value="0">
+                </div>
+
+                <div class="control-group">
+                    <div class="control-header">
+                        <span class="label"><i class="fas fa-mountain"></i> Sharpness</span>
+                        <span class="value" id="val-sharpness">Off</span>
+                    </div>
+                    <label style="display: flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer;">
+                        <input type="checkbox" id="sharpnessToggle" style="width: 18px; height: 18px; accent-color: var(--blue);">
+                        Enable Smart Sharpen
+                    </label>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-reset" id="resetBtn">
+                        <i class="fas fa-undo"></i> Reset
+                    </button>
+                    <button class="btn btn-download" id="downloadBtn">
+                        <i class="fas fa-download"></i> Download
+                    </button>
+                </div>
+            </aside>
+
+            <div class="preview-wrapper">
+                <button class="compare-badge" id="compareBtn">
+                    <i class="far fa-eye"></i> Hold to Compare
+                </button>
+                <canvas id="imageCanvas"></canvas>
+            </div>
+
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Passion Tools. Secure client-side processing.</p>
+        </div>
+    </footer>
+
+    <script>
+        // --- Elements ---
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const editorGrid = document.getElementById('editorGrid');
+        const canvas = document.getElementById('imageCanvas');
+        const ctx = canvas.getContext('2d');
+        const compareBtn = document.getElementById('compareBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        // --- Inputs & Display ---
+        const inputs = {
+            brightness: document.getElementById('brightness'),
+            contrast: document.getElementById('contrast'),
+            saturation: document.getElementById('saturation'),
+            warmth: document.getElementById('warmth'),
+            sharpness: document.getElementById('sharpnessToggle')
+        };
+
+        const displays = {
+            brightness: document.getElementById('val-brightness'),
+            contrast: document.getElementById('val-contrast'),
+            saturation: document.getElementById('val-saturation'),
+            warmth: document.getElementById('val-warmth'),
+            sharpness: document.getElementById('val-sharpness')
+        };
+
+        // --- State ---
+        let originalImage = new Image();
+        let fileName = "enhanced-image.jpg";
+        let isComparing = false;
+
+        // --- 1. Upload Logic ---
+        uploadArea.addEventListener('click', () => fileInput.click());
+        
+        // Drag & Drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = 'var(--blue)';
+            uploadArea.style.backgroundColor = 'rgba(59, 130, 246, 0.05)';
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.style.borderColor = 'var(--border-color)';
+            uploadArea.style.backgroundColor = '#ffffff';
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = 'var(--border-color)';
+            uploadArea.style.backgroundColor = '#ffffff';
+            handleFiles(e.dataTransfer.files);
+        });
+
+        fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
+
+        function handleFiles(files) {
+            if (files.length === 0) return;
+            const file = files[0];
+
+            if (!file.type.startsWith('image/')) {
+                alert("Please upload a valid image file.");
+                return;
+            }
+
+            fileName = file.name.split('.')[0] + "-enhanced.jpg";
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                originalImage.onload = () => {
+                    uploadArea.classList.add('hidden');
+                    editorGrid.style.display = 'grid';
+                    
+                    // Set Canvas dimensions to match image
+                    canvas.width = originalImage.width;
+                    canvas.height = originalImage.height;
+                    
+                    applyFilters();
+                };
+                originalImage.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // --- 2. Filter Logic ---
+        function applyFilters() {
+            if (!originalImage.src) return;
+
+            // Clear previous draw
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (isComparing) {
+                // If comparing, remove all filters
+                ctx.filter = "none";
+            } else {
+                // Build filter string
+                const b = inputs.brightness.value;
+                const c = inputs.contrast.value;
+                const s = inputs.saturation.value;
+                const w = inputs.warmth.value;
+
+                let filterString = `brightness(${b}%) contrast(${c}%) saturate(${s}%) sepia(${w}%)`;
+
+                // Append Sharpen SVG Filter if enabled
+                if (inputs.sharpness.checked) {
+                    filterString += ` url(#sharpnessFilter)`;
+                }
+
+                ctx.filter = filterString;
+            }
+
+            // Draw image with active filter
+            ctx.drawImage(originalImage, 0, 0, canvas.width, canvas.height);
+        }
+
+        // --- 3. Event Listeners ---
+        
+        // Sliders Update
+        Object.keys(inputs).forEach(key => {
+            inputs[key].addEventListener('input', () => {
+                // Update text displays
+                if (key === 'sharpness') {
+                    displays[key].textContent = inputs[key].checked ? "On" : "Off";
+                } else {
+                    displays[key].textContent = inputs[key].value + '%';
+                }
+                // Re-render
+                requestAnimationFrame(applyFilters);
+            });
+        });
+
+        // Compare Button (Mouse & Touch)
+        const startCompare = (e) => {
+            e.preventDefault();
+            isComparing = true;
+            compareBtn.classList.add('active');
+            compareBtn.innerHTML = '<i class="fas fa-eye"></i> Viewing Original';
+            applyFilters();
+        };
+
+        const endCompare = (e) => {
+            e.preventDefault();
+            isComparing = false;
+            compareBtn.classList.remove('active');
+            compareBtn.innerHTML = '<i class="far fa-eye"></i> Hold to Compare';
+            applyFilters();
+        };
+
+        compareBtn.addEventListener('mousedown', startCompare);
+        compareBtn.addEventListener('mouseup', endCompare);
+        compareBtn.addEventListener('mouseleave', endCompare);
+        compareBtn.addEventListener('touchstart', startCompare);
+        compareBtn.addEventListener('touchend', endCompare);
+
+        // Reset
+        resetBtn.addEventListener('click', () => {
+            inputs.brightness.value = 100;
+            inputs.contrast.value = 100;
+            inputs.saturation.value = 100;
+            inputs.warmth.value = 0;
+            inputs.sharpness.checked = false;
+
+            // Reset text
+            displays.brightness.textContent = "100%";
+            displays.contrast.textContent = "100%";
+            displays.saturation.textContent = "100%";
+            displays.warmth.textContent = "0%";
+            displays.sharpness.textContent = "Off";
+
+            applyFilters();
+        });
+
+        // Download
+        downloadBtn.addEventListener('click', () => {
+            // Force re-render to ensure filters are applied before saving
+            applyFilters();
+
+            const link = document.createElement('a');
+            link.download = fileName;
+            
+            // High quality JPEG
+            link.href = canvas.toDataURL('image/jpeg', 0.95);
+            link.click();
+        });
+
+    </script>
+</body>
+</html>
