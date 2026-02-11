@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scan to PDF - Passion Tools</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+
+    <style>
+        :root {
+            /* --- Brand Colors --- */
+            --red: #ef4444;
+            --purple: #a855f7;
+            --blue: #3b82f6;
+            --green: #22c55e;
+            
+            /* --- UI Colors --- */
+            --bg-color: #f9fafb;
+            --card-bg: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            
+            /* --- Spacing & Shadows --- */
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --radius: 16px;
+            --transition: all 0.2s ease;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Header --- */
+        header {
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-text { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
+        .logo-passion { color: #1f2937; }
+        .logo-tools {
+            background: linear-gradient(to right, var(--red), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .back-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+        }
+        .back-link:hover { color: var(--red); }
+
+        /* --- Main Layout --- */
+        .tool-container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 0 20px;
+            flex: 1;
+            width: 100%;
+        }
+
+        .tool-header { text-align: center; margin-bottom: 40px; }
+        .tool-title { font-size: 36px; font-weight: 800; margin-bottom: 12px; }
+        .tool-subtitle { color: var(--text-secondary); font-size: 18px; }
+
+        /* --- Stages --- */
+        .stage { display: none; animation: fadeIn 0.4s ease; }
+        .stage.active { display: block; }
+
+        /* --- 1. Upload Stage --- */
+        .upload-area {
+            background: #ffffff;
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius);
+            padding: 80px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .upload-area:hover, .upload-area.dragover {
+            border-color: var(--blue);
+            background-color: rgba(59, 130, 246, 0.05);
+        }
+        .upload-icon { font-size: 48px; color: var(--blue); margin-bottom: 16px; }
+        .upload-text { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+        .upload-subtext { color: var(--text-secondary); font-size: 14px; }
+
+        /* --- 2. Organize Stage --- */
+        .organize-layout {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+
+        /* Sidebar */
+        .controls-panel {
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            position: sticky;
+            top: 100px;
+        }
+
+        .helper-text {
+            color: var(--text-secondary);
+            font-size: 13px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f3f4f6;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        /* Grid */
+        .preview-panel {
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+        }
+
+        .pages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .page-card {
+            background: #f9fafb;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            cursor: grab;
+            transition: transform 0.2s;
+            position: relative;
+            user-select: none;
+        }
+
+        .page-card:hover { transform: translateY(-2px); border-color: #d1d5db; }
+        .page-card:active { cursor: grabbing; }
+
+        .page-card.dragging { opacity: 0.5; border: 2px dashed var(--blue); }
+        .page-card.drag-over { border-top: 4px solid var(--blue); }
+
+        .page-img {
+            width: 100%;
+            height: 180px;
+            object-fit: contain;
+            background: #e5e5e5; /* checkered pattern placeholder */
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 10px 10px;
+            border-radius: 4px;
+            pointer-events: none;
+        }
+
+        .page-num {
+            margin-top: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            background: #e5e7eb;
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .remove-btn {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--red);
+            color: white;
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .page-card:hover .remove-btn { opacity: 1; }
+
+        /* --- Buttons --- */
+        .btn-convert {
+            background-color: var(--blue);
+            color: white;
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 15px;
+        }
+        .btn-convert:hover { background-color: #2563eb; transform: translateY(-2px); }
+
+        .btn-add-more {
+            width: 100%;
+            margin-bottom: 15px;
+            background: white;
+            border: 1px dashed var(--blue);
+            color: var(--blue);
+            padding: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+            display: flex; justify-content: center; gap: 8px;
+        }
+        .btn-add-more:hover { background: rgba(59, 130, 246, 0.05); }
+
+        /* --- 3. Success Stage --- */
+        .success-card {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 24px;
+            text-align: center;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+        }
+        .success-icon { font-size: 60px; color: var(--green); margin-bottom: 20px; }
+
+        .btn-download {
+            background-color: var(--green);
+            color: white;
+            padding: 16px;
+            border-radius: 12px;
+            text-decoration: none;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            margin-top: 20px;
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+            width: 100%;
+        }
+        .btn-download:hover { background-color: #16a34a; transform: translateY(-2px); }
+
+        .status-msg { margin-top: 15px; text-align: center; font-size: 14px; font-weight: 500; color: var(--text-secondary); min-height: 20px; }
+
+        /* --- Footer --- */
+        footer {
+            background-color: #111827;
+            color: white;
+            padding: 40px 0;
+            margin-top: auto;
+            text-align: center;
+        }
+        footer p { opacity: 0.8; font-size: 14px; }
+
+        @media (max-width: 800px) {
+            .organize-layout { grid-template-columns: 1fr; }
+            .controls-panel { position: static; order: 2; }
+            .preview-panel { order: 1; }
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-text">
+                    <span class="logo-passion">Passion</span><span class="logo-tools">Tools</span>
+                </div>
+                <a href="index.html" class="back-link">
+                    <i class="fas fa-arrow-left"></i> Back to Tools
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="tool-container">
+        <div class="tool-header">
+            <h1 class="tool-title">Scan to PDF</h1>
+            <p class="tool-subtitle">Convert your scanned images (JPG, PNG) into a single PDF document.</p>
+        </div>
+
+        <div class="stage active" id="stageUpload">
+            <div class="upload-area" id="uploadArea">
+                <i class="fas fa-images upload-icon"></i>
+                <div class="upload-text">Click or Drag & Drop Images</div>
+                <div class="upload-subtext">Supports JPG, PNG (Max 10MB each)</div>
+                <input type="file" id="fileInput" accept="image/png, image/jpeg, image/jpg" multiple style="display: none;">
+            </div>
+        </div>
+
+        <div class="stage" id="stageOrganize">
+            <div class="organize-layout">
+                
+                <div class="controls-panel">
+                    <h3 style="margin-bottom: 15px;">PDF Settings</h3>
+                    
+                    <div class="helper-text">
+                        <i class="fas fa-hand-pointer"></i>
+                        Drag pages to reorder.
+                    </div>
+
+                    <div style="margin-bottom: 20px; font-size: 14px;">
+                        <strong>Total Pages:</strong> <span id="pageCount" style="color: var(--blue); font-weight: 700;">0</span>
+                    </div>
+
+                    <button class="btn-add-more" onclick="document.getElementById('fileInputAdd').click()">
+                        <i class="fas fa-plus"></i> Add More Images
+                    </button>
+                    <input type="file" id="fileInputAdd" accept="image/png, image/jpeg, image/jpg" multiple style="display: none;">
+
+                    <button class="btn-convert" id="convertBtn">
+                        <i class="fas fa-file-pdf"></i> Convert to PDF
+                    </button>
+                    
+                    <div class="status-msg" id="statusMsg"></div>
+                    
+                    <button class="btn-convert" style="background:transparent; border:1px solid #ddd; color:#666; margin-top:10px;" onclick="location.reload()">Start Over</button>
+                </div>
+
+                <div class="preview-panel">
+                    <div class="pages-grid" id="pagesGrid">
+                        </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="stage" id="stageSuccess">
+            <div class="success-card">
+                <i class="fas fa-check-circle success-icon"></i>
+                <h2>PDF Created Successfully!</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 20px;">Your scanned images have been combined.</p>
+                
+                <a href="#" class="btn-download" id="downloadBtn">
+                    <i class="fas fa-download"></i> Download PDF
+                </a>
+                
+                <button class="btn-convert" style="background:transparent; border:1px solid #ddd; color:#666; margin-top:20px; width:auto; padding: 10px 20px;" onclick="location.reload()">Convert More</button>
+            </div>
+        </div>
+
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Passion Tools. Secure client-side processing.</p>
+        </div>
+    </footer>
+
+    <script>
+        // DOM Elements
+        const stageUpload = document.getElementById('stageUpload');
+        const stageOrganize = document.getElementById('stageOrganize');
+        const stageSuccess = document.getElementById('stageSuccess');
+        
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const fileInputAdd = document.getElementById('fileInputAdd');
+        const pagesGrid = document.getElementById('pagesGrid');
+        const convertBtn = document.getElementById('convertBtn');
+        const statusMsg = document.getElementById('statusMsg');
+        const pageCountLabel = document.getElementById('pageCount');
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        // State
+        let imagesArray = []; // Stores { file: File, id: uniqueId, url: objectUrl }
+        let dragSrcEl = null;
+
+        // --- 1. Upload Logic ---
+        uploadArea.addEventListener('click', () => fileInput.click());
+        uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+        uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+        uploadArea.addEventListener('drop', (e) => { e.preventDefault(); handleFiles(e.dataTransfer.files); });
+        
+        fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
+        fileInputAdd.addEventListener('change', (e) => handleFiles(e.target.files));
+
+        function handleFiles(files) {
+            if (files.length === 0) return;
+
+            // Switch to organize stage if first upload
+            if (stageUpload.classList.contains('active')) {
+                stageUpload.classList.remove('active');
+                stageOrganize.classList.add('active');
+            }
+
+            Array.from(files).forEach(file => {
+                if (!file.type.startsWith('image/')) return;
+
+                const url = URL.createObjectURL(file);
+                const id = Date.now() + Math.random(); // Unique ID
+                
+                const imgObj = { file, id, url };
+                imagesArray.push(imgObj);
+                
+                addThumbnail(imgObj);
+            });
+
+            updatePageCount();
+        }
+
+        function addThumbnail(imgObj) {
+            const card = document.createElement('div');
+            card.className = 'page-card';
+            card.draggable = true;
+            card.dataset.id = imgObj.id;
+
+            card.innerHTML = `
+                <img src="${imgObj.url}" class="page-img">
+                <div class="page-num"></div>
+                <button class="remove-btn" onclick="removeImage('${imgObj.id}')"><i class="fas fa-times"></i></button>
+            `;
+
+            // Add Drag Events
+            addDragEvents(card);
+            pagesGrid.appendChild(card);
+            updatePageNumbers();
+        }
+
+        window.removeImage = (id) => {
+            // Remove from array
+            imagesArray = imagesArray.filter(img => img.id != id);
+            
+            // Remove from DOM
+            const card = pagesGrid.querySelector(`[data-id='${id}']`);
+            if (card) card.remove();
+
+            // If empty, go back to upload
+            if (imagesArray.length === 0) {
+                location.reload();
+            } else {
+                updatePageNumbers();
+                updatePageCount();
+            }
+        };
+
+        function updatePageNumbers() {
+            const cards = pagesGrid.querySelectorAll('.page-card');
+            cards.forEach((card, index) => {
+                card.querySelector('.page-num').textContent = `Page ${index + 1}`;
+            });
+        }
+
+        function updatePageCount() {
+            pageCountLabel.textContent = imagesArray.length;
+        }
+
+        // --- 2. Drag & Drop Logic ---
+        function addDragEvents(item) {
+            item.addEventListener('dragstart', handleDragStart);
+            item.addEventListener('dragover', handleDragOver);
+            item.addEventListener('dragenter', handleDragEnter);
+            item.addEventListener('dragleave', handleDragLeave);
+            item.addEventListener('drop', handleDrop);
+            item.addEventListener('dragend', handleDragEnd);
+        }
+
+        function handleDragStart(e) {
+            this.style.opacity = '0.4';
+            dragSrcEl = this;
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', this.innerHTML);
+        }
+
+        function handleDragOver(e) {
+            if (e.preventDefault) e.preventDefault();
+            return false;
+        }
+
+        function handleDragEnter(e) {
+            this.classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            this.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            if (e.stopPropagation) e.stopPropagation();
+
+            if (dragSrcEl !== this) {
+                // DOM Reordering
+                const allCards = [...pagesGrid.querySelectorAll('.page-card')];
+                const srcIndex = allCards.indexOf(dragSrcEl);
+                const targetIndex = allCards.indexOf(this);
+
+                if (srcIndex < targetIndex) {
+                    this.after(dragSrcEl);
+                } else {
+                    this.before(dragSrcEl);
+                }
+                
+                // Array Reordering handled during conversion by reading DOM order
+                updatePageNumbers();
+            }
+            return false;
+        }
+
+        function handleDragEnd(e) {
+            this.style.opacity = '1';
+            const items = pagesGrid.querySelectorAll('.page-card');
+            items.forEach(item => item.classList.remove('drag-over'));
+        }
+
+        // --- 3. Convert Logic ---
+        convertBtn.addEventListener('click', async () => {
+            if (imagesArray.length === 0) return;
+
+            convertBtn.disabled = true;
+            convertBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Converting...';
+            statusMsg.textContent = "Processing images...";
+
+            try {
+                const { PDFDocument } = PDFLib;
+                const pdfDoc = await PDFDocument.create();
+
+                // Get current DOM order
+                const cards = pagesGrid.querySelectorAll('.page-card');
+                
+                for (let card of cards) {
+                    const id = card.dataset.id;
+                    const imgObj = imagesArray.find(img => img.id == id);
+                    
+                    if (imgObj) {
+                        const imageBytes = await imgObj.file.arrayBuffer();
+                        let pdfImage;
+                        
+                        // Embed Image based on type
+                        if (imgObj.file.type === 'image/jpeg') {
+                            pdfImage = await pdfDoc.embedJpg(imageBytes);
+                        } else {
+                            pdfImage = await pdfDoc.embedPng(imageBytes);
+                        }
+
+                        const imageDims = pdfImage.scale(1);
+                        
+                        // Add Page matching image size
+                        const page = pdfDoc.addPage([imageDims.width, imageDims.height]);
+                        page.drawImage(pdfImage, {
+                            x: 0,
+                            y: 0,
+                            width: imageDims.width,
+                            height: imageDims.height,
+                        });
+                    }
+                }
+
+                // Save
+                const pdfBytes = await pdfDoc.save();
+                
+                // Create Download
+                const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+                const url = URL.createObjectURL(blob);
+                
+                downloadBtn.href = url;
+                downloadBtn.download = "scanned_document.pdf";
+
+                // Switch Stage
+                stageOrganize.classList.remove('active');
+                stageSuccess.classList.add('active');
+
+            } catch (err) {
+                console.error(err);
+                alert("Error creating PDF: " + err.message);
+                convertBtn.disabled = false;
+                convertBtn.innerHTML = "Try Again";
+            }
+        });
+
+    </script>
+</body>
+</html>
