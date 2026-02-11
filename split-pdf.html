@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Split PDF - Passion Tools</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+    <script>
+        // Initialize PDF.js Worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
+
+    <style>
+        :root {
+            /* --- Brand Colors --- */
+            --red: #ef4444;
+            --purple: #a855f7;
+            --blue: #3b82f6;
+            --green: #22c55e;
+            
+            /* --- UI Colors --- */
+            --bg-color: #f9fafb;
+            --card-bg: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            
+            /* --- Spacing & Shadows --- */
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --radius: 16px;
+            --transition: all 0.2s ease;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Header --- */
+        header {
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-text { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
+        .logo-passion { color: #1f2937; }
+        .logo-tools {
+            background: linear-gradient(to right, var(--red), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .back-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+        }
+        .back-link:hover { color: var(--red); }
+
+        /* --- Main Layout --- */
+        .tool-container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 0 20px;
+            flex: 1;
+            width: 100%;
+        }
+
+        .tool-header { text-align: center; margin-bottom: 40px; }
+        .tool-title { font-size: 36px; font-weight: 800; margin-bottom: 12px; }
+        .tool-subtitle { color: var(--text-secondary); font-size: 18px; }
+
+        /* --- Upload Area --- */
+        .upload-area {
+            background: #ffffff;
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius);
+            padding: 80px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .upload-area:hover, .upload-area.dragover {
+            border-color: var(--blue);
+            background-color: rgba(59, 130, 246, 0.05);
+        }
+        .upload-icon { font-size: 48px; color: var(--blue); margin-bottom: 16px; }
+        .upload-text { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+        .upload-subtext { color: var(--text-secondary); font-size: 14px; }
+
+        /* --- Workspace (Hidden initially) --- */
+        .workspace { display: none; gap: 30px; }
+        .workspace.active { display: grid; grid-template-columns: 320px 1fr; }
+
+        /* --- Sidebar Controls --- */
+        .controls-panel {
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-md);
+            height: fit-content;
+            border: 1px solid var(--border-color);
+            position: sticky;
+            top: 100px;
+        }
+
+        .control-group { margin-bottom: 20px; }
+        
+        .radio-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .radio-label:hover { background: var(--bg-color); }
+        .radio-label.selected { 
+            border-color: var(--blue); 
+            background: rgba(59, 130, 246, 0.05); 
+            color: var(--blue); 
+            font-weight: 600; 
+        }
+        .radio-label input { accent-color: var(--blue); width: 16px; height: 16px; }
+
+        .input-group { margin-top: 10px; display: none; }
+        .input-group.active { display: block; animation: fadeIn 0.3s ease; }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: inherit;
+            outline: none;
+            transition: var(--transition);
+        }
+        input[type="text"]:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        
+        .helper-text { font-size: 12px; color: var(--text-secondary); margin-top: 5px; line-height: 1.4; }
+
+        /* --- Preview Grid --- */
+        .preview-panel {
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+        }
+
+        .pages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+            max-height: 600px;
+            overflow-y: auto;
+            padding: 4px;
+        }
+
+        .page-card {
+            background: #f3f4f6;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .page-card:hover { transform: translateY(-2px); border-color: #cbd5e1; }
+        
+        /* Selection State */
+        .page-card.selected { border-color: var(--blue); background: rgba(59, 130, 246, 0.1); }
+        .page-card.selected::after {
+            content: '\f00c';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: var(--blue);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .page-canvas {
+            width: 100%;
+            height: auto;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background: white;
+            border-radius: 4px;
+        }
+        .page-num { margin-top: 8px; font-size: 13px; font-weight: 500; color: var(--text-secondary); }
+
+        /* --- Buttons --- */
+        .btn-split {
+            background-color: var(--blue);
+            color: white;
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-split:hover { background-color: #2563eb; transform: translateY(-2px); }
+        .btn-split:disabled { background-color: var(--text-secondary); cursor: not-allowed; transform: none; }
+
+        .btn-download {
+            background-color: var(--green);
+            color: white;
+            padding: 14px;
+            border-radius: 12px;
+            text-decoration: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            margin-top: 20px;
+            display: none; /* Hidden */
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+        }
+        .btn-download:hover { background-color: #16a34a; transform: translateY(-2px); }
+
+        .btn-reset {
+            width: 100%;
+            margin-top: 10px;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+        .btn-reset:hover { background: #fee2e2; border-color: #fecaca; color: var(--red); }
+
+        .status-msg { margin-top: 15px; text-align: center; font-size: 14px; font-weight: 500; color: var(--text-secondary); min-height: 20px; }
+
+        /* --- Footer --- */
+        footer {
+            background-color: #111827;
+            color: white;
+            padding: 40px 0;
+            margin-top: auto;
+            text-align: center;
+        }
+        footer p { opacity: 0.8; font-size: 14px; }
+
+        @media (max-width: 800px) {
+            .workspace.active { grid-template-columns: 1fr; }
+            .controls-panel { position: static; order: 2; }
+            .preview-panel { order: 1; }
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-text">
+                    <span class="logo-passion">Passion</span><span class="logo-tools">Tools</span>
+                </div>
+                <a href="index.html" class="back-link">
+                    <i class="fas fa-arrow-left"></i> Back to Tools
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="tool-container">
+        <div class="tool-header">
+            <h1 class="tool-title">Split PDF</h1>
+            <p class="tool-subtitle">Extract pages or split your document into multiple files.</p>
+        </div>
+
+        <div class="upload-area" id="uploadArea">
+            <i class="fas fa-file-pdf upload-icon"></i>
+            <div class="upload-text">Click or Drag & Drop PDF</div>
+            <div class="upload-subtext">Max size 20MB</div>
+            <input type="file" id="fileInput" accept="application/pdf" style="display: none;">
+        </div>
+
+        <div class="workspace" id="workspace">
+            
+            <div class="controls-panel">
+                <h3 style="margin-bottom: 15px;">Split Options</h3>
+                
+                <div class="control-group">
+                    <label class="radio-label selected" onclick="setMode('extract')">
+                        <input type="radio" name="splitMode" value="extract" checked> Extract Selected
+                    </label>
+                    <div class="helper-text" style="margin-bottom: 12px;">Click pages on the right to select.</div>
+
+                    <label class="radio-label" onclick="setMode('all')">
+                        <input type="radio" name="splitMode" value="all"> Split Every Page
+                    </label>
+                    <div class="helper-text" style="margin-bottom: 12px;">Creates separate files for every page.</div>
+
+                    <label class="radio-label" onclick="setMode('range')">
+                        <input type="radio" name="splitMode" value="range"> Split by Range
+                    </label>
+                    
+                    <div class="input-group" id="rangeInputGroup">
+                        <input type="text" id="rangeInput" placeholder="e.g. 1-3, 5-7">
+                        <div class="helper-text">Use comma for multiple ranges.</div>
+                    </div>
+                </div>
+
+                <button class="btn-split" id="splitBtn">
+                    <i class="fas fa-cut"></i> Split PDF
+                </button>
+                
+                <div class="status-msg" id="statusMsg"></div>
+                
+                <a href="#" class="btn-download" id="downloadBtn">
+                    <i class="fas fa-download"></i> Download Files
+                </a>
+                
+                <button class="btn-reset" id="resetBtn">Start Over</button>
+            </div>
+
+            <div class="preview-panel">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <h3 id="fileName" style="font-size: 18px;">document.pdf</h3>
+                    <span id="pageCount" style="color:var(--text-secondary); font-size:14px; background:#f3f4f6; padding: 4px 10px; border-radius: 20px;">0 Pages</span>
+                </div>
+                <div class="pages-grid" id="pagesGrid">
+                    </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Passion Tools. Secure client-side processing.</p>
+        </div>
+    </footer>
+
+    <script>
+        // DOM Elements
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const workspace = document.getElementById('workspace');
+        const pagesGrid = document.getElementById('pagesGrid');
+        const splitBtn = document.getElementById('splitBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const statusMsg = document.getElementById('statusMsg');
+        const rangeInputGroup = document.getElementById('rangeInputGroup');
+        const fileNameLabel = document.getElementById('fileName');
+        const pageCountLabel = document.getElementById('pageCount');
+        const resetBtn = document.getElementById('resetBtn');
+
+        // State
+        let currentFileArrayBuffer = null;
+        let originalFileName = "";
+        let pdfDocProxy = null;
+        let totalPages = 0;
+        let selectedPages = new Set();
+        let currentMode = 'extract';
+
+        // --- 1. Upload Logic ---
+        uploadArea.addEventListener('click', () => fileInput.click());
+        uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+        uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+        uploadArea.addEventListener('drop', (e) => { e.preventDefault(); handleFile(e.dataTransfer.files[0]); });
+        fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
+
+        async function handleFile(file) {
+            if (!file || file.type !== 'application/pdf') {
+                alert("Please upload a valid PDF.");
+                return;
+            }
+
+            originalFileName = file.name.replace('.pdf', '');
+            fileNameLabel.textContent = file.name;
+            
+            uploadArea.style.display = 'none';
+            workspace.classList.add('active');
+            statusMsg.textContent = "Loading preview...";
+
+            // Store original buffer
+            currentFileArrayBuffer = await file.arrayBuffer();
+            
+            // Pass a COPY to PDF.js to avoid "detached ArrayBuffer" error
+            await renderPDFPreview(currentFileArrayBuffer.slice(0));
+        }
+
+        // --- 2. Preview Logic (PDF.js) ---
+        async function renderPDFPreview(data) {
+            try {
+                // Load PDF
+                pdfDocProxy = await pdfjsLib.getDocument(data).promise;
+                totalPages = pdfDocProxy.numPages;
+                pageCountLabel.textContent = `${totalPages} Pages`;
+                
+                pagesGrid.innerHTML = '';
+                selectedPages.clear();
+
+                // Loop pages
+                for (let i = 1; i <= totalPages; i++) {
+                    const page = await pdfDocProxy.getPage(i);
+                    const viewport = page.getViewport({ scale: 0.3 }); // Small scale for performance
+                    
+                    const card = document.createElement('div');
+                    card.className = 'page-card';
+                    card.dataset.pageNum = i;
+                    
+                    const canvas = document.createElement('canvas');
+                    canvas.className = 'page-canvas';
+                    canvas.width = viewport.width;
+                    canvas.height = viewport.height;
+                    
+                    const context = canvas.getContext('2d');
+                    await page.render({ canvasContext: context, viewport: viewport }).promise;
+
+                    const numLabel = document.createElement('div');
+                    numLabel.className = 'page-num';
+                    numLabel.textContent = `Page ${i}`;
+
+                    card.appendChild(canvas);
+                    card.appendChild(numLabel);
+                    
+                    card.addEventListener('click', () => togglePageSelection(card, i));
+
+                    pagesGrid.appendChild(card);
+                }
+                statusMsg.textContent = "";
+
+            } catch (error) {
+                console.error(error);
+                statusMsg.textContent = "Error rendering preview.";
+                statusMsg.style.color = "var(--red)";
+            }
+        }
+
+        // --- 3. Selection & Mode Logic ---
+        window.setMode = (mode) => {
+            currentMode = mode;
+            
+            // UI Updates
+            document.querySelectorAll('.radio-label').forEach(el => el.classList.remove('selected'));
+            document.querySelector(`input[value="${mode}"]`).parentElement.classList.add('selected');
+
+            rangeInputGroup.classList.toggle('active', mode === 'range');
+
+            // Reset visual selections if leaving extract mode
+            if(mode !== 'extract') {
+                 document.querySelectorAll('.page-card').forEach(c => c.classList.remove('selected'));
+                 selectedPages.clear();
+            }
+        }
+
+        function togglePageSelection(card, pageNum) {
+            if (currentMode !== 'extract') {
+                // Auto-switch to extract mode if user clicks a page?
+                // Or just ignore. Let's auto-switch for better UX.
+                setMode('extract');
+                document.querySelector(`input[value="extract"]`).checked = true;
+            }
+            
+            if (selectedPages.has(pageNum)) {
+                selectedPages.delete(pageNum);
+                card.classList.remove('selected');
+            } else {
+                selectedPages.add(pageNum);
+                card.classList.add('selected');
+            }
+        }
+
+        // --- 4. Split Logic (PDF-Lib) ---
+        splitBtn.addEventListener('click', async () => {
+            if (!currentFileArrayBuffer) return;
+
+            splitBtn.disabled = true;
+            splitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            statusMsg.textContent = "Processing PDF...";
+            statusMsg.style.color = "var(--text-secondary)";
+
+            try {
+                const { PDFDocument } = PDFLib;
+                
+                // Load the original buffer (which we kept safe)
+                const originalPdf = await PDFDocument.load(currentFileArrayBuffer);
+                const zip = new JSZip();
+                let fileCount = 0;
+
+                // --- Case 1: Extract Selected ---
+                if (currentMode === 'extract') {
+                    if (selectedPages.size === 0) throw new Error("Please select at least one page.");
+                    
+                    const newPdf = await PDFDocument.create();
+                    const sortedPages = Array.from(selectedPages).sort((a,b) => a-b);
+                    
+                    // copyPages takes 0-based indices
+                    const copiedPages = await newPdf.copyPages(originalPdf, sortedPages.map(p => p - 1));
+                    copiedPages.forEach(page => newPdf.addPage(page));
+                    
+                    const pdfBytes = await newPdf.save();
+                    zip.file(`${originalFileName}_extracted.pdf`, pdfBytes);
+                    fileCount = 1;
+                }
+
+                // --- Case 2: Split Every Page ---
+                else if (currentMode === 'all') {
+                    for (let i = 0; i < totalPages; i++) {
+                        const newPdf = await PDFDocument.create();
+                        const [copiedPage] = await newPdf.copyPages(originalPdf, [i]);
+                        newPdf.addPage(copiedPage);
+                        const pdfBytes = await newPdf.save();
+                        zip.file(`${originalFileName}_page_${i + 1}.pdf`, pdfBytes);
+                    }
+                    fileCount = totalPages;
+                }
+
+                // --- Case 3: Range Split ---
+                else if (currentMode === 'range') {
+                    const rangeStr = document.getElementById('rangeInput').value;
+                    const ranges = parseRangeString(rangeStr, totalPages);
+                    
+                    if (ranges.length === 0) throw new Error("Invalid range format. Use e.g. '1-3, 5'");
+
+                    for (let i = 0; i < ranges.length; i++) {
+                        const indices = ranges[i]; // Array of 0-based indices
+                        const newPdf = await PDFDocument.create();
+                        const copiedPages = await newPdf.copyPages(originalPdf, indices);
+                        copiedPages.forEach(page => newPdf.addPage(page));
+                        
+                        const pdfBytes = await newPdf.save();
+                        zip.file(`${originalFileName}_split_${i + 1}.pdf`, pdfBytes);
+                    }
+                    fileCount = ranges.length;
+                }
+
+                // --- Download Logic ---
+                if (fileCount === 1) {
+                    // Single PDF Download
+                    const content = await zip.file(Object.keys(zip.files)[0]).async("blob");
+                    downloadBtn.href = URL.createObjectURL(content);
+                    downloadBtn.download = Object.keys(zip.files)[0];
+                    downloadBtn.innerHTML = `<i class="fas fa-file-pdf"></i> Download PDF`;
+                } else {
+                    // ZIP Download
+                    const content = await zip.generateAsync({ type: "blob" });
+                    downloadBtn.href = URL.createObjectURL(content);
+                    downloadBtn.download = `${originalFileName}_split.zip`;
+                    downloadBtn.innerHTML = `<i class="fas fa-file-archive"></i> Download ZIP (${fileCount} files)`;
+                }
+
+                downloadBtn.style.display = 'flex';
+                splitBtn.style.display = 'none';
+                statusMsg.textContent = "Success! File ready.";
+                statusMsg.style.color = "var(--green)";
+
+            } catch (err) {
+                console.error(err);
+                alert(err.message);
+                splitBtn.disabled = false;
+                splitBtn.innerHTML = '<i class="fas fa-cut"></i> Split PDF';
+                statusMsg.textContent = "Error occurred.";
+                statusMsg.style.color = "var(--red)";
+            }
+        });
+
+        // Helper: Parse Range String (1-based input to 0-based indices)
+        function parseRangeString(str, max) {
+            if (!str) return [];
+            const parts = str.split(',');
+            const result = [];
+            
+            parts.forEach(part => {
+                const subResult = [];
+                const range = part.trim().split('-');
+                
+                if (range.length === 2) {
+                    const start = parseInt(range[0]);
+                    const end = parseInt(range[1]);
+                    if (!isNaN(start) && !isNaN(end)) {
+                        for(let i=start; i<=end; i++) {
+                            if(i > 0 && i <= max) subResult.push(i - 1);
+                        }
+                    }
+                } else if (range.length === 1) {
+                    const page = parseInt(range[0]);
+                    if (!isNaN(page) && page > 0 && page <= max) {
+                        subResult.push(page - 1);
+                    }
+                }
+                
+                if (subResult.length > 0) result.push(subResult);
+            });
+            return result;
+        }
+
+        // Reset
+        resetBtn.addEventListener('click', () => {
+            location.reload();
+        });
+
+    </script>
+</body>
+</html>
