@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GST Calculator | PassionTools</title>
+    <style>
+        :root {
+            /* Brand Colors */
+            --brand-charcoal: #1f2937;
+            --brand-red: #ef4444;
+            --brand-purple: #a855f7;
+            --brand-gradient: linear-gradient(135deg, #ef4444, #a855f7);
+            --midnight-black: #111827;
+            
+            /* Light Theme UI Colors */
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-soft: #f1f5f9;
+            --border-color: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            
+            /* Primary Blue for Main Actions */
+            --primary-blue: #3b82f6;
+            --primary-blue-hover: #2563eb;
+            --error-color: #ef4444;
+            --success-color: #10b981;
+            
+            /* Chart/Tax Colors */
+            --color-base: #10b981; /* Green for Base Amount */
+            --color-tax: #f59e0b; /* Orange for Tax */
+
+            /* Shadows & Radius */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            
+            /* Transitions */
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Dark Theme Variables */
+        [data-theme="dark"] {
+            --bg-body: #0f172a;
+            --bg-card: #1e293b;
+            --bg-soft: #334155;
+            --border-color: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --midnight-black: #020617;
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+            --shadow-lg: 0 10px 25px -5px rgba(0,0,0,0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            transition: var(--transition);
+        }
+
+        /* --- Header --- */
+        header {
+            background-color: var(--bg-card);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: var(--transition);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            text-decoration: none;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo span {
+            background: var(--brand-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .btn-back {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 15px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+        }
+
+        .btn-back:hover { color: var(--brand-red); }
+        .btn-back svg { width: 16px; height: 16px; fill: currentColor; }
+
+        .header-divider {
+            width: 1px;
+            height: 20px;
+            background-color: var(--border-color);
+        }
+
+        .theme-toggle {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            padding: 4px;
+        }
+
+        .theme-toggle svg { width: 20px; height: 20px; fill: currentColor; }
+        .theme-toggle:hover { color: var(--text-main); transform: scale(1.1); }
+        [data-theme="dark"] .theme-toggle { color: #fbbf24; }
+
+        /* --- Main App Layout --- */
+        main {
+            flex: 1;
+            padding: 40px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .hero-title {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: fadeUp 0.5s ease;
+        }
+
+        .hero-title h1 {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .hero-title p {
+            color: var(--text-muted);
+            font-size: 16px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* --- Card Styles --- */
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 24px;
+            overflow: hidden;
+            transition: var(--transition);
+            animation: fadeUp 0.6s ease;
+        }
+
+        .card-body { padding: 30px; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- GST Mode Toggle --- */
+        .mode-toggle {
+            display: flex;
+            background: var(--bg-soft);
+            border-radius: var(--radius-sm);
+            padding: 4px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border-color);
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .mode-btn.active {
+            background: var(--bg-card);
+            color: var(--primary-blue);
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* --- Inputs --- */
+        .input-group { margin-bottom: 24px; }
+        .input-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .input-header label { font-size: 14px; font-weight: 600; color: var(--text-main); }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            background: var(--bg-soft);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            transition: var(--transition);
+            overflow: hidden;
+        }
+
+        .input-wrapper:focus-within {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            background: var(--bg-card);
+        }
+
+        .input-prefix, .input-suffix {
+            padding: 0 16px;
+            color: var(--text-muted);
+            font-weight: 600;
+            background: rgba(0,0,0,0.02);
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-field {
+            flex: 1;
+            width: 100%;
+            padding: 14px 16px;
+            border: none;
+            background: transparent;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-main);
+            outline: none;
+        }
+
+        /* Rate Chips */
+        .rate-chips {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .chip {
+            padding: 8px 16px;
+            background: var(--bg-soft);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .chip:hover {
+            background: #e0f2fe;
+            color: var(--primary-blue);
+            border-color: #bae6fd;
+        }
+
+        .chip.active {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 16px;
+            margin-top: 32px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px 24px;
+            border-radius: var(--radius-md);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: none;
+        }
+
+        .btn svg { width: 18px; height: 18px; fill: currentColor; }
+
+        .btn-primary {
+            background: var(--primary-blue);
+            color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            background: var(--primary-blue-hover);
+            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-primary:active:not(:disabled) { transform: translateY(0); }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; background: var(--text-muted); box-shadow: none; }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-main);
+            border: 2px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-soft);
+            border-color: var(--text-muted);
+        }
+
+        /* --- Error Message --- */
+        .error-message {
+            color: var(--error-color);
+            font-size: 14px;
+            font-weight: 500;
+            margin-top: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            opacity: 0;
+            height: 0;
+            transition: var(--transition);
+            overflow: hidden;
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: var(--radius-sm);
+        }
+
+        .error-message.show { opacity: 1; height: auto; padding: 10px; margin-bottom: 16px; }
+        .error-message svg { width: 16px; height: 16px; fill: currentColor; }
+        .error-shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        /* --- Results UI --- */
+        .results-wrapper {
+            display: none;
+            width: 100%;
+            max-width: 800px;
+            animation: fadeUp 0.5s ease;
+        }
+
+        .result-box {
+            padding: 30px;
+            border-radius: var(--radius-lg);
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .result-header h3 { font-size: 18px; font-weight: 700; color: var(--text-main); }
+
+        .action-icons { display: flex; gap: 12px; }
+        .icon-btn {
+            background: var(--bg-soft); border: 1px solid var(--border-color);
+            width: 36px; height: 36px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-muted); cursor: pointer; transition: var(--transition);
+        }
+        .icon-btn:hover { background: var(--bg-card); color: var(--primary-blue); border-color: var(--primary-blue); }
+        .icon-btn svg { width: 16px; height: 16px; fill: currentColor; }
+
+        /* Breakdown Grid */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .summary-item {
+            background: var(--bg-soft);
+            padding: 20px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .summary-label { font-size: 13px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; margin-bottom: 8px; }
+        .summary-val { font-size: 24px; font-weight: 700; color: var(--text-main); font-variant-numeric: tabular-nums; }
+        .val-tax { color: var(--color-tax); }
+        .val-base { color: var(--color-base); }
+
+        .final-amount-box {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(168, 85, 247, 0.1));
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            padding: 30px;
+            border-radius: var(--radius-md);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .final-label { font-size: 14px; font-weight: 700; color: var(--primary-blue); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+        .final-val { font-size: 48px; font-weight: 800; color: var(--text-main); line-height: 1.2; }
+
+        /* Tax Split Table */
+        .tax-split {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 24px;
+            padding: 16px;
+            background: var(--bg-soft);
+            border-radius: var(--radius-md);
+        }
+
+        .split-item { display: flex; flex-direction: column; align-items: center; }
+        .split-label { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+        .split-val { font-size: 16px; font-weight: 700; color: var(--text-main); }
+
+        /* Visual Breakdown Bar */
+        .chart-container { margin-top: 10px; }
+        .chart-labels { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+        .label-p { color: var(--color-base); }
+        .label-i { color: var(--color-tax); }
+
+        .bar-wrapper {
+            width: 100%; height: 12px; background: var(--bg-soft);
+            border-radius: 6px; overflow: hidden; display: flex;
+        }
+
+        .bar-segment { height: 100%; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
+        .bar-base { background-color: var(--color-base); width: 0%; }
+        .bar-tax { background-color: var(--color-tax); width: 0%; }
+
+        /* --- Toast Notification --- */
+        .toast {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
+            background: var(--text-main); color: white; padding: 12px 24px;
+            border-radius: 30px; font-weight: 500; font-size: 14px;
+            display: flex; align-items: center; gap: 8px;
+            box-shadow: var(--shadow-lg); transition: var(--transition);
+            opacity: 0; z-index: 2000;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .toast svg { width: 16px; height: 16px; fill: var(--success-color); }
+
+        /* --- Footer --- */
+        footer {
+            background-color: var(--midnight-black); color: #94a3b8;
+            padding: 30px 20px; text-align: center; font-size: 14px; margin-top: auto;
+        }
+
+        /* --- Print Styles --- */
+        @media print {
+            body { background: white; color: black; }
+            header, footer, .hero-title, #calculatorCard, .action-icons, .toast { display: none !important; }
+            .results-wrapper { display: block !important; max-width: 100%; box-shadow: none; }
+            .result-box { border: none; padding: 0; }
+            .final-amount-box { background: none; border: 2px solid #000; }
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+        }
+
+        /* --- Mobile Responsiveness --- */
+        @media (max-width: 600px) {
+            .card-body { padding: 24px 20px; }
+            .hero-title h1 { font-size: 28px; }
+            .action-buttons { flex-direction: column; }
+            .summary-grid { grid-template-columns: 1fr; }
+            .final-val { font-size: 36px; }
+            .tax-split { gap: 20px; flex-direction: column; text-align: center; }
+        }
+
+        @media (max-width: 480px) {
+            .card { border-radius: 0; border-left: none; border-right: none; margin-bottom: 16px; }
+            main { padding: 20px 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">Passion<span>Tools</span></a>
+                <div class="header-actions">
+                    <a href="index.html" class="btn-back">
+                        <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                        Back to Tools
+                    </a>
+                    <div class="header-divider"></div>
+                    <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
+                        <svg viewBox="0 0 24 24" id="iconLightbulb"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7zm2.85 11.1l-.85.6V16h-4v-2.3l-.85-.6C7.8 12.16 7 10.63 7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.63-.8 3.16-2.15 4.1z"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container" style="display: flex; flex-direction: column; align-items: center;">
+            
+            <div class="hero-title">
+                <h1>GST Calculator</h1>
+                <p>Instantly calculate GST inclusive or exclusive amounts with detailed CGST & SGST tax breakdowns.</p>
+            </div>
+
+            <div class="card" id="calculatorCard">
+                <div class="card-body">
+                    
+                    <div class="mode-toggle">
+                        <button class="mode-btn active" id="btnAddGst">Add GST (+)</button>
+                        <button class="mode-btn" id="btnRemoveGst">Remove GST (-)</button>
+                    </div>
+
+                    <div class="error-message" id="errorMsg">
+                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                        <span id="errorText">Please enter valid values.</span>
+                    </div>
+
+                    <div class="input-group">
+                        <div class="input-header">
+                            <label for="amountInput" id="amountLabel">Base Amount (Before Tax)</label>
+                        </div>
+                        <div class="input-wrapper">
+                            <span class="input-prefix">₹</span>
+                            <input type="text" id="amountInput" class="input-field" placeholder="e.g. 10,000" autocomplete="off">
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <div class="input-header">
+                            <label for="rateInput">GST Rate</label>
+                        </div>
+                        <div class="input-wrapper">
+                            <input type="number" id="rateInput" class="input-field" placeholder="e.g. 18" min="0" max="100" step="0.1" value="18">
+                            <span class="input-suffix">%</span>
+                        </div>
+                        <div class="rate-chips">
+                            <div class="chip" data-rate="5">5%</div>
+                            <div class="chip" data-rate="12">12%</div>
+                            <div class="chip active" data-rate="18">18%</div>
+                            <div class="chip" data-rate="28">28%</div>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn btn-secondary" id="btnReset">
+                            <svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+                            Reset
+                        </button>
+                        <button class="btn btn-primary" id="btnCalculate">
+                            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 9h-2V7h-2v5H6v2h2v5h2v-5h2v-2z"/></svg>
+                            Calculate Tax
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="results-wrapper" id="resultsWrapper">
+                <div class="card result-box">
+                    
+                    <div class="result-header">
+                        <h3>Tax Invoice Summary</h3>
+                        <div class="action-icons">
+                            <button class="icon-btn" id="btnCopy" title="Copy Details">
+                                <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                            </button>
+                            <button class="icon-btn" id="btnPrint" title="Print / Save PDF">
+                                <svg viewBox="0 0 24 24"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="final-amount-box">
+                        <div class="final-label" id="finalLabel">Total Payable Amount</div>
+                        <div class="final-val" id="resTotal">₹0.00</div>
+                    </div>
+
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <div class="summary-label">Net Amount (Base)</div>
+                            <div class="summary-val val-base" id="resBase">₹0.00</div>
+                        </div>
+                        
+                        <div class="summary-item">
+                            <div class="summary-label">Total GST (<span id="resRatePct">18</span>%)</div>
+                            <div class="summary-val val-tax" id="resGst">₹0.00</div>
+                        </div>
+                    </div>
+
+                    <div class="tax-split">
+                        <div class="split-item">
+                            <span class="split-label">CGST (<span id="cgstPct">9</span>%)</span>
+                            <span class="split-val" id="resCgst">₹0.00</span>
+                        </div>
+                        <div class="split-item">
+                            <span class="split-label">SGST (<span id="sgstPct">9</span>%)</span>
+                            <span class="split-val" id="resSgst">₹0.00</span>
+                        </div>
+                    </div>
+
+                    <div class="chart-container">
+                        <div class="chart-labels">
+                            <span class="label-p">Base Amount (<span id="pctBase">0</span>%)</span>
+                            <span class="label-i">GST (<span id="pctTax">0</span>%)</span>
+                        </div>
+                        <div class="bar-wrapper">
+                            <div class="bar-segment bar-base" id="barBase"></div>
+                            <div class="bar-segment bar-tax" id="barTax"></div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            &copy; 2026 PassionTools. Secure client-side processing.
+        </div>
+    </footer>
+
+    <div class="toast" id="toast">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+        <span id="toastMsg">Action successful</span>
+    </div>
+
+    <script>
+        /**
+         * PASSIONTOOLS - GST CALCULATOR
+         */
+
+        const DOM = {
+            // Theme
+            themeToggle: document.getElementById('themeToggle'),
+            iconLightbulb: document.getElementById('iconLightbulb'),
+            
+            // Mode Toggles
+            btnAddGst: document.getElementById('btnAddGst'),
+            btnRemoveGst: document.getElementById('btnRemoveGst'),
+            amountLabel: document.getElementById('amountLabel'),
+            
+            // Inputs
+            amountInput: document.getElementById('amountInput'),
+            rateInput: document.getElementById('rateInput'),
+            chips: document.querySelectorAll('.chip'),
+            
+            // Buttons
+            btnCalculate: document.getElementById('btnCalculate'),
+            btnReset: document.getElementById('btnReset'),
+            btnCopy: document.getElementById('btnCopy'),
+            btnPrint: document.getElementById('btnPrint'),
+            
+            // UI States
+            errorMsg: document.getElementById('errorMsg'),
+            errorText: document.getElementById('errorText'),
+            calculatorCard: document.getElementById('calculatorCard'),
+            resultsWrapper: document.getElementById('resultsWrapper'),
+            toast: document.getElementById('toast'),
+            toastMsg: document.getElementById('toastMsg'),
+            
+            // Outputs
+            finalLabel: document.getElementById('finalLabel'),
+            resTotal: document.getElementById('resTotal'),
+            resBase: document.getElementById('resBase'),
+            resGst: document.getElementById('resGst'),
+            resRatePct: document.getElementById('resRatePct'),
+            
+            resCgst: document.getElementById('resCgst'),
+            resSgst: document.getElementById('resSgst'),
+            cgstPct: document.getElementById('cgstPct'),
+            sgstPct: document.getElementById('sgstPct'),
+            
+            // Visual Bar
+            pctBase: document.getElementById('pctBase'),
+            pctTax: document.getElementById('pctTax'),
+            barBase: document.getElementById('barBase'),
+            barTax: document.getElementById('barTax'),
+        };
+
+        let mode = 'add'; // 'add' or 'remove'
+        let currentResult = {};
+
+        // --- Theme Management ---
+        function checkThemePreference() {
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.body.setAttribute('data-theme', 'dark');
+                DOM.iconLightbulb.innerHTML = '<path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7zm2.85 11.1l-.85.6V16h-4v-2.3l-.85-.6C7.8 12.16 7 10.63 7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.63-.8 3.16-2.15 4.1z"/>';
+            } else {
+                DOM.iconLightbulb.innerHTML = '<path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7zm2.85 11.1l-.85.6V16h-4v-2.3l-.85-.6C7.8 12.16 7 10.63 7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.63-.8 3.16-2.15 4.1z"/>'; // Same path, relies on CSS color
+            }
+        }
+
+        DOM.themeToggle.addEventListener('click', () => {
+            const isDark = document.body.getAttribute('data-theme') === 'dark';
+            if (isDark) {
+                document.body.removeAttribute('data-theme');
+            } else {
+                document.body.setAttribute('data-theme', 'dark');
+            }
+        });
+        checkThemePreference();
+
+        // --- Mode Toggling (Add/Remove) ---
+        DOM.btnAddGst.addEventListener('click', () => {
+            mode = 'add';
+            DOM.btnAddGst.classList.add('active');
+            DOM.btnRemoveGst.classList.remove('active');
+            DOM.amountLabel.textContent = "Base Amount (Before Tax)";
+            DOM.finalLabel.textContent = "Total Payable Amount";
+            hideError();
+        });
+
+        DOM.btnRemoveGst.addEventListener('click', () => {
+            mode = 'remove';
+            DOM.btnRemoveGst.classList.add('active');
+            DOM.btnAddGst.classList.remove('active');
+            DOM.amountLabel.textContent = "Gross Amount (Including Tax)";
+            DOM.finalLabel.textContent = "Base Amount (Without Tax)";
+            hideError();
+        });
+
+        // --- Input Formatting (Commas) ---
+        DOM.amountInput.addEventListener('input', function(e) {
+            // Remove non-numeric except decimal
+            let value = this.value.replace(/[^0-9.]/g, '');
+            
+            // Prevent multiple decimals
+            const parts = value.split('.');
+            if (parts.length > 2) value = parts[0] + '.' + parts.slice(1).join('');
+            
+            // Format with commas if integer part exists
+            if (parts[0].length > 0) {
+                let intPart = parseInt(parts[0], 10).toLocaleString('en-IN');
+                this.value = parts.length > 1 ? intPart + '.' + parts[1] : intPart;
+            } else {
+                this.value = value;
+            }
+        });
+
+        // --- Quick Rate Chips ---
+        DOM.chips.forEach(chip => {
+            chip.addEventListener('click', () => {
+                DOM.chips.forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
+                DOM.rateInput.value = chip.dataset.rate;
+            });
+        });
+
+        DOM.rateInput.addEventListener('input', () => {
+            const val = parseFloat(DOM.rateInput.value);
+            DOM.chips.forEach(c => {
+                if(parseFloat(c.dataset.rate) === val) {
+                    c.classList.add('active');
+                } else {
+                    c.classList.remove('active');
+                }
+            });
+        });
+
+        // --- Formatting Helper ---
+        const formatCurrency = (num) => {
+            return new Intl.NumberFormat('en-IN', {
+                style: 'currency',
+                currency: 'INR',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(num);
+        };
+
+        const getRawAmount = () => {
+            return parseFloat(DOM.amountInput.value.replace(/,/g, ''));
+        };
+
+        // --- Calculation Logic ---
+        DOM.btnCalculate.addEventListener('click', () => {
+            hideError();
+            
+            const amount = getRawAmount();
+            const rate = parseFloat(DOM.rateInput.value);
+
+            if (isNaN(amount) || amount <= 0) return showError("Please enter a valid positive amount.");
+            if (isNaN(rate) || rate < 0) return showError("Please enter a valid GST rate percentage.");
+
+            let baseAmount, gstAmount, totalAmount;
+
+            if (mode === 'add') {
+                baseAmount = amount;
+                gstAmount = amount * (rate / 100);
+                totalAmount = baseAmount + gstAmount;
+            } else {
+                totalAmount = amount;
+                baseAmount = amount / (1 + (rate / 100));
+                gstAmount = totalAmount - baseAmount;
+            }
+
+            const splitGst = gstAmount / 2;
+            const splitRate = rate / 2;
+
+            currentResult = {
+                base: baseAmount,
+                gst: gstAmount,
+                total: totalAmount,
+                rate: rate,
+                cgst: splitGst,
+                sgst: splitGst
+            };
+
+            displayResults(baseAmount, gstAmount, totalAmount, rate, splitGst, splitRate);
+        });
+
+        function displayResults(base, gst, total, rate, splitGst, splitRate) {
+            DOM.resultsWrapper.style.display = 'block';
+
+            // Update Labels
+            DOM.resRatePct.textContent = rate;
+            DOM.cgstPct.textContent = splitRate;
+            DOM.sgstPct.textContent = splitRate;
+
+            // Determine what to highlight based on mode
+            const highlightVal = mode === 'add' ? total : base;
+            
+            // Animate Numbers
+            animateValue(DOM.resTotal, highlightVal);
+            animateValue(DOM.resBase, base);
+            animateValue(DOM.resGst, gst);
+            animateValue(DOM.resCgst, splitGst);
+            animateValue(DOM.resSgst, splitGst);
+
+            // Breakdown Bar Math
+            const pctBase = ((base / total) * 100).toFixed(1);
+            const pctTax = ((gst / total) * 100).toFixed(1);
+
+            DOM.pctBase.textContent = pctBase;
+            DOM.pctTax.textContent = pctTax;
+
+            setTimeout(() => {
+                DOM.barBase.style.width = `${pctBase}%`;
+                DOM.barTax.style.width = `${pctTax}%`;
+            }, 100);
+
+            // Scroll down
+            setTimeout(() => {
+                DOM.resultsWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 200);
+        }
+
+        // --- Actions (Copy & Print) ---
+        DOM.btnCopy.addEventListener('click', () => {
+            if(!currentResult.total) return;
+            
+            const text = `GST Calculation Summary:
+------------------------
+Base Amount: ${formatCurrency(currentResult.base)}
+GST Rate: ${currentResult.rate}%
+Total GST: ${formatCurrency(currentResult.gst)}
+ (CGST: ${formatCurrency(currentResult.cgst)} | SGST: ${formatCurrency(currentResult.sgst)})
+------------------------
+Total Amount: ${formatCurrency(currentResult.total)}`;
+
+            navigator.clipboard.writeText(text).then(() => {
+                showToast("Details copied to clipboard!");
+            }).catch(() => {
+                showError("Failed to copy text.");
+            });
+        });
+
+        DOM.btnPrint.addEventListener('click', () => {
+            window.print();
+        });
+
+        // --- Reset ---
+        DOM.btnReset.addEventListener('click', () => {
+            DOM.amountInput.value = '';
+            DOM.rateInput.value = '18';
+            DOM.chips.forEach(c => c.classList.remove('active'));
+            document.querySelector('.chip[data-rate="18"]').classList.add('active');
+
+            DOM.resultsWrapper.style.display = 'none';
+            DOM.barBase.style.width = '0%';
+            DOM.barTax.style.width = '0%';
+            currentResult = {};
+            
+            hideError();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // --- Error Handling ---
+        function showError(msg) {
+            DOM.errorText.textContent = msg;
+            DOM.errorMsg.classList.add('show');
+            DOM.calculatorCard.classList.add('error-shake');
+            DOM.resultsWrapper.style.display = 'none';
+            setTimeout(() => DOM.calculatorCard.classList.remove('error-shake'), 400);
+        }
+
+        function hideError() {
+            DOM.errorMsg.classList.remove('show');
+        }
+
+        function showToast(msg) {
+            DOM.toastMsg.textContent = msg;
+            DOM.toast.classList.add('show');
+            setTimeout(() => DOM.toast.classList.remove('show'), 3000);
+        }
+
+        // --- Number Animation ---
+        function animateValue(obj, end) {
+            let startTimestamp = null;
+            const duration = 800; // 0.8s
+            const start = 0;
+
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const easeOut = progress * (2 - progress); 
+                const currentVal = (easeOut * (end - start) + start);
+                
+                obj.innerHTML = formatCurrency(currentVal);
+                
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                } else {
+                    obj.innerHTML = formatCurrency(end);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        // Enter key support
+        DOM.amountInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') DOM.btnCalculate.click();
+        });
+        DOM.rateInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') DOM.btnCalculate.click();
+        });
+
+    </script>
+</body>
+</html>
