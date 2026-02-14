@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loan EMI Calculator | PassionTools</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            /* Brand Colors */
+            --brand-charcoal: #1f2937;
+            --brand-red: #ef4444;
+            --brand-purple: #a855f7;
+            --brand-gradient: linear-gradient(135deg, #ef4444, #a855f7);
+            --midnight-black: #111827;
+            
+            /* Light Theme UI Colors */
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-soft: #f1f5f9;
+            --border-color: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            
+            /* Modern Blue for Button */
+            --primary-blue: #3b82f6;
+            --primary-blue-hover: #2563eb;
+            --error-color: #ef4444;
+            
+            /* Chart Colors */
+            --color-principal: #10b981; /* Green */
+            --color-interest: #f59e0b; /* Orange */
+
+            /* Shadows & Border Radius */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            
+            /* Transitions */
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Dark Theme Variables */
+        [data-theme="dark"] {
+            --bg-body: #0f172a;
+            --bg-card: #1e293b;
+            --bg-soft: #334155;
+            --border-color: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --midnight-black: #020617;
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+            --shadow-lg: 0 10px 25px -5px rgba(0,0,0,0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            transition: var(--transition);
+        }
+
+        /* --- Header --- */
+        header {
+            background-color: var(--bg-card);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: var(--transition);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            text-decoration: none;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo span {
+            background: var(--brand-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .btn-back {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 15px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+        }
+
+        .btn-back:hover {
+            color: var(--brand-red);
+        }
+
+        .header-divider {
+            width: 1px;
+            height: 20px;
+            background-color: var(--border-color);
+        }
+
+        .theme-toggle {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .theme-toggle:hover {
+            color: var(--text-main);
+            transform: scale(1.1);
+        }
+
+        /* --- Main App Layout --- */
+        main {
+            flex: 1;
+            padding: 40px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .hero-title {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: fadeUp 0.5s ease;
+        }
+
+        .hero-title h1 {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .hero-title p {
+            color: var(--text-muted);
+            font-size: 16px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* --- Card Styles --- */
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 24px;
+            overflow: hidden;
+            transition: var(--transition);
+            animation: fadeUp 0.6s ease;
+        }
+
+        .card-body {
+            padding: 30px;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Inputs --- */
+        .input-group {
+            margin-bottom: 24px;
+        }
+
+        .input-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .input-header label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            background: var(--bg-soft);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            transition: var(--transition);
+            overflow: hidden;
+        }
+
+        .input-wrapper:focus-within {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            background: var(--bg-card);
+        }
+
+        .input-prefix, .input-suffix {
+            padding: 0 16px;
+            color: var(--text-muted);
+            font-weight: 600;
+            background: rgba(0,0,0,0.02);
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-field {
+            flex: 1;
+            width: 100%;
+            padding: 14px 16px;
+            border: none;
+            background: transparent;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-main);
+            outline: none;
+            -moz-appearance: textfield;
+        }
+
+        .input-field::-webkit-outer-spin-button,
+        .input-field::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Sliders */
+        .slider-wrapper {
+            margin-top: 12px;
+            padding: 0 5px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            background: var(--border-color);
+            border-radius: 3px;
+            outline: none;
+            -webkit-appearance: none;
+            transition: var(--transition);
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-blue);
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+            transition: transform 0.1s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+        }
+
+        /* Dual Input Row */
+        .dual-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 16px;
+            margin-top: 32px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px 24px;
+            border-radius: var(--radius-md);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: none;
+        }
+
+        /* Modern Blue Primary Button */
+        .btn-primary {
+            background: var(--primary-blue);
+            color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            background: var(--primary-blue-hover);
+            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-primary:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background: var(--text-muted);
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-main);
+            border: 2px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-soft);
+            border-color: var(--text-muted);
+        }
+
+        /* --- Error Message --- */
+        .error-message {
+            color: var(--error-color);
+            font-size: 14px;
+            font-weight: 500;
+            margin-top: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            opacity: 0;
+            height: 0;
+            transition: var(--transition);
+            overflow: hidden;
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: var(--radius-sm);
+        }
+
+        .error-message.show {
+            opacity: 1;
+            height: auto;
+            padding: 10px;
+            margin-bottom: 16px;
+        }
+
+        .error-shake {
+            animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        /* --- Results UI --- */
+        .results-wrapper {
+            display: none;
+            width: 100%;
+            max-width: 800px;
+            animation: fadeUp 0.5s ease;
+        }
+
+        .result-box {
+            padding: 30px;
+            border-radius: var(--radius-lg);
+            background: linear-gradient(to bottom, var(--bg-card), var(--bg-soft));
+            border: 1px solid var(--border-color);
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .emi-highlight {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .emi-title {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .emi-value {
+            font-size: 48px;
+            font-weight: 800;
+            background: var(--brand-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.2;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Breakdown Grid */
+        .breakdown-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .breakdown-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 16px;
+            border-radius: var(--radius-md);
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .breakdown-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .icon-principal { background: rgba(16, 185, 129, 0.15); color: var(--color-principal); }
+        .icon-interest { background: rgba(245, 158, 11, 0.15); color: var(--color-interest); }
+
+        .breakdown-info { display: flex; flex-direction: column; }
+        .breakdown-label { font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
+        .breakdown-val { font-size: 18px; font-weight: 700; color: var(--text-main); font-variant-numeric: tabular-nums; }
+
+        /* Visual Breakdown Bar */
+        .chart-container {
+            margin-top: 10px;
+        }
+
+        .chart-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .label-p { color: var(--color-principal); }
+        .label-i { color: var(--color-interest); }
+
+        .bar-wrapper {
+            width: 100%;
+            height: 12px;
+            background: var(--bg-soft);
+            border-radius: 6px;
+            overflow: hidden;
+            display: flex;
+        }
+
+        .bar-segment {
+            height: 100%;
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .bar-principal { background-color: var(--color-principal); width: 0%; }
+        .bar-interest { background-color: var(--color-interest); width: 0%; }
+
+        /* --- Amortization Table --- */
+        .amortization-section {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        .amortization-header {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            background: var(--bg-soft);
+            transition: var(--transition);
+        }
+
+        .amortization-header:hover { background: var(--border-color); }
+        .amortization-header h3 { font-size: 16px; font-weight: 700; margin: 0; }
+        .amortization-header i { transition: transform 0.3s ease; }
+        .amortization-header.open i { transform: rotate(180deg); }
+
+        .table-wrapper {
+            display: none;
+            width: 100%;
+            overflow-x: auto;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .table-wrapper.open { display: block; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: right;
+            font-size: 14px;
+        }
+
+        th, td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            font-variant-numeric: tabular-nums;
+        }
+
+        th {
+            position: sticky;
+            top: 0;
+            background: var(--bg-card);
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            z-index: 10;
+        }
+
+        td { color: var(--text-main); font-weight: 500; }
+        td:first-child, th:first-child { text-align: left; }
+        
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background-color: rgba(0,0,0,0.02); }
+        [data-theme="dark"] tr:hover td { background-color: rgba(255,255,255,0.02); }
+
+        .table-actions {
+            padding: 16px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            display: none;
+        }
+        .table-actions.open { display: flex; }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 13px;
+            border-radius: var(--radius-sm);
+        }
+
+        /* --- Footer --- */
+        footer {
+            background-color: var(--midnight-black);
+            color: #94a3b8;
+            padding: 30px 20px;
+            text-align: center;
+            font-size: 14px;
+            margin-top: auto;
+            transition: var(--transition);
+        }
+
+        /* --- Mobile Responsiveness --- */
+        @media (max-width: 600px) {
+            .card-body { padding: 24px 20px; }
+            .hero-title h1 { font-size: 28px; }
+            .action-buttons { flex-direction: column; }
+            .emi-value { font-size: 40px; }
+            .breakdown-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 480px) {
+            .card { border-radius: 0; border-left: none; border-right: none; margin-bottom: 16px; }
+            main { padding: 20px 0; }
+            .dual-inputs { grid-template-columns: 1fr; gap: 24px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">Passion<span>Tools</span></a>
+                <div class="header-actions">
+                    <a href="index.html" class="btn-back">
+                        <i class="fas fa-arrow-left"></i> Back to Tools
+                    </a>
+                    <div class="header-divider"></div>
+                    <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
+                        <i class="far fa-lightbulb"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container" style="display: flex; flex-direction: column; align-items: center;">
+            
+            <div class="hero-title">
+                <h1>Loan EMI Calculator</h1>
+                <p>Calculate your Equated Monthly Installment (EMI), view payment breakdowns, and generate amortization schedules instantly.</p>
+            </div>
+
+            <div class="card" id="calculatorCard">
+                <div class="card-body">
+                    
+                    <div class="error-message" id="errorMsg">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span id="errorText">Please enter valid values.</span>
+                    </div>
+
+                    <div class="input-group">
+                        <div class="input-header">
+                            <label for="loanAmount">Loan Amount</label>
+                        </div>
+                        <div class="input-wrapper">
+                            <span class="input-prefix">₹</span>
+                            <input type="number" id="loanAmount" class="input-field" placeholder="e.g. 500000" min="1000" max="100000000" step="1000">
+                        </div>
+                        <div class="slider-wrapper">
+                            <input type="range" id="loanAmountSlider" min="10000" max="10000000" step="10000" value="500000">
+                        </div>
+                    </div>
+
+                    <div class="dual-inputs">
+                        <div class="input-group">
+                            <div class="input-header">
+                                <label for="interestRate">Annual Interest Rate</label>
+                            </div>
+                            <div class="input-wrapper">
+                                <input type="number" id="interestRate" class="input-field" placeholder="e.g. 8.5" min="0" max="50" step="0.1">
+                                <span class="input-suffix">%</span>
+                            </div>
+                            <div class="slider-wrapper">
+                                <input type="range" id="interestRateSlider" min="1" max="30" step="0.1" value="8.5">
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <div class="input-header">
+                                <label for="loanTenure">Loan Tenure</label>
+                            </div>
+                            <div class="input-wrapper">
+                                <input type="number" id="loanTenure" class="input-field" placeholder="e.g. 5" min="1" max="50" step="1">
+                                <span class="input-suffix">Years</span>
+                            </div>
+                            <div class="slider-wrapper">
+                                <input type="range" id="loanTenureSlider" min="1" max="30" step="1" value="5">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn btn-secondary" id="btnReset">
+                            <i class="fas fa-undo"></i> Reset
+                        </button>
+                        <button class="btn btn-primary" id="btnCalculate">
+                            <i class="fas fa-calculator"></i> Calculate EMI
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="results-wrapper" id="resultsWrapper">
+                
+                <div class="card">
+                    <div class="result-box">
+                        
+                        <div class="emi-highlight">
+                            <div class="emi-title">Your Monthly EMI</div>
+                            <div class="emi-value" id="resEmi">₹0.00</div>
+                        </div>
+
+                        <div class="breakdown-grid">
+                            <div class="breakdown-item">
+                                <div class="breakdown-icon icon-principal">
+                                    <i class="fas fa-coins"></i>
+                                </div>
+                                <div class="breakdown-info">
+                                    <span class="breakdown-label">Principal Amount</span>
+                                    <span class="breakdown-val" id="resPrincipal">₹0.00</span>
+                                </div>
+                            </div>
+                            
+                            <div class="breakdown-item">
+                                <div class="breakdown-icon icon-interest">
+                                    <i class="fas fa-chart-pie"></i>
+                                </div>
+                                <div class="breakdown-info">
+                                    <span class="breakdown-label">Total Interest</span>
+                                    <span class="breakdown-val" id="resInterest">₹0.00</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="text-align: center; margin-bottom: 24px;">
+                            <span style="font-size: 14px; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Total Payment (Principal + Interest)</span><br>
+                            <span style="font-size: 24px; font-weight: 800; color: var(--text-main);" id="resTotal">₹0.00</span>
+                        </div>
+
+                        <div class="chart-container">
+                            <div class="chart-labels">
+                                <span class="label-p">Principal (<span id="pctPrincipal">0</span>%)</span>
+                                <span class="label-i">Interest (<span id="pctInterest">0</span>%)</span>
+                            </div>
+                            <div class="bar-wrapper">
+                                <div class="bar-segment bar-principal" id="barPrincipal"></div>
+                                <div class="bar-segment bar-interest" id="barInterest"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="amortization-section">
+                    <div class="amortization-header" id="btnToggleTable">
+                        <h3>Amortization Schedule</h3>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="table-wrapper" id="tableWrapper">
+                        <table id="amortizationTable">
+                            <thead>
+                                <tr>
+                                    <th>Month</th>
+                                    <th>Principal Paid</th>
+                                    <th>Interest Paid</th>
+                                    <th>Total Payment</th>
+                                    <th>Balance</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                </tbody>
+                        </table>
+                    </div>
+                    <div class="table-actions" id="tableActions">
+                        <button class="btn btn-secondary btn-small" id="btnDownloadCSV">
+                            <i class="fas fa-file-csv"></i> Download CSV
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            &copy; 2026 PassionTools. Secure client-side processing.
+        </div>
+    </footer>
+
+    <script>
+        /**
+         * PASSIONTOOLS - LOAN EMI CALCULATOR
+         */
+
+        const DOM = {
+            // Theme
+            themeToggle: document.getElementById('themeToggle'),
+            
+            // Inputs & Sliders
+            loanAmount: document.getElementById('loanAmount'),
+            loanAmountSlider: document.getElementById('loanAmountSlider'),
+            interestRate: document.getElementById('interestRate'),
+            interestRateSlider: document.getElementById('interestRateSlider'),
+            loanTenure: document.getElementById('loanTenure'),
+            loanTenureSlider: document.getElementById('loanTenureSlider'),
+            
+            // Buttons
+            btnCalculate: document.getElementById('btnCalculate'),
+            btnReset: document.getElementById('btnReset'),
+            
+            // UI States
+            errorMsg: document.getElementById('errorMsg'),
+            errorText: document.getElementById('errorText'),
+            calculatorCard: document.getElementById('calculatorCard'),
+            resultsWrapper: document.getElementById('resultsWrapper'),
+            
+            // Outputs
+            resEmi: document.getElementById('resEmi'),
+            resPrincipal: document.getElementById('resPrincipal'),
+            resInterest: document.getElementById('resInterest'),
+            resTotal: document.getElementById('resTotal'),
+            
+            // Visual Bar
+            pctPrincipal: document.getElementById('pctPrincipal'),
+            pctInterest: document.getElementById('pctInterest'),
+            barPrincipal: document.getElementById('barPrincipal'),
+            barInterest: document.getElementById('barInterest'),
+
+            // Amortization
+            btnToggleTable: document.getElementById('btnToggleTable'),
+            tableWrapper: document.getElementById('tableWrapper'),
+            tableActions: document.getElementById('tableActions'),
+            tableBody: document.querySelector('#amortizationTable tbody'),
+            btnDownloadCSV: document.getElementById('btnDownloadCSV')
+        };
+
+        // --- Theme Management ---
+        function checkThemePreference() {
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.body.setAttribute('data-theme', 'dark');
+                DOM.themeToggle.innerHTML = '<i class="fas fa-lightbulb" style="color: #fbbf24;"></i>';
+            } else {
+                DOM.themeToggle.innerHTML = '<i class="far fa-lightbulb"></i>';
+            }
+        }
+
+        DOM.themeToggle.addEventListener('click', () => {
+            const isDark = document.body.getAttribute('data-theme') === 'dark';
+            if (isDark) {
+                document.body.removeAttribute('data-theme');
+                DOM.themeToggle.innerHTML = '<i class="far fa-lightbulb"></i>';
+            } else {
+                document.body.setAttribute('data-theme', 'dark');
+                DOM.themeToggle.innerHTML = '<i class="fas fa-lightbulb" style="color: #fbbf24;"></i>';
+            }
+        });
+        checkThemePreference();
+
+        // --- Synchronization (Input <-> Slider) ---
+        function syncInputAndSlider(inputEl, sliderEl) {
+            inputEl.addEventListener('input', () => {
+                let val = parseFloat(inputEl.value);
+                if (!isNaN(val)) sliderEl.value = val;
+            });
+            sliderEl.addEventListener('input', () => {
+                inputEl.value = sliderEl.value;
+            });
+        }
+        
+        syncInputAndSlider(DOM.loanAmount, DOM.loanAmountSlider);
+        syncInputAndSlider(DOM.interestRate, DOM.interestRateSlider);
+        syncInputAndSlider(DOM.loanTenure, DOM.loanTenureSlider);
+
+        // --- Formatting ---
+        const formatCurrency = (num) => {
+            return new Intl.NumberFormat('en-IN', {
+                style: 'currency',
+                currency: 'INR',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(num);
+        };
+
+        // --- Calculation Logic ---
+        let amortizationData = [];
+
+        DOM.btnCalculate.addEventListener('click', () => {
+            hideError();
+            
+            const principal = parseFloat(DOM.loanAmount.value);
+            const annualRate = parseFloat(DOM.interestRate.value);
+            const years = parseFloat(DOM.loanTenure.value);
+
+            if (isNaN(principal) || principal <= 0) return showError("Please enter a valid loan amount.");
+            if (isNaN(annualRate) || annualRate < 0) return showError("Please enter a valid interest rate.");
+            if (isNaN(years) || years <= 0) return showError("Please enter a valid loan tenure.");
+
+            const months = years * 12;
+            const monthlyRate = annualRate / 12 / 100;
+            let emi = 0;
+            let totalPayment = 0;
+            let totalInterest = 0;
+
+            // EMI Formula
+            if (monthlyRate === 0) {
+                emi = principal / months;
+            } else {
+                emi = principal * monthlyRate * Math.pow(1 + monthlyRate, months) / (Math.pow(1 + monthlyRate, months) - 1);
+            }
+
+            totalPayment = emi * months;
+            totalInterest = totalPayment - principal;
+
+            displayResults(emi, principal, totalInterest, totalPayment);
+            generateAmortizationSchedule(principal, monthlyRate, emi, months);
+        });
+
+        function displayResults(emi, principal, totalInterest, totalPayment) {
+            DOM.resultsWrapper.style.display = 'block';
+
+            // Animate Numbers
+            animateValue(DOM.resEmi, emi, true);
+            animateValue(DOM.resPrincipal, principal, true);
+            animateValue(DOM.resInterest, totalInterest, true);
+            animateValue(DOM.resTotal, totalPayment, true);
+
+            // Breakdown Bar Math
+            const pctPrincipal = ((principal / totalPayment) * 100).toFixed(1);
+            const pctInterest = ((totalInterest / totalPayment) * 100).toFixed(1);
+
+            animateValue(DOM.pctPrincipal, parseFloat(pctPrincipal), false);
+            animateValue(DOM.pctInterest, parseFloat(pctInterest), false);
+
+            setTimeout(() => {
+                DOM.barPrincipal.style.width = `${pctPrincipal}%`;
+                DOM.barInterest.style.width = `${pctInterest}%`;
+            }, 100);
+
+            // Scroll down
+            setTimeout(() => {
+                DOM.resultsWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 200);
+        }
+
+        function generateAmortizationSchedule(principal, monthlyRate, emi, months) {
+            amortizationData = [];
+            DOM.tableBody.innerHTML = '';
+            let balance = principal;
+
+            for (let i = 1; i <= months; i++) {
+                let interestForMonth = balance * monthlyRate;
+                let principalForMonth = emi - interestForMonth;
+
+                // Handle precision errors on last month
+                if (i === months) {
+                    principalForMonth = balance;
+                    emi = principalForMonth + interestForMonth;
+                    balance = 0;
+                } else {
+                    balance -= principalForMonth;
+                }
+
+                amortizationData.push({
+                    month: i,
+                    emi: emi,
+                    principal: principalForMonth,
+                    interest: interestForMonth,
+                    balance: Math.max(0, balance)
+                });
+
+                // Generate Table Rows
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${i}</td>
+                    <td>${formatCurrency(principalForMonth)}</td>
+                    <td>${formatCurrency(interestForMonth)}</td>
+                    <td>${formatCurrency(emi)}</td>
+                    <td>${formatCurrency(Math.max(0, balance))}</td>
+                `;
+                DOM.tableBody.appendChild(tr);
+            }
+        }
+
+        // --- Amortization Toggle ---
+        DOM.btnToggleTable.addEventListener('click', () => {
+            const isOpen = DOM.tableWrapper.classList.contains('open');
+            if (isOpen) {
+                DOM.tableWrapper.classList.remove('open');
+                DOM.tableActions.classList.remove('open');
+                DOM.btnToggleTable.classList.remove('open');
+            } else {
+                DOM.tableWrapper.classList.add('open');
+                DOM.tableActions.classList.add('open');
+                DOM.btnToggleTable.classList.add('open');
+            }
+        });
+
+        // --- CSV Download ---
+        DOM.btnDownloadCSV.addEventListener('click', () => {
+            if (!amortizationData.length) return;
+            
+            let csvContent = "Month,Principal Paid,Interest Paid,Total Payment,Remaining Balance\n";
+            
+            amortizationData.forEach(row => {
+                csvContent += `${row.month},${row.principal.toFixed(2)},${row.interest.toFixed(2)},${row.emi.toFixed(2)},${row.balance.toFixed(2)}\n`;
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", "passiontools_amortization_schedule.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+
+        // --- Reset ---
+        DOM.btnReset.addEventListener('click', () => {
+            DOM.loanAmount.value = '';
+            DOM.interestRate.value = '';
+            DOM.loanTenure.value = '';
+            
+            DOM.loanAmountSlider.value = 500000;
+            DOM.interestRateSlider.value = 8.5;
+            DOM.loanTenureSlider.value = 5;
+
+            DOM.resultsWrapper.style.display = 'none';
+            DOM.barPrincipal.style.width = '0%';
+            DOM.barInterest.style.width = '0%';
+            
+            // Close table
+            DOM.tableWrapper.classList.remove('open');
+            DOM.tableActions.classList.remove('open');
+            DOM.btnToggleTable.classList.remove('open');
+            
+            hideError();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // --- Error Handling ---
+        function showError(msg) {
+            DOM.errorText.textContent = msg;
+            DOM.errorMsg.classList.add('show');
+            DOM.calculatorCard.classList.add('error-shake');
+            DOM.resultsWrapper.style.display = 'none';
+            setTimeout(() => DOM.calculatorCard.classList.remove('error-shake'), 400);
+        }
+
+        function hideError() {
+            DOM.errorMsg.classList.remove('show');
+        }
+
+        // --- Number Animation ---
+        function animateValue(obj, end, isCurrency) {
+            let startTimestamp = null;
+            const duration = 1000; // 1s
+            const start = 0;
+
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const easeOut = progress * (2 - progress); 
+                const currentVal = (easeOut * (end - start) + start);
+                
+                if(isCurrency) {
+                    obj.innerHTML = formatCurrency(currentVal);
+                } else {
+                    obj.innerHTML = currentVal.toFixed(1);
+                }
+                
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                } else {
+                    obj.innerHTML = isCurrency ? formatCurrency(end) : end.toFixed(1);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        // Initialize values to defaults
+        DOM.loanAmount.value = DOM.loanAmountSlider.value;
+        DOM.interestRate.value = DOM.interestRateSlider.value;
+        DOM.loanTenure.value = DOM.loanTenureSlider.value;
+
+    </script>
+</body>
+</html>
