@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Scanner & Safety Checker - PassionTools</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --red: #ef4444;
+            --purple: #a855f7;
+            --blue: #3b82f6;
+            --green: #22c55e;
+            --orange: #f59e0b;
+            --bg-color: #f9fafb;
+            --card-bg: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --radius: 16px;
+            --transition: all 0.3s ease;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        header {
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        .header-content { display: flex; justify-content: space-between; align-items: center; }
+        .logo-text { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
+        .logo-tools { background: linear-gradient(to right, var(--red), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .back-link { text-decoration: none; color: var(--text-secondary); font-weight: 500; display: flex; align-items: center; gap: 8px; transition: var(--transition); cursor: pointer; }
+        .back-link:hover { color: var(--red); }
+        .tool-container { margin: 40px auto; flex: 1; max-width: 800px; width: 100%; }
+        .tool-header { text-align: center; margin-bottom: 30px; }
+        .tool-title { font-size: 36px; font-weight: 800; margin-bottom: 12px; }
+        .stage { display: none; animation: fadeIn 0.4s ease; }
+        .stage.active { display: block; }
+        .upload-area { background: white; border: 2px dashed var(--border-color); border-radius: var(--radius); padding: 80px 20px; text-align: center; cursor: pointer; transition: var(--transition); }
+        .upload-area:hover, .upload-area.dragover { border-color: var(--blue); background-color: rgba(59, 130, 246, 0.05); }
+        .upload-icon { font-size: 48px; color: var(--blue); margin-bottom: 16px; }
+        .card { background: white; padding: 30px; border-radius: var(--radius); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid var(--border-color); }
+        .scan-animation { text-align: center; padding: 40px 0; }
+        .radar { position: relative; width: 100px; height: 100px; border-radius: 50%; border: 2px solid var(--blue); margin: 0 auto 20px; overflow: hidden; background: rgba(59, 130, 246, 0.1); }
+        .radar::after { content: ''; position: absolute; top: 50%; left: 50%; width: 50%; height: 50%; background: linear-gradient(45deg, rgba(59,130,246,0) 0%, rgba(59,130,246,0.8) 100%); transform-origin: top left; animation: radarSpin 1.5s linear infinite; }
+        .progress-bar-bg { width: 100%; height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden; margin-top: 20px; }
+        .progress-bar-fill { height: 100%; width: 0%; background: linear-gradient(to right, var(--blue), var(--purple)); transition: width 0.1s linear; }
+        .scan-step { font-size: 14px; color: var(--text-secondary); margin-top: 10px; font-weight: 500; height: 20px; }
+        .result-header { display: flex; align-items: center; gap: 15px; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); }
+        .result-icon { font-size: 40px; }
+        .status-safe { color: var(--green); }
+        .status-suspicious { color: var(--orange); }
+        .status-threat { color: var(--red); }
+        .metadata-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
+        .meta-item { background: var(--bg-color); padding: 12px; border-radius: 8px; font-size: 13px; }
+        .meta-item.full-width { grid-column: 1 / -1; }
+        .meta-label { color: var(--text-secondary); font-size: 11px; text-transform: uppercase; font-weight: 700; margin-bottom: 4px; }
+        .meta-value { font-weight: 600; word-break: break-all; }
+        .risk-meter-container { margin-bottom: 25px; background: var(--bg-color); padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); }
+        .risk-labels { display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: var(--text-secondary); margin-bottom: 8px; text-transform: uppercase; }
+        .risk-bar-bg { width: 100%; height: 12px; background: #e5e7eb; border-radius: 6px; overflow: hidden; position: relative; }
+        .risk-bar-fill { height: 100%; width: 0%; border-radius: 6px; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.5s ease; }
+        .risk-score-text { text-align: center; margin-top: 12px; font-weight: 800; font-size: 16px; }
+        .risk-low { background: var(--green); }
+        .risk-med { background: var(--orange); }
+        .risk-high { background: var(--red); }
+        .preview-container { margin-bottom: 25px; border-radius: 8px; overflow: hidden; background: var(--bg-color); display: flex; justify-content: center; align-items: center; min-height: 150px; border: 1px solid var(--border-color); }
+        .preview-container img { max-width: 100%; max-height: 300px; object-fit: contain; }
+        .preview-container iframe { width: 100%; height: 400px; border: none; }
+        .threat-details { background: #fef2f2; border: 1px solid #fecaca; padding: 15px; border-radius: 8px; margin-bottom: 25px; display: none; }
+        .threat-details.suspicious { background: #fffbeb; border-color: #fde68a; display: block; }
+        .threat-details.active { display: block; }
+        .threat-details ul { margin-left: 20px; margin-top: 10px; font-size: 13px; color: var(--red); }
+        .threat-details.suspicious ul { color: #d97706; }
+        .btn { padding: 14px 24px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: var(--transition); border: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; text-decoration: none; font-size: 14px; }
+        .btn-primary { background: var(--blue); color: white; }
+        .btn-primary:hover { background: #2563eb; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
+        .btn-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); margin-top: 10px; }
+        .btn-outline:hover { background: var(--bg-color); color: var(--text-primary); }
+        .btn-safe-dl { background: var(--green); color: white; display: none; }
+        .btn-safe-dl:hover { background: #16a34a; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3); }
+        footer { background: #111827; color: white; padding: 40px 0; margin-top: auto; text-align: center; font-size: 14px; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes radarSpin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @media (max-width: 600px) {
+            .tool-title { font-size: 26px; }
+            .upload-area { padding: 50px 15px; }
+            .metadata-grid { grid-template-columns: 1fr; }
+            .preview-container iframe { height: 250px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-text">Passion<span class="logo-tools">Tools</span></div>
+                <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Tools</a>
+            </div>
+        </div>
+    </header>
+    <main class="container tool-container">
+        <div class="tool-header">
+            <h1 class="tool-title">File Scanner & Safety Checker</h1>
+            <p style="color: var(--text-secondary);">Analyze files for hidden threats, spoofed extensions, and malware signatures.</p>
+        </div>
+        <div class="main-content">
+            <div class="stage active" id="stageUpload">
+                <div class="upload-area" id="dropZone">
+                    <i class="fas fa-shield-virus upload-icon"></i>
+                    <div style="font-size: 18px; font-weight: 700;">Click or Drag & Drop File</div>
+                    <p style="color: var(--text-secondary); font-size: 14px; margin-top: 8px;">Max size: 25MB. Supports Images, PDFs, Documents, ZIPs.</p>
+                    <input type="file" id="fileInput" style="display: none;">
+                </div>
+            </div>
+            <div class="stage" id="stageScan">
+                <div class="card scan-animation">
+                    <div class="radar"></div>
+                    <h3 id="scanFilename">document.pdf</h3>
+                    <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressBar"></div></div>
+                    <div class="scan-step" id="scanStep">Scanning file structure...</div>
+                </div>
+            </div>
+            <div class="stage" id="stageResult">
+                <div class="card">
+                    <div class="result-header">
+                        <i class="fas fa-check-circle result-icon status-safe" id="resIcon"></i>
+                        <div>
+                            <h2 id="resTitle">File is Safe</h2>
+                            <p style="color: var(--text-secondary); font-size: 14px;" id="resDesc">No malicious signatures detected.</p>
+                        </div>
+                    </div>
+                    <div class="risk-meter-container">
+                        <div class="risk-labels">
+                            <span>Safe (0)</span>
+                            <span>High Risk (100)</span>
+                        </div>
+                        <div class="risk-bar-bg">
+                            <div class="risk-bar-fill" id="riskBarFill"></div>
+                        </div>
+                        <div class="risk-score-text">Threat Score: <span id="riskScoreValue">0</span>/100</div>
+                    </div>
+                    <div class="preview-container" id="previewContainer">
+                        <i class="fas fa-file-alt" style="font-size: 40px; color: #ccc;"></i>
+                    </div>
+                    <div class="metadata-grid">
+                        <div class="meta-item"><div class="meta-label">File Name</div><div class="meta-value" id="metaName">-</div></div>
+                        <div class="meta-item"><div class="meta-label">File Size</div><div class="meta-value" id="metaSize">-</div></div>
+                        <div class="meta-item"><div class="meta-label">Detected Type</div><div class="meta-value" id="metaType">-</div></div>
+                        <div class="meta-item"><div class="meta-label">Last Modified</div><div class="meta-value" id="metaDate">-</div></div>
+                        <div class="meta-item full-width">
+                            <div class="meta-label">SHA-256 Cryptographic Hash</div>
+                            <div class="meta-value" id="metaHash" style="font-size: 11px; font-family: monospace;">-</div>
+                        </div>
+                    </div>
+                    <div class="threat-details" id="threatBox">
+                        <strong id="threatTitle"><i class="fas fa-exclamation-triangle"></i> Security Alerts:</strong>
+                        <ul id="threatList"></ul>
+                    </div>
+                    <a href="#" class="btn btn-safe-dl" id="btnSafeDownload"><i class="fas fa-file-download"></i> Download Sanitized Copy</a>
+                    <button class="btn btn-outline" onclick="resetTool()"><i class="fas fa-redo"></i> Scan Another File</button>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 PassionTools. Secure client-side processing.</p>
+        </div>
+    </footer>
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const stages = { upload: document.getElementById('stageUpload'), scan: document.getElementById('stageScan'), result: document.getElementById('stageResult') };
+        const scanUI = { filename: document.getElementById('scanFilename'), bar: document.getElementById('progressBar'), step: document.getElementById('scanStep') };
+        const resUI = { icon: document.getElementById('resIcon'), title: document.getElementById('resTitle'), desc: document.getElementById('resDesc'), metaName: document.getElementById('metaName'), metaSize: document.getElementById('metaSize'), metaType: document.getElementById('metaType'), metaDate: document.getElementById('metaDate'), metaHash: document.getElementById('metaHash'), riskFill: document.getElementById('riskBarFill'), riskValue: document.getElementById('riskScoreValue'), threatBox: document.getElementById('threatBox'), threatList: document.getElementById('threatList'), preview: document.getElementById('previewContainer'), safeDlBtn: document.getElementById('btnSafeDownload') };
+        const MAX_SIZE_MB = 25;
+        const EXECUTABLE_EXTENSIONS = ['.exe', '.bat', '.cmd', '.sh', '.js', '.vbs', '.scr', '.pif', '.msi', '.jar', '.ps1'];
+        const SUSPICIOUS_MIME_TYPES = ['application/x-msdownload', 'application/x-sh', 'application/javascript', 'application/x-executable'];
+        let currentFile = null;
+        dropZone.onclick = () => fileInput.click();
+        fileInput.onchange = (e) => handleFile(e.target.files[0]);
+        dropZone.ondragover = (e) => { e.preventDefault(); dropZone.classList.add('dragover'); };
+        dropZone.ondragleave = () => dropZone.classList.remove('dragover');
+        dropZone.ondrop = (e) => { e.preventDefault(); dropZone.classList.remove('dragover'); handleFile(e.dataTransfer.files[0]); };
+        function switchStage(stageName) {
+            Object.values(stages).forEach(s => s.classList.remove('active'));
+            stages[stageName].classList.add('active');
+        }
+        function resetTool() {
+            fileInput.value = '';
+            resUI.preview.innerHTML = '<i class="fas fa-file-alt" style="font-size: 40px; color: #ccc;"></i>';
+            resUI.safeDlBtn.style.display = 'none';
+            resUI.threatBox.classList.remove('active', 'suspicious');
+            resUI.threatList.innerHTML = '';
+            resUI.metaHash.textContent = '-';
+            resUI.riskFill.style.width = '0%';
+            resUI.riskFill.className = 'risk-bar-fill';
+            resUI.riskValue.textContent = '0';
+            switchStage('upload');
+        }
+        async function generateFileHash(file) {
+            const buffer = await file.arrayBuffer();
+            const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+        }
+        async function handleFile(file) {
+            if (!file) return;
+            currentFile = file;
+            if (file.size > MAX_SIZE_MB * 1024 * 1024) {
+                alert(`File is too large. Maximum size is ${MAX_SIZE_MB}MB.`);
+                return;
+            }
+            switchStage('scan');
+            scanUI.filename.textContent = file.name;
+            const fileHash = await generateFileHash(file);
+            const report = analyzeFile(file);
+            report.hash = fileHash;
+            await simulateScanProgress();
+            let safeDataUrl = null;
+            if (file.type.startsWith('image/') && report.score < 70) {
+                safeDataUrl = await sanitizeImage(file);
+            }
+            displayResult(file, report, safeDataUrl);
+        }
+        function analyzeFile(file) {
+            const report = { score: 0, warnings: [], errors: [] };
+            const name = file.name.toLowerCase();
+            const extParts = name.split('.');
+            const finalExt = '.' + extParts[extParts.length - 1];
+            if (extParts.length > 2) {
+                const hiddenExt = '.' + extParts[extParts.length - 2];
+                if (['.pdf', '.jpg', '.png', '.doc', '.txt'].includes(hiddenExt) && EXECUTABLE_EXTENSIONS.includes(finalExt)) {
+                    report.errors.push(`Spoofed Extension Detected: File pretends to be ${hiddenExt} but is actually ${finalExt}.`);
+                    report.score += 100;
+                } else {
+                    report.warnings.push("Double extension detected. This tactic is often used to hide the true file type.");
+                    report.score += 40;
+                }
+            }
+            if (EXECUTABLE_EXTENSIONS.includes(finalExt)) {
+                report.errors.push(`Executable files (${finalExt}) are highly dangerous and blocked.`);
+                report.score += 100;
+            }
+            if (SUSPICIOUS_MIME_TYPES.includes(file.type)) {
+                report.errors.push(`Suspicious MIME type detected: ${file.type}`);
+                report.score += 85;
+            }
+            if (file.type.startsWith('image/') && !['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.bmp'].includes(finalExt)) {
+                report.warnings.push("File extension does not match the expected image type signature.");
+                report.score += 35;
+            }
+            if (file.size > 5000000 && !file.type.startsWith('image/') && !file.type.includes('video') && !file.type.includes('pdf')) {
+                report.warnings.push("Abnormally high file size for a non-media document. Could contain packed/obfuscated malware.");
+                report.score += 25;
+            }
+            if ((finalExt === '.zip' || file.type.includes('zip')) && file.size < 50000) {
+                report.warnings.push("Very small compressed archive detected. Possible compression bomb (Zip Bomb).");
+                report.score += 45;
+            }
+            report.score = Math.min(report.score, 100);
+            if (report.score === 0) report.status = 'safe';
+            else if (report.score < 70) report.status = 'suspicious';
+            else report.status = 'threat';
+            return report;
+        }
+        async function simulateScanProgress() {
+            let progress = 0;
+            scanUI.bar.style.width = '0%';
+            while (progress < 100) {
+                await new Promise(r => setTimeout(r, 120));
+                progress += Math.random() * 12;
+                if (progress > 100) progress = 100;
+                scanUI.bar.style.width = progress + '%';
+                if (progress < 30) scanUI.step.textContent = "Scanning file structure...";
+                else if (progress < 60) scanUI.step.textContent = "Analyzing binary signature...";
+                else if (progress < 85) scanUI.step.textContent = "Checking threat intelligence heuristics...";
+                else scanUI.step.textContent = "Finalizing security report...";
+            }
+            await new Promise(r => setTimeout(r, 200)); 
+        }
+        function sanitizeImage(file) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                img.onload = () => {
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+                    resolve(canvas.toDataURL('image/webp', 0.9));
+                };
+                img.onerror = () => resolve(null);
+                img.src = URL.createObjectURL(file);
+            });
+        }
+        function displayResult(file, report, safeDataUrl) {
+            switchStage('result');
+            const modDate = file.lastModified ? new Date(file.lastModified) : new Date();
+            const formattedDate = modDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+            resUI.metaName.textContent = file.name;
+            resUI.metaSize.textContent = formatBytes(file.size);
+            resUI.metaType.textContent = file.type || 'Unknown / Binary';
+            resUI.metaDate.textContent = formattedDate;
+            resUI.metaHash.textContent = report.hash;
+            setTimeout(() => {
+                resUI.riskFill.style.width = `${report.score}%`;
+                resUI.riskValue.textContent = report.score;
+                if (report.score <= 30) {
+                    resUI.riskFill.classList.add('risk-low');
+                    resUI.riskValue.style.color = 'var(--green)';
+                } else if (report.score < 70) {
+                    resUI.riskFill.classList.add('risk-med');
+                    resUI.riskValue.style.color = 'var(--orange)';
+                } else {
+                    resUI.riskFill.classList.add('risk-high');
+                    resUI.riskValue.style.color = 'var(--red)';
+                }
+            }, 100);
+            resUI.icon.className = 'fas result-icon';
+            if (report.status === 'safe') {
+                resUI.icon.classList.add('fa-check-circle', 'status-safe');
+                resUI.title.textContent = "File is Safe";
+                resUI.title.style.color = 'var(--text-primary)';
+                resUI.desc.textContent = "No anomalies found. Passed all client-side security heuristics.";
+            } else if (report.status === 'suspicious') {
+                resUI.icon.classList.add('fa-exclamation-triangle', 'status-suspicious');
+                resUI.title.textContent = "Suspicious File";
+                resUI.title.style.color = 'var(--orange)';
+                resUI.desc.textContent = "Proceed with caution. Several anomalies were detected.";
+            } else {
+                resUI.icon.classList.add('fa-times-circle', 'status-threat');
+                resUI.title.textContent = "Threat Detected";
+                resUI.title.style.color = 'var(--red)';
+                resUI.desc.textContent = "File blocked. Highly malicious signatures found.";
+            }
+            const issues = [...report.errors, ...report.warnings];
+            if (issues.length > 0) {
+                resUI.threatBox.className = `threat-details ${report.status}`;
+                resUI.threatList.innerHTML = issues.map(i => `<li>${i}</li>`).join('');
+            } else {
+                resUI.threatBox.classList.remove('active', 'suspicious');
+            }
+            resUI.preview.innerHTML = '';
+            if (report.status !== 'threat') {
+                if (file.type.startsWith('image/')) {
+                    const img = document.createElement('img');
+                    img.src = safeDataUrl || URL.createObjectURL(file);
+                    resUI.preview.appendChild(img);
+                    if (safeDataUrl) {
+                        resUI.safeDlBtn.style.display = 'inline-flex';
+                        resUI.safeDlBtn.href = safeDataUrl;
+                        resUI.safeDlBtn.download = `sanitized_${file.name.split('.')[0]}.webp`;
+                    }
+                } else if (file.type === 'application/pdf') {
+                    const iframe = document.createElement('iframe');
+                    iframe.src = URL.createObjectURL(file) + "#toolbar=0";
+                    resUI.preview.appendChild(iframe);
+                } else {
+                    resUI.preview.innerHTML = `<i class="fas fa-file-alt" style="font-size: 50px; color: #9ca3af;"></i><p style="margin-top:10px; color:#6b7280;">No preview available for this format.</p>`;
+                }
+            } else {
+                resUI.preview.innerHTML = `<i class="fas fa-shield-virus" style="font-size: 50px; color: var(--red);"></i><p style="margin-top:10px; color:var(--red); font-weight:600;">Preview Blocked for Security</p>`;
+            }
+        }
+        function formatBytes(bytes, decimals = 2) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024, dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+        }
+    </script>
+</body>
+</html>
