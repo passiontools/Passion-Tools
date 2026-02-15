@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Countdown Timer - PassionTools</title>
+    <style>
+        /* 🎨 GLOBAL TYPOGRAPHY & THEME VARIABLES */
+        :root {
+            /* Light Theme */
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --input-bg: #f8fafc;
+            --input-border: #cbd5e1;
+            --accent: #ef4444;
+            --accent-hover: #dc2626;
+            --bulb-hover: #0f172a;
+            --bulb-active: #0f172a;
+            --modern-blue: #3b82f6;
+            --modern-blue-dark: #2563eb;
+            --success: #10b981;
+            
+            /* Footer */
+            --footer-bg: #111827;
+            --footer-text: #94a3b8;
+        }
+
+        [data-theme="dark"] {
+            /* Dark Theme */
+            --bg-color: #020617;
+            --card-bg: #111827;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --input-bg: #1e293b;
+            --input-border: #475569;
+            --bulb-hover: #f8fafc;
+            --bulb-active: #fbbf24;
+
+            /* Footer */
+            --footer-bg: #020617;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* 🔷 HEADER */
+        header {
+            position: sticky;
+            top: 0;
+            height: 70px;
+            width: 100%;
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header-container {
+            width: 100%;
+            max-width: 1000px;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-passion { color: var(--text-main); }
+        .logo-tools {
+            background: linear-gradient(135deg, #ef4444, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .nav-link {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-muted);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-link:hover { color: var(--accent); }
+
+        .vertical-divider {
+            height: 20px;
+            width: 1px;
+            background-color: var(--border-color);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            border-radius: 6px;
+        }
+
+        .theme-toggle svg { width: 20px; height: 20px; }
+        .theme-toggle:hover { color: var(--bulb-hover); }
+        [data-theme="dark"] .theme-toggle svg { color: var(--bulb-active); }
+
+        /* 📦 MAIN TOOL SECTION */
+        main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+            width: 100%;
+        }
+
+        .tool-container {
+            width: 100%;
+            max-width: 800px; /* Slightly narrower for timer focus */
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            padding: 30px;
+            border: 1px solid var(--border-color);
+        }
+
+        .card h1 {
+            font-size: 24px;
+            margin-bottom: 25px;
+            font-weight: 700;
+            color: var(--text-main);
+            text-align: center;
+        }
+
+        /* ⏳ FORM LAYOUT */
+        .setup-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            transition: opacity 0.3s ease, height 0.3s ease;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .form-row.datetime {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        input[type="text"], input[type="date"], input[type="time"] {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--input-border);
+            background-color: var(--input-bg);
+            color: var(--text-main);
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input:focus {
+            border-color: var(--modern-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        /* 🔵 BUTTONS */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--modern-blue), var(--modern-blue-dark));
+            color: #ffffff;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 100%;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+            margin-top: 10px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+        }
+
+        .controls-row {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 25px;
+        }
+
+        .btn-secondary {
+            background-color: var(--input-bg);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--border-color);
+        }
+
+        /* ⏲️ COUNTDOWN DISPLAY SECTION */
+        .countdown-wrapper {
+            display: none; /* Hidden until started */
+            flex-direction: column;
+            align-items: center;
+            margin-top: 10px;
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .event-title-display {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .segments-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            width: 100%;
+        }
+
+        @media (min-width: 768px) {
+            .segments-container {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 20px;
+            }
+        }
+
+        .segment {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .segment-value {
+            font-size: 48px;
+            font-weight: 800;
+            color: var(--modern-blue);
+            line-height: 1;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: -1px;
+        }
+
+        .segment-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-top: 8px;
+            letter-spacing: 1px;
+        }
+
+        /* 🔔 COMPLETION STATE */
+        .completion-message {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            margin-top: 20px;
+            animation: bounceIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            50% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .completion-text {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--success);
+        }
+
+        /* 🔻 FOOTER */
+        footer {
+            background-color: var(--footer-bg);
+            color: var(--footer-text);
+            text-align: center;
+            padding: 30px 20px;
+            font-size: 14px;
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <span class="logo-passion">Passion</span><span class="logo-tools">Tools</span>
+            </div>
+            <div class="header-controls">
+                <a href="index.html" class="nav-link">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    Back to Tools
+                </a>
+                <div class="vertical-divider"></div>
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.9 1.2 1.5 1.5 2.5"/>
+                        <path d="M9 18h6"/>
+                        <path d="M10 22h4"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="tool-container">
+            <div class="card">
+                <h1>Countdown to Your Event</h1>
+                
+                <div class="setup-section" id="setupSection">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="eventName">Event Name (Optional)</label>
+                            <input type="text" id="eventName" placeholder="e.g., Vacation, Product Launch, New Year">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row datetime">
+                        <div class="form-group">
+                            <label for="targetDate">Target Date</label>
+                            <input type="date" id="targetDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="targetTime">Target Time</label>
+                            <input type="time" id="targetTime" required>
+                        </div>
+                    </div>
+
+                    <button class="btn-primary" id="startBtn">Start Countdown</button>
+                </div>
+
+                <div class="countdown-wrapper" id="countdownWrapper">
+                    <div class="event-title-display" id="displayEventName">Counting Down...</div>
+                    
+                    <div class="segments-container" id="timerSegments">
+                        <div class="segment">
+                            <div class="segment-value" id="valDays">00</div>
+                            <div class="segment-label">Days</div>
+                        </div>
+                        <div class="segment">
+                            <div class="segment-value" id="valHours">00</div>
+                            <div class="segment-label">Hours</div>
+                        </div>
+                        <div class="segment">
+                            <div class="segment-value" id="valMinutes">00</div>
+                            <div class="segment-label">Minutes</div>
+                        </div>
+                        <div class="segment">
+                            <div class="segment-value" id="valSeconds">00</div>
+                            <div class="segment-label">Seconds</div>
+                        </div>
+                    </div>
+
+                    <div class="completion-message" id="completionState">
+                        <div class="completion-text">Time's up! 🎉</div>
+                    </div>
+
+                    <div class="controls-row">
+                        <button class="btn-secondary" id="pauseBtn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+                            Pause
+                        </button>
+                        <button class="btn-secondary" id="resetBtn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+                            Reset
+                        </button>
+                        <button class="btn-secondary" id="shareBtn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+                            Share
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        © 2026 Passion Tools. Secure client-side processing.
+    </footer>
+
+    <script>
+        // --- 1. THEME SYSTEM ---
+        const themeToggleBtn = document.getElementById('themeToggle');
+        const htmlElement = document.documentElement;
+        const savedTheme = localStorage.getItem('passionTheme') || 'light';
+        htmlElement.setAttribute('data-theme', savedTheme);
+
+        themeToggleBtn.addEventListener('click', () => {
+            const currentTheme = htmlElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            htmlElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('passionTheme', newTheme);
+        });
+
+        // --- 2. DOM ELEMENTS ---
+        const setupSection = document.getElementById('setupSection');
+        const countdownWrapper = document.getElementById('countdownWrapper');
+        
+        const eventNameInput = document.getElementById('eventName');
+        const targetDateInput = document.getElementById('targetDate');
+        const targetTimeInput = document.getElementById('targetTime');
+        const startBtn = document.getElementById('startBtn');
+        
+        const displayEventName = document.getElementById('displayEventName');
+        const valDays = document.getElementById('valDays');
+        const valHours = document.getElementById('valHours');
+        const valMinutes = document.getElementById('valMinutes');
+        const valSeconds = document.getElementById('valSeconds');
+        const timerSegments = document.getElementById('timerSegments');
+        
+        const completionState = document.getElementById('completionState');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const shareBtn = document.getElementById('shareBtn');
+
+        // --- 3. STATE VARIABLES ---
+        let timerInterval = null;
+        let targetTimestamp = 0;
+        let isPaused = false;
+        let timeRemainingMs = 0; // Stored when paused to adjust target on resume
+
+        // Set default minimum datetime (Now + 5 minutes)
+        function setDefaultDateTime() {
+            const now = new Date();
+            now.setMinutes(now.getMinutes() + 5);
+            
+            const yyyy = now.getFullYear();
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            const dd = String(now.getDate()).padStart(2, '0');
+            targetDateInput.value = `${yyyy}-${mm}-${dd}`;
+            
+            const hours = String(now.getHours()).padStart(2, '0');
+            const mins = String(now.getMinutes()).padStart(2, '0');
+            targetTimeInput.value = `${hours}:${mins}`;
+        }
+        setDefaultDateTime();
+
+        // --- 4. AUDIO API BEEP ---
+        function playBeep() {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContext) return;
+                
+                const ctx = new AudioContext();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, ctx.currentTime); // A5 note
+                
+                // Fade out to avoid clicking sounds
+                gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+                
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                
+                osc.start();
+                osc.stop(ctx.currentTime + 0.5);
+            } catch (error) {
+                console.log("Audio not supported or blocked by browser policy.");
+            }
+        }
+
+        // --- 5. TIMER LOGIC ---
+        function formatNumber(num) {
+            return num < 10 ? `0${num}` : num;
+        }
+
+        function calculateTime() {
+            const now = Date.now();
+            const difference = targetTimestamp - now;
+
+            if (difference <= 0) {
+                clearInterval(timerInterval);
+                valDays.textContent = "00";
+                valHours.textContent = "00";
+                valMinutes.textContent = "00";
+                valSeconds.textContent = "00";
+                
+                timerSegments.style.display = 'none';
+                completionState.style.display = 'flex';
+                pauseBtn.style.display = 'none';
+                playBeep();
+                return;
+            }
+
+            const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+            valDays.textContent = formatNumber(days);
+            valHours.textContent = formatNumber(hours);
+            valMinutes.textContent = formatNumber(minutes);
+            valSeconds.textContent = formatNumber(seconds);
+        }
+
+        function startTimer() {
+            const dateVal = targetDateInput.value;
+            const timeVal = targetTimeInput.value;
+            
+            if (!dateVal || !timeVal) {
+                alert("Please select a valid date and time.");
+                return;
+            }
+
+            const selectedDate = new Date(`${dateVal}T${timeVal}`);
+            targetTimestamp = selectedDate.getTime();
+
+            if (targetTimestamp <= Date.now()) {
+                alert("Please select a date and time in the future.");
+                return;
+            }
+
+            // Setup UI
+            const name = eventNameInput.value.trim();
+            displayEventName.textContent = name ? `Counting down to: ${name}` : "Counting Down...";
+            
+            setupSection.style.display = 'none';
+            countdownWrapper.style.display = 'flex';
+            timerSegments.style.display = 'grid';
+            completionState.style.display = 'none';
+            pauseBtn.style.display = 'flex';
+            
+            isPaused = false;
+            pauseBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg> Pause`;
+
+            calculateTime(); // initial call
+            timerInterval = setInterval(calculateTime, 1000);
+        }
+
+        function togglePause() {
+            if (isPaused) {
+                // Resuming: Shift the target timestamp by how long it was paused
+                // so the remaining duration continues exactly where it left off.
+                targetTimestamp = Date.now() + timeRemainingMs;
+                timerInterval = setInterval(calculateTime, 1000);
+                isPaused = false;
+                pauseBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg> Pause`;
+            } else {
+                // Pausing: Calculate exact remaining ms and freeze
+                clearInterval(timerInterval);
+                timeRemainingMs = targetTimestamp - Date.now();
+                isPaused = true;
+                pauseBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> Resume`;
+            }
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            countdownWrapper.style.display = 'none';
+            setupSection.style.display = 'flex';
+        }
+
+        function shareCountdown() {
+            const name = eventNameInput.value.trim() || "my event";
+            const dateObj = new Date(targetTimestamp);
+            const dateString = dateObj.toLocaleString();
+            
+            const shareText = `I'm counting down to ${name} on ${dateString}! Create your own countdown at PassionTools.`;
+            
+            navigator.clipboard.writeText(shareText).then(() => {
+                const originalHTML = shareBtn.innerHTML;
+                shareBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Copied!`;
+                
+                setTimeout(() => {
+                    shareBtn.innerHTML = originalHTML;
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+            });
+        }
+
+        // --- 6. EVENT LISTENERS ---
+        startBtn.addEventListener('click', startTimer);
+        pauseBtn.addEventListener('click', togglePause);
+        resetBtn.addEventListener('click', resetTimer);
+        shareBtn.addEventListener('click', shareCountdown);
+
+    </script>
+</body>
+</html>
