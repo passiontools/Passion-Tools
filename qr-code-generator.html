@@ -187,11 +187,9 @@
             letter-spacing: -0.5px;
         }
 
+        /* CHANGED FROM GRADIENT TO BLACK/THEME COLOR */
         .page-title .gradient-text {
-            background: linear-gradient(135deg, #ef4444, #a855f7);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--text);
         }
 
         .page-subtitle {
@@ -607,11 +605,11 @@
 <body>
 
     <header class="header">
-        <a href="#" class="logo">
+        <a href="index.html" class="logo">
             <span class="logo-passion">Passion</span><span class="logo-tools">Tools</span>
         </a>
         <div class="header-right">
-            <a href="#" class="back-link">
+            <a href="index.html" class="back-link">
                 <svg viewBox="0 0 24 24"><path d="M19 12H5m0 0l7 7m-7-7l7-7"/></svg>
                 Back to Tools
             </a>
@@ -735,15 +733,11 @@
     <div class="toast" id="toast"></div>
 
     <script>
-        // ===== THEME SYSTEM (Bulb Icon) =====
         const themeToggle = document.getElementById('themeToggle');
         const themeIcon = document.getElementById('themeIcon');
         const html = document.documentElement;
 
-        // Bulb OFF (light mode) — outline only
         const bulbOff = '<path d="M9 21h6"/><path d="M12 3a6 6 0 0 0-4 10.47V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3.53A6 6 0 0 0 12 3z"/>';
-
-        // Bulb ON (dark mode) — filled with rays
         const bulbOn = '<path d="M9 21h6" stroke-width="2"/><path d="M12 3a6 6 0 0 0-4 10.47V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3.53A6 6 0 0 0 12 3z" fill="currentColor"/><line x1="12" y1="0" x2="12" y2="1"/><line x1="4.22" y1="4.22" x2="4.93" y2="4.93"/><line x1="0" y1="12" x2="1" y2="12"/><line x1="4.22" y1="19.78" x2="4.93" y2="19.07"/><line x1="19.78" y1="4.22" x2="19.07" y2="4.93"/><line x1="23" y1="12" x2="22" y2="12"/><line x1="19.78" y1="19.78" x2="19.07" y2="19.07"/>';
 
         function setTheme(theme) {
@@ -760,7 +754,6 @@
             setTheme(current === 'dark' ? 'light' : 'dark');
         });
 
-        // ===== TOAST =====
         function showToast(msg) {
             const toast = document.getElementById('toast');
             toast.textContent = msg;
@@ -768,7 +761,6 @@
             setTimeout(() => toast.classList.remove('show'), 2800);
         }
 
-        // ===== QR CODE GENERATOR =====
         let currentTab = 'url';
         let qrInstance = null;
 
@@ -805,7 +797,6 @@
             }
             errorEl.classList.remove('show');
 
-            // Clear previous QR
             if (qrInstance) {
                 qrInstance.clear();
                 qrInstance.makeCode(value);
@@ -815,7 +806,6 @@
                     text: value,
                     width: 256,
                     height: 256,
-                    // ==== CHANGED BACK TO BLACK HERE ====
                     colorDark: "#000000", 
                     colorLight: "#ffffff",
                     correctLevel: QRCode.CorrectLevel.H
@@ -854,13 +844,11 @@
             const input = document.getElementById('qrInput');
             const errorEl = document.getElementById('qrError');
 
-            // Clear QR
             if (qrInstance) {
                 qrInstance.clear();
                 qrInstance = null;
             }
 
-            // Reset QR box
             qrBox.innerHTML = '';
             qrBox.classList.remove('has-qr');
             const placeholder = document.createElement('div');
@@ -869,20 +857,14 @@
             placeholder.innerHTML = '<svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><path d="M14 14.5v1.5h1.5v-1.5H14z"></path><path d="M18.5 14.5v1.5H20v-1.5h-1.5z"></path><path d="M14 18.5v1.5h1.5v-1.5H14z"></path><path d="M18.5 18.5v1.5H20v-1.5h-1.5z"></path><path d="M16.25 16.25v1.5h1.5v-1.5h-1.5z"></path></svg>Your QR code will appear here';
             qrBox.appendChild(placeholder);
 
-            // Hide actions
             actionsEl.classList.add('hidden');
-
-            // Clear input
             input.value = '';
             errorEl.classList.remove('show');
-
-            // Reset tab to URL
             switchTab('url');
 
             showToast('🔄 Reset complete — start fresh!');
         }
 
-        // Enter key support
         document.getElementById('qrInput').addEventListener('keydown', function(e) {
             if (e.key === 'Enter') generateQR();
         });
