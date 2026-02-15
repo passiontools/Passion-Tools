@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Zone Converter - PassionTools</title>
+    <style>
+        /* 🎨 GLOBAL TYPOGRAPHY & THEME VARIABLES */
+        :root {
+            /* Light Theme */
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --input-bg: #f8fafc;
+            --input-border: #cbd5e1;
+            --accent: #ef4444;
+            --accent-hover: #dc2626;
+            --bulb-hover: #0f172a;
+            --bulb-active: #0f172a;
+            --modern-blue: #3b82f6;
+            --modern-blue-dark: #2563eb;
+            
+            /* Footer */
+            --footer-bg: #111827;
+            --footer-text: #94a3b8;
+        }
+
+        [data-theme="dark"] {
+            /* Dark Theme */
+            --bg-color: #020617;
+            --card-bg: #111827;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --input-bg: #1e293b;
+            --input-border: #475569;
+            --bulb-hover: #f8fafc;
+            --bulb-active: #fbbf24;
+
+            /* Footer */
+            --footer-bg: #020617;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* 🔷 HEADER */
+        header {
+            position: sticky;
+            top: 0;
+            height: 70px;
+            width: 100%;
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header-container {
+            width: 100%;
+            max-width: 1000px;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-passion { color: var(--text-main); }
+        .logo-tools {
+            background: linear-gradient(135deg, #ef4444, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .nav-link {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-muted);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-link:hover { color: var(--accent); }
+
+        .vertical-divider {
+            height: 20px;
+            width: 1px;
+            background-color: var(--border-color);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            border-radius: 6px;
+        }
+
+        .theme-toggle svg { width: 20px; height: 20px; }
+        .theme-toggle:hover { color: var(--bulb-hover); }
+        [data-theme="dark"] .theme-toggle svg { color: var(--bulb-active); }
+
+        /* 📦 MAIN TOOL SECTION */
+        main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+            width: 100%;
+        }
+
+        .tool-container {
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            padding: 30px;
+            border: 1px solid var(--border-color);
+        }
+
+        .card h1 {
+            font-size: 24px;
+            margin-bottom: 25px;
+            font-weight: 700;
+            color: var(--text-main);
+            text-align: center;
+        }
+
+        /* 🌍 FORM LAYOUT */
+        .grid-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        input[type="date"], input[type="time"], select {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--input-border);
+            background-color: var(--input-bg);
+            color: var(--text-main);
+            font-size: 16px;
+            outline: none;
+            cursor: pointer;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--modern-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .tz-columns {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 15px;
+            align-items: end;
+        }
+
+        .swap-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-bottom: 4px;
+        }
+
+        .btn-swap {
+            background-color: var(--input-bg);
+            border: 1px solid var(--input-border);
+            color: var(--text-main);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .btn-swap:hover {
+            border-color: var(--modern-blue);
+            color: var(--modern-blue);
+            transform: rotate(180deg);
+        }
+
+        /* 🔵 ACTIONS & RESULTS */
+        .actions {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn-action {
+            background: linear-gradient(135deg, var(--modern-blue), var(--modern-blue-dark));
+            color: #ffffff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 100%;
+            max-width: 300px;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+        }
+
+        .result-section {
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            min-height: 120px;
+            transition: opacity 0.3s ease;
+        }
+
+        .result-time-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .result-time {
+            font-size: 42px;
+            font-weight: 800;
+            color: var(--modern-blue);
+            line-height: 1.1;
+        }
+
+        .day-night-icon {
+            font-size: 32px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .result-date {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .result-meta {
+            font-size: 14px;
+            color: var(--text-muted);
+            background: var(--input-bg);
+            padding: 6px 14px;
+            border-radius: 20px;
+            display: inline-flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .badge {
+            background: var(--modern-blue);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* ⏱️ LIVE CLOCK FEATURE */
+        .live-clocks-wrapper {
+            margin-top: 25px;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            display: none;
+        }
+
+        .live-clocks-wrapper.active {
+            display: block;
+        }
+
+        .live-clocks-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .clocks-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            text-align: center;
+        }
+
+        .clock-card h3 {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .clock-card .time {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-main);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .toggle-clocks-btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .toggle-clocks-btn:hover {
+            background: var(--input-bg);
+            color: var(--text-main);
+        }
+
+        /* 📱 RESPONSIVENESS */
+        @media (max-width: 768px) {
+            .tz-columns {
+                grid-template-columns: 1fr;
+            }
+            .btn-swap {
+                transform: rotate(90deg);
+            }
+            .btn-swap:hover {
+                transform: rotate(270deg);
+            }
+            .clocks-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .card { padding: 40px; }
+            .result-time { font-size: 52px; }
+            .day-night-icon { font-size: 40px; }
+        }
+
+        /* 🔻 FOOTER */
+        footer {
+            background-color: var(--footer-bg);
+            color: var(--footer-text);
+            text-align: center;
+            padding: 30px 20px;
+            font-size: 14px;
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <span class="logo-passion">Passion</span><span class="logo-tools">Tools</span>
+            </div>
+            <div class="header-controls">
+                <a href="index.html" class="nav-link">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    Back to Tools
+                </a>
+                <div class="vertical-divider"></div>
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.9 1.2 1.5 1.5 2.5"/>
+                        <path d="M9 18h6"/>
+                        <path d="M10 22h4"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="tool-container">
+            <div class="card">
+                <h1>Convert Time Between Time Zones</h1>
+                
+                <div class="grid-layout">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="dateInput">Date</label>
+                            <input type="date" id="dateInput" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="timeInput">Time</label>
+                            <input type="time" id="timeInput" required>
+                        </div>
+                    </div>
+
+                    <div class="tz-columns">
+                        <div class="form-group">
+                            <label for="fromTz">From Time Zone</label>
+                            <select id="fromTz"></select>
+                        </div>
+
+                        <div class="swap-wrapper">
+                            <button class="btn-swap" id="swapBtn" aria-label="Swap time zones">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M16 3h5v5M4 21h5v-5M21 3l-7 7M3 21l7-7"></path>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="toTz">To Time Zone</label>
+                            <select id="toTz"></select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button class="btn-action" id="convertBtn">Convert Time</button>
+                    <button class="toggle-clocks-btn" id="toggleClocksBtn">Show Live Clocks</button>
+                </div>
+
+                <div class="result-section" id="resultContainer" style="opacity: 0;">
+                    <div class="result-time-wrapper">
+                        <div class="result-time" id="resTime">--:--</div>
+                        <div class="day-night-icon" id="resDayNightIcon"></div>
+                    </div>
+                    <div class="result-date" id="resDate">Select valid inputs to convert</div>
+                    <div class="result-meta" id="resMeta">
+                        <span id="resOffset">GMT Offset</span>
+                        <span class="badge" id="resDayDiff" style="display: none;"></span>
+                    </div>
+                </div>
+
+                <div class="live-clocks-wrapper" id="liveClocksWrapper">
+                    <div class="live-clocks-header">
+                        <span>Live Time Synchronization</span>
+                        <span style="font-size: 18px;">🔴</span>
+                    </div>
+                    <div class="clocks-grid">
+                        <div class="clock-card">
+                            <h3 id="liveFromTzLabel">From Zone <span id="liveFromIcon"></span></h3>
+                            <div class="time" id="liveFromTime">--:--:--</div>
+                        </div>
+                        <div class="clock-card">
+                            <h3 id="liveToTzLabel">To Zone <span id="liveToIcon"></span></h3>
+                            <div class="time" id="liveToTime">--:--:--</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        © 2026 Passion Tools. Secure client-side processing.
+    </footer>
+
+    <script>
+        // --- 1. THEME SYSTEM ---
+        const themeToggleBtn = document.getElementById('themeToggle');
+        const htmlElement = document.documentElement;
+        const savedTheme = localStorage.getItem('passionTheme') || 'light';
+        htmlElement.setAttribute('data-theme', savedTheme);
+
+        themeToggleBtn.addEventListener('click', () => {
+            const currentTheme = htmlElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            htmlElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('passionTheme', newTheme);
+        });
+
+        // --- 2. DOM ELEMENTS ---
+        const dateInput = document.getElementById('dateInput');
+        const timeInput = document.getElementById('timeInput');
+        const fromTzSelect = document.getElementById('fromTz');
+        const toTzSelect = document.getElementById('toTz');
+        const convertBtn = document.getElementById('convertBtn');
+        const swapBtn = document.getElementById('swapBtn');
+        const resultContainer = document.getElementById('resultContainer');
+        
+        const resTime = document.getElementById('resTime');
+        const resDayNightIcon = document.getElementById('resDayNightIcon');
+        const resDate = document.getElementById('resDate');
+        const resOffset = document.getElementById('resOffset');
+        const resDayDiff = document.getElementById('resDayDiff');
+
+        const toggleClocksBtn = document.getElementById('toggleClocksBtn');
+        const liveClocksWrapper = document.getElementById('liveClocksWrapper');
+        const liveFromTime = document.getElementById('liveFromTime');
+        const liveToTime = document.getElementById('liveToTime');
+        const liveFromTzLabel = document.getElementById('liveFromTzLabel');
+        const liveToTzLabel = document.getElementById('liveToTzLabel');
+        const liveFromIcon = document.getElementById('liveFromIcon');
+        const liveToIcon = document.getElementById('liveToIcon');
+
+        let liveClockInterval = null;
+
+        // --- 3. INITIALIZE TIME ZONES ---
+        const popularZones = [
+            'UTC',
+            'Asia/Kolkata',
+            'America/New_York',
+            'Europe/London',
+            'Asia/Dubai',
+            'Asia/Tokyo',
+            'Australia/Sydney'
+        ];
+
+        function initTimeZones() {
+            const allZones = Intl.supportedValuesOf('timeZone');
+            
+            const popularGroup = document.createElement('optgroup');
+            popularGroup.label = "Popular Time Zones";
+            popularZones.forEach(tz => {
+                popularGroup.appendChild(new Option(tz, tz));
+            });
+
+            const allGroup = document.createElement('optgroup');
+            allGroup.label = "All Time Zones";
+            allZones.forEach(tz => {
+                if (!popularZones.includes(tz)) {
+                    allGroup.appendChild(new Option(tz, tz));
+                }
+            });
+
+            fromTzSelect.appendChild(popularGroup);
+            fromTzSelect.appendChild(allGroup);
+            toTzSelect.innerHTML = fromTzSelect.innerHTML;
+
+            const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            fromTzSelect.value = allZones.includes(localTz) ? localTz : 'UTC';
+            toTzSelect.value = 'America/New_York';
+        }
+
+        function setDefaultDateTime() {
+            const now = new Date();
+            const yyyy = now.getFullYear();
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            const dd = String(now.getDate()).padStart(2, '0');
+            dateInput.value = `${yyyy}-${mm}-${dd}`;
+            
+            const hours = String(now.getHours()).padStart(2, '0');
+            const mins = String(now.getMinutes()).padStart(2, '0');
+            timeInput.value = `${hours}:${mins}`;
+        }
+
+        // --- 4. DAY/NIGHT HELPER ---
+        function getDayNightIcon(hour24) {
+            // Day is considered 6:00 AM to 5:59 PM (17:59)
+            if (hour24 >= 6 && hour24 < 18) {
+                return '☀️';
+            }
+            // Night is 6:00 PM to 5:59 AM
+            return '🌙';
+        }
+
+        // --- 5. CONVERSION LOGIC ---
+        function getUtcDateForTimezone(dateStr, timeStr, tz) {
+            const [year, month, day] = dateStr.split('-').map(Number);
+            const [hour, minute] = timeStr.split(':').map(Number);
+            
+            let d = new Date(Date.UTC(year, month - 1, day, hour, minute));
+            
+            for (let i = 0; i < 3; i++) {
+                const parts = new Intl.DateTimeFormat('en-US', {
+                    timeZone: tz, year: 'numeric', month: 'numeric', day: 'numeric',
+                    hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false
+                }).formatToParts(d);
+                
+                let p = {};
+                parts.forEach(x => p[x.type] = Number(x.value));
+                if (p.hour === 24) p.hour = 0;
+                
+                const guessLocal = Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute);
+                const targetLocal = Date.UTC(year, month - 1, day, hour, minute);
+                
+                const diff = targetLocal - guessLocal;
+                if (diff === 0) break;
+                
+                d = new Date(d.getTime() + diff);
+            }
+            return d;
+        }
+
+        function convertTime() {
+            if (!dateInput.value || !timeInput.value) {
+                alert("Please select a valid date and time.");
+                return;
+            }
+
+            const fromTz = fromTzSelect.value;
+            const toTz = toTzSelect.value;
+            
+            const trueDate = getUtcDateForTimezone(dateInput.value, timeInput.value, fromTz);
+
+            const optionsDate = { timeZone: toTz, weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const optionsTime = { timeZone: toTz, hour: '2-digit', minute: '2-digit', hour12: true };
+            const optionsHour24 = { timeZone: toTz, hour: 'numeric', hour12: false };
+            const optionsOffset = { timeZone: toTz, timeZoneName: 'shortOffset' };
+
+            const formattedDate = new Intl.DateTimeFormat('en-US', optionsDate).format(trueDate);
+            const formattedTime = new Intl.DateTimeFormat('en-US', optionsTime).format(trueDate);
+            
+            // Extract Hour to determine Day or Night
+            const targetHourParts = new Intl.DateTimeFormat('en-US', optionsHour24).formatToParts(trueDate);
+            let targetHour = parseInt(targetHourParts.find(p => p.type === 'hour').value, 10);
+            if (targetHour === 24) targetHour = 0;
+
+            const offsetParts = new Intl.DateTimeFormat('en-US', optionsOffset).formatToParts(trueDate);
+            const tzNamePart = offsetParts.find(p => p.type === 'timeZoneName');
+            const offsetStr = tzNamePart ? tzNamePart.value : toTz;
+
+            const formatYMD = (tz) => new Intl.DateTimeFormat('en-CA', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit'}).format(trueDate);
+            const sourceDayStr = formatYMD(fromTz);
+            const targetDayStr = formatYMD(toTz);
+            
+            const msDiff = new Date(targetDayStr) - new Date(sourceDayStr);
+            const dayDiff = Math.round(msDiff / 86400000);
+
+            // Update UI
+            resTime.textContent = formattedTime;
+            
+            // Re-trigger animation by re-rendering the icon element slightly
+            resDayNightIcon.style.animation = 'none';
+            resDayNightIcon.offsetHeight; /* trigger reflow */
+            resDayNightIcon.style.animation = null; 
+            resDayNightIcon.textContent = getDayNightIcon(targetHour);
+
+            resDate.textContent = formattedDate;
+            resOffset.textContent = offsetStr;
+            
+            if (dayDiff !== 0) {
+                resDayDiff.textContent = dayDiff > 0 ? `+${dayDiff} Day` : `${dayDiff} Day`;
+                resDayDiff.style.display = 'inline-block';
+            } else {
+                resDayDiff.style.display = 'none';
+            }
+
+            resultContainer.style.opacity = '1';
+        }
+
+        // --- 6. LIVE CLOCKS FEATURE ---
+        function updateLiveClocks() {
+            const now = new Date();
+            const fromTz = fromTzSelect.value;
+            const toTz = toTzSelect.value;
+
+            const timeOpt = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+            const hour24Opt = { hour: 'numeric', hour12: false };
+            
+            // Update From Zone
+            liveFromTzLabel.childNodes[0].nodeValue = fromTz.replace(/_/g, ' ') + " ";
+            liveFromTime.textContent = new Intl.DateTimeFormat('en-US', { ...timeOpt, timeZone: fromTz }).format(now);
+            
+            let fromHour = parseInt(new Intl.DateTimeFormat('en-US', { ...hour24Opt, timeZone: fromTz }).format(now), 10);
+            if(fromHour === 24) fromHour = 0;
+            liveFromIcon.textContent = getDayNightIcon(fromHour);
+
+            // Update To Zone
+            liveToTzLabel.childNodes[0].nodeValue = toTz.replace(/_/g, ' ') + " ";
+            liveToTime.textContent = new Intl.DateTimeFormat('en-US', { ...timeOpt, timeZone: toTz }).format(now);
+            
+            let toHour = parseInt(new Intl.DateTimeFormat('en-US', { ...hour24Opt, timeZone: toTz }).format(now), 10);
+            if(toHour === 24) toHour = 0;
+            liveToIcon.textContent = getDayNightIcon(toHour);
+        }
+
+        function toggleClocks() {
+            const isActive = liveClocksWrapper.classList.toggle('active');
+            if (isActive) {
+                toggleClocksBtn.textContent = "Hide Live Clocks";
+                updateLiveClocks(); // Initial paint
+                liveClockInterval = setInterval(updateLiveClocks, 1000);
+            } else {
+                toggleClocksBtn.textContent = "Show Live Clocks";
+                clearInterval(liveClockInterval);
+            }
+        }
+
+        // --- 7. EVENT LISTENERS ---
+        convertBtn.addEventListener('click', convertTime);
+        toggleClocksBtn.addEventListener('click', toggleClocks);
+
+        swapBtn.addEventListener('click', () => {
+            const temp = fromTzSelect.value;
+            fromTzSelect.value = toTzSelect.value;
+            toTzSelect.value = temp;
+            convertTime();
+            if (liveClocksWrapper.classList.contains('active')) {
+                updateLiveClocks();
+            }
+        });
+
+        [dateInput, timeInput, fromTzSelect, toTzSelect].forEach(el => {
+            el.addEventListener('change', () => {
+                if (resultContainer.style.opacity === '1') convertTime();
+            });
+        });
+
+        // Initialize App
+        initTimeZones();
+        setDefaultDateTime();
+    </script>
+</body>
+</html>
