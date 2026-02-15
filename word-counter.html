@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Counter & Analytics | PassionTools</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            /* Brand Colors */
+            --brand-charcoal: #1f2937;
+            --brand-red: #ef4444;
+            --brand-purple: #a855f7;
+            --brand-gradient: linear-gradient(to right, #ef4444, #a855f7);
+            --midnight-black: #111827;
+            
+            /* Light Theme UI */
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-soft: #f1f5f9;
+            --border-color: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            
+            /* Accents */
+            --primary-blue: #3b82f6;
+            --primary-blue-hover: #2563eb;
+            --accent-green: #10b981;
+            --accent-orange: #f59e0b;
+            --accent-purple: #8b5cf6;
+            --accent-rose: #f43f5e;
+            
+            /* Structure */
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #0f172a;
+            --bg-card: #1e293b;
+            --bg-soft: #334155;
+            --border-color: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --midnight-black: #020617;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-body); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; transition: var(--transition); }
+
+        /* --- HEADER --- */
+        header { background-color: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 16px 0; position: sticky; top: 0; z-index: 100; transition: var(--transition); }
+        .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        .header-content { display: flex; justify-content: space-between; align-items: center; height: 70px; }
+        
+        .logo { font-size: 24px; font-weight: 800; text-decoration: none; color: var(--text-main); letter-spacing: -0.5px; }
+        .logo span { background: var(--brand-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        .header-actions { display: flex; align-items: center; gap: 16px; }
+        .back-link { text-decoration: none; color: var(--text-muted); font-size: 15px; font-weight: 500; display: flex; align-items: center; gap: 8px; transition: var(--transition); }
+        .back-link:hover { color: var(--brand-red); opacity: 0.9; transform: translateX(-2px); }
+        
+        .header-divider { width: 1px; height: 20px; background-color: var(--border-color); }
+        .theme-toggle { background: transparent; border: none; color: var(--text-muted); font-size: 18px; cursor: pointer; display: flex; align-items: center; transition: var(--transition); }
+        .theme-toggle:hover { transform: scale(1.1); color: var(--text-main); }
+
+        /* --- MAIN LAYOUT --- */
+        main { flex: 1; padding: 40px 0; display: flex; flex-direction: column; align-items: center; }
+        .hero-title { text-align: center; margin-bottom: 30px; padding: 0 20px; animation: fadeUp 0.4s ease; }
+        .hero-title h1 { font-size: 32px; font-weight: 800; margin-bottom: 10px; }
+        .hero-title p { color: var(--text-muted); font-size: 16px; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+            width: 100%;
+            animation: fadeUp 0.5s ease;
+        }
+
+        @media (min-width: 1024px) {
+            .dashboard-grid { grid-template-columns: 1fr 380px; }
+        }
+
+        /* --- CARDS --- */
+        .card { 
+            background: var(--bg-card); 
+            border-radius: var(--radius-lg); 
+            box-shadow: var(--shadow-md); 
+            border: 1px solid var(--border-color); 
+            padding: 24px; 
+            transition: var(--transition); 
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* --- EDITOR SECTION --- */
+        .editor-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .toolbar-group { display: flex; gap: 10px; }
+
+        .icon-btn {
+            background: var(--bg-soft);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+        }
+
+        .icon-btn:hover { background: var(--border-color); color: var(--primary-blue); }
+        .icon-btn.danger:hover { color: var(--brand-red); }
+
+        textarea {
+            width: 100%;
+            min-height: 300px;
+            padding: 20px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background: var(--bg-soft);
+            color: var(--text-main);
+            font-size: 16px;
+            line-height: 1.6;
+            resize: vertical;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        textarea:focus {
+            border-color: var(--primary-blue);
+            background: var(--bg-card);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+
+        /* --- STATS GRID --- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .stat-box {
+            background: var(--bg-soft);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .stat-box:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary-blue);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .stat-val {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 4px;
+            line-height: 1.2;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* --- ANALYTICS SIDEBAR --- */
+        .analytics-group { margin-bottom: 30px; }
+        .analytics-group:last-child { margin-bottom: 0; }
+
+        /* Keyword Density Bars */
+        .keyword-list { display: flex; flex-direction: column; gap: 12px; }
+        .keyword-item { display: flex; flex-direction: column; gap: 6px; }
+        
+        .kw-header { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; }
+        .kw-word { color: var(--text-main); text-transform: capitalize; }
+        .kw-count { color: var(--text-muted); }
+
+        .kw-bar-track {
+            width: 100%;
+            height: 8px;
+            background: var(--bg-soft);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .kw-bar-fill {
+            height: 100%;
+            background: var(--brand-gradient);
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Secondary Stats (Reading time, Lexical density) */
+        .mini-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .mini-stat {
+            background: var(--bg-soft);
+            padding: 12px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .ms-label { font-size: 12px; color: var(--text-muted); font-weight: 600; }
+        .ms-val { font-size: 15px; font-weight: 700; color: var(--text-main); }
+
+        /* Text Insights */
+        .insights-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .insight-badge {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px;
+            border-radius: var(--radius-sm);
+            background: var(--bg-soft);
+            border: 1px solid var(--border-color);
+            font-size: 13px;
+            color: var(--text-main);
+            line-height: 1.5;
+        }
+
+        .insight-badge i { margin-top: 2px; }
+        .insight-info i { color: var(--primary-blue); }
+        .insight-warn i { color: var(--accent-orange); }
+        .insight-good i { color: var(--accent-green); }
+
+        /* --- FOOTER --- */
+        footer { background-color: var(--midnight-black); color: #ffffff; padding: 40px 0; text-align: center; font-size: 14px; margin-top: auto; transition: var(--transition); }
+
+        @media (max-width: 768px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .editor-toolbar { flex-direction: column; align-items: stretch; }
+            .toolbar-group { justify-content: space-between; }
+            .icon-btn { flex: 1; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">Passion<span>Tools</span></a>
+                <div class="header-actions">
+                    <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Tools</a>
+                    <div class="header-divider"></div>
+                    <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
+                        <i class="far fa-lightbulb"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="hero-title">
+                <h1>Word Counter & Analytics</h1>
+                <p>Real-time text statistics, keyword density, and deep writing insights.</p>
+            </div>
+
+            <div class="dashboard-grid">
+                
+                <div class="dashboard-main">
+                    <div class="card">
+                        <div class="editor-toolbar">
+                            <div class="card-title" style="margin:0;"><i class="fas fa-edit" style="color: var(--primary-blue)"></i> Text Editor</div>
+                            <div class="toolbar-group">
+                                <button class="icon-btn" id="btnPaste"><i class="fas fa-clipboard"></i> Paste</button>
+                                <button class="icon-btn danger" id="btnClear"><i class="fas fa-trash-alt"></i> Clear</button>
+                            </div>
+                        </div>
+
+                        <textarea id="textInput" placeholder="Start typing or paste your document here to analyze..."></textarea>
+                        
+                        <div class="stats-grid">
+                            <div class="stat-box">
+                                <div class="stat-val" id="stWords">0</div>
+                                <div class="stat-label">Words</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-val" id="stChars">0</div>
+                                <div class="stat-label">Characters</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-val" id="stCharsNoSpace">0</div>
+                                <div class="stat-label">Chars (No Space)</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-val" id="stSentences">0</div>
+                                <div class="stat-label">Sentences</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-val" id="stParagraphs">0</div>
+                                <div class="stat-label">Paragraphs</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-val" id="stLines">0</div>
+                                <div class="stat-label">Lines</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-sidebar">
+                    <div class="card" style="height: 100%;">
+                        
+                        <div class="analytics-group">
+                            <div class="card-title"><i class="fas fa-chart-bar" style="color: var(--accent-purple)"></i> Deep Analytics</div>
+                            <div class="mini-stats">
+                                <div class="mini-stat">
+                                    <span class="ms-label">Reading Time</span>
+                                    <span class="ms-val" id="msRead">0 min 0 sec</span>
+                                </div>
+                                <div class="mini-stat">
+                                    <span class="ms-label">Speaking Time</span>
+                                    <span class="ms-val" id="msSpeak">0 min 0 sec</span>
+                                </div>
+                                <div class="mini-stat">
+                                    <span class="ms-label">Lexical Density</span>
+                                    <span class="ms-val" id="msLexical">0%</span>
+                                </div>
+                                <div class="mini-stat">
+                                    <span class="ms-label">Avg Word Length</span>
+                                    <span class="ms-val" id="msAvgLen">0 chars</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="analytics-group">
+                            <div class="card-title"><i class="fas fa-tags" style="color: var(--accent-orange)"></i> Keyword Density (Top 5)</div>
+                            <div class="keyword-list" id="keywordList">
+                                <div style="font-size: 13px; color: var(--text-muted); text-align: center; padding: 20px 0;">Type some text to see keyword density.</div>
+                            </div>
+                        </div>
+
+                        <div class="analytics-group">
+                            <div class="card-title"><i class="fas fa-lightbulb" style="color: var(--accent-green)"></i> Text Insights</div>
+                            <div class="insights-list" id="insightsList">
+                                <div class="insight-badge insight-info">
+                                    <i class="fas fa-info-circle"></i>
+                                    <span>Insights will appear here as you type.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            © 2026 PassionTools. Secure client-side processing.
+        </div>
+    </footer>
+
+    <script>
+        /**
+         * PASSIONTOOLS - WORD COUNTER & ANALYTICS
+         */
+
+        const DOM = {
+            themeToggle: document.getElementById('themeToggle'),
+            iconLightbulb: document.querySelector('.theme-toggle i'),
+            textInput: document.getElementById('textInput'),
+            btnPaste: document.getElementById('btnPaste'),
+            btnClear: document.getElementById('btnClear'),
+            
+            // Stats
+            stWords: document.getElementById('stWords'),
+            stChars: document.getElementById('stChars'),
+            stCharsNoSpace: document.getElementById('stCharsNoSpace'),
+            stSentences: document.getElementById('stSentences'),
+            stParagraphs: document.getElementById('stParagraphs'),
+            stLines: document.getElementById('stLines'),
+            
+            // Advanced
+            msRead: document.getElementById('msRead'),
+            msSpeak: document.getElementById('msSpeak'),
+            msLexical: document.getElementById('msLexical'),
+            msAvgLen: document.getElementById('msAvgLen'),
+            
+            keywordList: document.getElementById('keywordList'),
+            insightsList: document.getElementById('insightsList')
+        };
+
+        // Common English Stop Words
+        const stopWords = new Set(['a','about','above','after','again','against','all','am','an','and','any','are','aren\'t','as','at','be','because','been','before','being','below','between','both','but','by','can\'t','cannot','could','couldn\'t','did','didn\'t','do','does','doesn\'t','doing','don\'t','down','during','each','few','for','from','further','had','hadn\'t','has','hasn\'t','have','haven\'t','having','he','he\'d','he\'ll','he\'s','her','here','here\'s','hers','herself','him','himself','his','how','how\'s','i','i\'d','i\'ll','i\'m','i\'ve','if','in','into','is','isn\'t','it','it\'s','its','itself','let\'s','me','more','most','mustn\'t','my','myself','no','nor','not','of','off','on','once','only','or','other','ought','oughtn\'t','our','ours','ourselves','out','over','own','same','shan\'t','she','she\'d','she\'ll','she\'s','should','shouldn\'t','so','some','such','than','that','that\'s','the','their','theirs','them','themselves','then','there','there\'s','these','they','they\'d','they\'ll','they\'re','they\'ve','this','those','through','to','too','under','until','up','very','was','wasn\'t','we','we\'d','we\'ll','we\'re','we\'ve','were','weren\'t','what','what\'s','when','when\'s','where','where\'s','which','which\'s','while','while\'s','who','who\'s','whom','why','why\'s','with','won\'t','would','wouldn\'t','you','you\'d','you\'ll','you\'re','you\'ve','your','yours','yourself','yourselves']);
+
+        // --- Theme Management ---
+        function checkThemePreference() {
+            if (localStorage.getItem('passion_theme') === 'dark' || 
+               (!localStorage.getItem('passion_theme') && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.body.setAttribute('data-theme', 'dark');
+                DOM.iconLightbulb.className = 'fas fa-lightbulb';
+                DOM.iconLightbulb.style.color = '#fbbf24';
+            } else {
+                document.body.removeAttribute('data-theme');
+                DOM.iconLightbulb.className = 'far fa-lightbulb';
+                DOM.iconLightbulb.style.color = '';
+            }
+        }
+
+        DOM.themeToggle.addEventListener('click', () => {
+            const isDark = document.body.getAttribute('data-theme') === 'dark';
+            if (isDark) {
+                document.body.removeAttribute('data-theme');
+                localStorage.setItem('passion_theme', 'light');
+                DOM.iconLightbulb.className = 'far fa-lightbulb';
+                DOM.iconLightbulb.style.color = '';
+            } else {
+                document.body.setAttribute('data-theme', 'dark');
+                localStorage.setItem('passion_theme', 'dark');
+                DOM.iconLightbulb.className = 'fas fa-lightbulb';
+                DOM.iconLightbulb.style.color = '#fbbf24';
+            }
+        });
+
+        // --- Analytics Engine ---
+        function analyzeText() {
+            const text = DOM.textInput.value;
+            const textTrimmed = text.trim();
+            
+            // 1. Basic Stats
+            const chars = text.length;
+            const charsNoSpace = text.replace(/\s/g, '').length;
+            const lines = text === '' ? 0 : text.split('\n').length;
+            
+            // Extract pure words (ignoring punctuation)
+            const wordsArray = textTrimmed === '' ? [] : textTrimmed.toLowerCase().match(/\b[a-z0-9'-]+\b/gi) || [];
+            const words = wordsArray.length;
+            
+            // Sentences: Split by . ! ? followed by space or end
+            const sentencesArray = textTrimmed === '' ? [] : textTrimmed.split(/[.!?]+(?=\s|$)/).filter(s => s.trim().length > 0);
+            const sentences = sentencesArray.length;
+            
+            // Paragraphs: Split by 2 or more newlines
+            const paragraphs = textTrimmed === '' ? 0 : textTrimmed.split(/\n\s*\n/).filter(p => p.trim().length > 0).length;
+
+            // Update DOM Basic
+            DOM.stWords.textContent = words;
+            DOM.stChars.textContent = chars;
+            DOM.stCharsNoSpace.textContent = charsNoSpace;
+            DOM.stSentences.textContent = sentences;
+            DOM.stParagraphs.textContent = paragraphs;
+            DOM.stLines.textContent = lines;
+
+            // 2. Advanced Stats
+            
+            // Reading & Speaking Time (200 wpm / 130 wpm)
+            const readMins = Math.floor(words / 200);
+            const readSecs = Math.round((words % 200) / (200 / 60));
+            DOM.msRead.textContent = `${readMins}m ${readSecs}s`;
+
+            const speakMins = Math.floor(words / 130);
+            const speakSecs = Math.round((words % 130) / (130 / 60));
+            DOM.msSpeak.textContent = `${speakMins}m ${speakSecs}s`;
+
+            // Lexical Density & Avg Length
+            if (words > 0) {
+                const uniqueWords = new Set(wordsArray.map(w => w.toLowerCase())).size;
+                const density = ((uniqueWords / words) * 100).toFixed(1);
+                DOM.msLexical.textContent = `${density}%`;
+
+                const totalWordChars = wordsArray.join('').length;
+                DOM.msAvgLen.textContent = (totalWordChars / words).toFixed(1) + ' ch';
+            } else {
+                DOM.msLexical.textContent = '0%';
+                DOM.msAvgLen.textContent = '0 ch';
+            }
+
+            // 3. Keyword Density (Top 5, excluding stop words)
+            renderKeywords(wordsArray);
+
+            // 4. Text Insights
+            renderInsights(text, sentencesArray, wordsArray);
+            
+            // Auto-resize textarea logic could go here if needed, but height:100% and min-height is usually cleaner for dashboards
+            
+            // Save state
+            localStorage.setItem('passion_word_counter', text);
+        }
+
+        function renderKeywords(wordsArray) {
+            if (wordsArray.length === 0) {
+                DOM.keywordList.innerHTML = '<div style="font-size: 13px; color: var(--text-muted); text-align: center; padding: 20px 0;">Type some text to see keyword density.</div>';
+                return;
+            }
+
+            const freqMap = {};
+            let validWordCount = 0;
+
+            wordsArray.forEach(word => {
+                const w = word.toLowerCase();
+                if (!stopWords.has(w) && w.length > 1) {
+                    freqMap[w] = (freqMap[w] || 0) + 1;
+                    validWordCount++;
+                }
+            });
+
+            // Sort by frequency
+            const sortedWords = Object.keys(freqMap).sort((a, b) => freqMap[b] - freqMap[a]).slice(0, 5);
+
+            if (sortedWords.length === 0) {
+                DOM.keywordList.innerHTML = '<div style="font-size: 13px; color: var(--text-muted); text-align: center; padding: 20px 0;">No significant keywords found yet.</div>';
+                return;
+            }
+
+            let html = '';
+            sortedWords.forEach(word => {
+                const count = freqMap[word];
+                const percentage = validWordCount > 0 ? ((count / validWordCount) * 100).toFixed(1) : 0;
+                
+                html += `
+                    <div class="keyword-item">
+                        <div class="kw-header">
+                            <span class="kw-word">${word}</span>
+                            <span class="kw-count">${count} (${percentage}%)</span>
+                        </div>
+                        <div class="kw-bar-track">
+                            <div class="kw-bar-fill" style="width: ${percentage}%;"></div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            DOM.keywordList.innerHTML = html;
+        }
+
+        function renderInsights(text, sentencesArray, wordsArray) {
+            const insights = [];
+            
+            if (text.length === 0) {
+                DOM.insightsList.innerHTML = `
+                    <div class="insight-badge insight-info">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Start typing to generate structural insights.</span>
+                    </div>`;
+                return;
+            }
+
+            // Check 1: Long Sentences (> 20 words)
+            let longSentences = 0;
+            sentencesArray.forEach(s => {
+                if (s.split(/\s+/).length > 20) longSentences++;
+            });
+            if (longSentences > 0) {
+                insights.push({
+                    type: 'warn',
+                    icon: 'fa-exclamation-triangle',
+                    text: `Found <strong>${longSentences}</strong> long sentence(s) (over 20 words). Consider breaking them up for better readability.`
+                });
+            }
+
+            // Check 2: Repeated Words (consecutive)
+            const repeatedRegex = /\b(\w+)\s+\1\b/gi;
+            let match;
+            const repeats = new Set();
+            while ((match = repeatedRegex.exec(text)) !== null) {
+                repeats.add(match[1].toLowerCase());
+            }
+            if (repeats.size > 0) {
+                insights.push({
+                    type: 'warn',
+                    icon: 'fa-copy',
+                    text: `Consecutive repeated words found: <strong>${Array.from(repeats).slice(0, 3).join(', ')}</strong>.`
+                });
+            }
+
+            // Check 3: Extra Spaces
+            if (/[ \t]{2,}/.test(text)) {
+                insights.push({
+                    type: 'info',
+                    icon: 'fa-ruler-horizontal',
+                    text: `Multiple consecutive spaces detected. You might want to clean up formatting.`
+                });
+            }
+
+            // Check 4: Punctuation density
+            const punctuationCount = (text.match(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g) || []).length;
+            if (wordsArray.length > 0 && (punctuationCount / wordsArray.length) > 0.3) {
+                insights.push({
+                    type: 'info',
+                    icon: 'fa-quote-right',
+                    text: `High punctuation density. Ensure it's not affecting readability.`
+                });
+            }
+
+            // Good job fallback
+            if (insights.length === 0 && wordsArray.length > 10) {
+                insights.push({
+                    type: 'good',
+                    icon: 'fa-check-circle',
+                    text: `Your text looks clean! No major readability issues detected.`
+                });
+            } else if (insights.length === 0) {
+                insights.push({
+                    type: 'info',
+                    icon: 'fa-pen',
+                    text: `Keep writing! More data needed for deep insights.`
+                });
+            }
+
+            // Build HTML
+            let html = '';
+            insights.forEach(ins => {
+                html += `
+                    <div class="insight-badge insight-${ins.type}">
+                        <i class="fas ${ins.icon}"></i>
+                        <span>${ins.text}</span>
+                    </div>
+                `;
+            });
+            
+            DOM.insightsList.innerHTML = html;
+        }
+
+        // --- Event Listeners ---
+        DOM.textInput.addEventListener('input', analyzeText);
+
+        DOM.btnClear.addEventListener('click', () => {
+            DOM.textInput.value = '';
+            analyzeText();
+            DOM.textInput.focus();
+        });
+
+        DOM.btnPaste.addEventListener('click', async () => {
+            try {
+                const text = await navigator.clipboard.readText();
+                DOM.textInput.value += text;
+                analyzeText();
+            } catch (err) {
+                alert('Clipboard access denied. Please paste manually using Ctrl+V or Cmd+V.');
+            }
+        });
+
+        // --- Initialization ---
+        function init() {
+            checkThemePreference();
+            const savedText = localStorage.getItem('passion_word_counter');
+            if (savedText) {
+                DOM.textInput.value = savedText;
+                analyzeText();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+
+    </script>
+</body>
+</html>
