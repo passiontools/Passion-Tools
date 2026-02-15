@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit Converter - PassionTools</title>
+    <style>
+        /* 🎨 GLOBAL TYPOGRAPHY & THEME VARIABLES */
+        :root {
+            /* Light Theme */
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --input-bg: #f8fafc;
+            --input-border: #cbd5e1;
+            --accent: #ef4444;
+            --accent-hover: #dc2626;
+            --bulb-hover: #0f172a;
+            --bulb-active: #0f172a;
+            
+            /* Footer */
+            --footer-bg: #111827;
+            --footer-text: #94a3b8;
+        }
+
+        [data-theme="dark"] {
+            /* Dark Theme */
+            --bg-color: #020617;
+            --card-bg: #111827;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --input-bg: #1e293b;
+            --input-border: #475569;
+            --bulb-hover: #f8fafc;
+            --bulb-active: #fbbf24;
+
+            /* Footer */
+            --footer-bg: #020617;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* 🔷 HEADER */
+        header {
+            position: sticky;
+            top: 0;
+            height: 70px;
+            width: 100%;
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header-container {
+            width: 100%;
+            max-width: 1000px;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-passion {
+            color: var(--text-main);
+        }
+
+        .logo-tools {
+            background: linear-gradient(135deg, #ef4444, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .nav-link {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-link:hover {
+            color: var(--accent);
+        }
+
+        .vertical-divider {
+            height: 20px;
+            width: 1px;
+            background-color: var(--border-color);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            border-radius: 6px;
+        }
+
+        .theme-toggle svg {
+            width: 20px;
+            height: 20px;
+            transition: color 0.2s, stroke 0.2s;
+        }
+
+        .theme-toggle:hover {
+            color: var(--bulb-hover);
+        }
+
+        [data-theme="dark"] .theme-toggle svg {
+            color: var(--bulb-active);
+        }
+
+        /* 📦 MAIN TOOL SECTION */
+        main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+            width: 100%;
+        }
+
+        .tool-container {
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            padding: 30px;
+            border: 1px solid var(--border-color);
+        }
+
+        .card h1 {
+            font-size: 24px;
+            margin-bottom: 25px;
+            font-weight: 700;
+            color: var(--text-main);
+            text-align: center;
+        }
+
+        /* 🔄 UNIT CONVERTER LAYOUT */
+        .converter-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        select, input {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--input-border);
+            background-color: var(--input-bg);
+            color: var(--text-main);
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        select:focus, input:focus {
+            border-color: #3b82f6; /* Focus updated to modern blue */
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        /* Hide number spinners */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        .columns {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: relative;
+        }
+
+        .swap-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .btn-swap {
+            background-color: var(--input-bg);
+            border: 1px solid var(--input-border);
+            color: var(--text-main);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .btn-swap:hover {
+            border-color: #3b82f6;
+            color: #3b82f6;
+            transform: rotate(180deg);
+        }
+
+        /* 📊 RESULT SECTION */
+        .result-section {
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .result-display {
+            font-size: 42px;
+            font-weight: 800;
+            color: var(--text-main);
+            word-break: break-all;
+            line-height: 1.2;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .result-display.animate {
+            transform: scale(1.08);
+            color: #3b82f6;
+        }
+
+        .formula-text {
+            font-size: 14px;
+            color: var(--text-muted);
+            background: var(--input-bg);
+            padding: 8px 16px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        /* 🔵 MODERN BLUE BUTTON */
+        .btn-action {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: #ffffff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            max-width: 300px;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+        }
+
+        .btn-action:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-copy {
+            background-color: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            font-size: 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-copy:hover {
+            background-color: var(--input-bg);
+            color: var(--text-main);
+        }
+
+        /* 📱 RESPONSIVENESS */
+        @media (min-width: 768px) {
+            .columns {
+                flex-direction: row;
+                align-items: flex-end;
+            }
+            .form-group {
+                flex: 1;
+            }
+            .swap-wrapper {
+                padding-bottom: 5px;
+            }
+            .btn-action {
+                width: auto;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .card {
+                padding: 40px;
+            }
+            .result-display {
+                font-size: 56px;
+            }
+        }
+
+        /* 🔻 FOOTER */
+        footer {
+            background-color: var(--footer-bg);
+            color: var(--footer-text);
+            text-align: center;
+            padding: 30px 20px;
+            font-size: 14px;
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <span class="logo-passion">Passion</span><span class="logo-tools">Tools</span>
+            </div>
+            <div class="header-controls">
+                <a href="#" class="nav-link">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    Back to Tools
+                </a>
+                <div class="vertical-divider"></div>
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.9 1.2 1.5 1.5 2.5"/>
+                        <path d="M9 18h6"/>
+                        <path d="M10 22h4"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="tool-container">
+            <div class="card">
+                <h1>Convert Units</h1>
+                
+                <div class="converter-grid">
+                    <div class="form-group">
+                        <label for="category">Category</label>
+                        <select id="category"></select>
+                    </div>
+
+                    <div class="columns">
+                        <div class="form-group">
+                            <label for="inputValue">From</label>
+                            <input type="number" id="inputValue" value="1" step="any" placeholder="Enter value">
+                            <select id="fromUnit" style="margin-top: 8px;"></select>
+                        </div>
+
+                        <div class="swap-wrapper">
+                            <button class="btn-swap" id="swapBtn" aria-label="Swap units">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M16 3h5v5M4 21h5v-5M21 3l-7 7M3 21l7-7"></path>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="toUnit">To</label>
+                            <div style="height: 43px; display: none;" class="desktop-spacer"></div>
+                            <select id="toUnit" style="margin-top: 51px;"></select>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: center; margin-top: 10px;">
+                        <button class="btn-action" id="convertBtn">Convert Now</button>
+                    </div>
+
+                    <div class="result-section">
+                        <div class="result-display" id="resultDisplay">0</div>
+                        <div class="formula-text" id="formulaText">Select units to view formula</div>
+                        <button class="btn-copy" id="copyBtn">Copy Result</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        © 2026 Passion Tools. Secure client-side processing.
+    </footer>
+
+    <script>
+        // 1. Theme Logic
+        const themeToggleBtn = document.getElementById('themeToggle');
+        const htmlElement = document.documentElement;
+        
+        const savedTheme = localStorage.getItem('passionTheme') || 'light';
+        htmlElement.setAttribute('data-theme', savedTheme);
+
+        themeToggleBtn.addEventListener('click', () => {
+            const currentTheme = htmlElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            htmlElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('passionTheme', newTheme);
+        });
+
+        // 2. Unit Dictionary mapping (Relative to a Base Unit for scaling)
+        const unitData = {
+            Length: {
+                "Meter": 1,
+                "Kilometer": 0.001,
+                "Mile": 0.000621371,
+                "Centimeter": 100,
+                "Millimeter": 1000,
+                "Inch": 39.3701,
+                "Foot": 3.28084,
+                "Yard": 1.09361
+            },
+            Weight: {
+                "Kilogram": 1,
+                "Gram": 1000,
+                "Pound": 2.20462,
+                "Ounce": 35.274,
+                "Ton": 0.001
+            },
+            Temperature: {
+                "Celsius": "celsius",
+                "Fahrenheit": "fahrenheit",
+                "Kelvin": "kelvin"
+            },
+            Area: {
+                "Square meter": 1,
+                "Square kilometer": 0.000001,
+                "Acre": 0.000247105,
+                "Hectare": 0.0001,
+                "Square foot": 10.7639
+            },
+            Volume: {
+                "Liter": 1,
+                "Milliliter": 1000,
+                "Gallon": 0.264172,
+                "Cubic meter": 0.001
+            },
+            Speed: {
+                "km/h": 1,
+                "mph": 0.621371,
+                "m/s": 0.277778
+            },
+            Time: {
+                "Second": 1,
+                "Minute": 1/60,
+                "Hour": 1/3600,
+                "Day": 1/86400
+            },
+            "Data Storage": {
+                "Byte": 1,
+                "KB": 1/1024,
+                "MB": 1/1048576,
+                "GB": 1/1073741824,
+                "TB": 1/1099511627776
+            }
+        };
+
+        // 3. DOM Elements Setup
+        const categorySelect = document.getElementById('category');
+        const fromUnitSelect = document.getElementById('fromUnit');
+        const toUnitSelect = document.getElementById('toUnit');
+        const inputValue = document.getElementById('inputValue');
+        const resultDisplay = document.getElementById('resultDisplay');
+        const formulaText = document.getElementById('formulaText');
+        const swapBtn = document.getElementById('swapBtn');
+        const convertBtn = document.getElementById('convertBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        
+        const desktopSpacer = document.querySelector('.desktop-spacer');
+        if (window.innerWidth >= 768) { desktopSpacer.style.display = 'block'; toUnitSelect.style.marginTop = '8px'; }
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 768) { desktopSpacer.style.display = 'block'; toUnitSelect.style.marginTop = '8px'; } 
+            else { desktopSpacer.style.display = 'none'; toUnitSelect.style.marginTop = '51px'; }
+        });
+
+        // 4. Populate Dropdowns
+        function initDropdowns() {
+            Object.keys(unitData).forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat;
+                opt.textContent = cat;
+                categorySelect.appendChild(opt);
+            });
+            populateUnits();
+        }
+
+        function populateUnits() {
+            fromUnitSelect.innerHTML = '';
+            toUnitSelect.innerHTML = '';
+            const category = categorySelect.value;
+            const units = Object.keys(unitData[category]);
+
+            units.forEach(unit => {
+                const opt1 = document.createElement('option');
+                opt1.value = unit;
+                opt1.textContent = unit;
+                fromUnitSelect.appendChild(opt1);
+
+                const opt2 = document.createElement('option');
+                opt2.value = unit;
+                opt2.textContent = unit;
+                toUnitSelect.appendChild(opt2);
+            });
+
+            if (units.length > 1) {
+                toUnitSelect.selectedIndex = 1;
+            }
+            calculate();
+        }
+
+        // 5. Conversion Logic
+        function formatNumber(num) {
+            if (Number.isInteger(num)) return num.toString();
+            return parseFloat(num.toPrecision(10)).toString();
+        }
+
+        function calculateTemperature(val, from, to) {
+            let celsius;
+            if (from === 'Celsius') celsius = val;
+            else if (from === 'Fahrenheit') celsius = (val - 32) * 5/9;
+            else if (from === 'Kelvin') celsius = val - 273.15;
+
+            if (to === 'Celsius') return celsius;
+            else if (to === 'Fahrenheit') return (celsius * 9/5) + 32;
+            else if (to === 'Kelvin') return celsius + 273.15;
+        }
+
+        function calculate() {
+            const val = parseFloat(inputValue.value);
+            const category = categorySelect.value;
+            const from = fromUnitSelect.value;
+            const to = toUnitSelect.value;
+
+            if (isNaN(val)) {
+                resultDisplay.textContent = "0";
+                formulaText.textContent = "Please enter a valid number";
+                return;
+            }
+
+            let result = 0;
+            let formula = "";
+
+            if (category === "Temperature") {
+                result = calculateTemperature(val, from, to);
+                formula = `Applying specific formula: ${from} to ${to}`;
+            } else {
+                const rateFrom = unitData[category][from];
+                const rateTo = unitData[category][to];
+                result = (val / rateFrom) * rateTo;
+                const conversionFactor = rateTo / rateFrom;
+                formula = `Multiply value by ${formatNumber(conversionFactor)}`;
+            }
+
+            const formattedResult = formatNumber(result);
+            resultDisplay.textContent = `${formattedResult} ${to}`;
+            formulaText.textContent = formula;
+
+            // Animation logic
+            resultDisplay.classList.remove('animate');
+            void resultDisplay.offsetWidth; // Trigger reflow
+            resultDisplay.classList.add('animate');
+            setTimeout(() => resultDisplay.classList.remove('animate'), 300);
+        }
+
+        // 6. Event Listeners
+        categorySelect.addEventListener('change', populateUnits);
+        fromUnitSelect.addEventListener('change', calculate);
+        toUnitSelect.addEventListener('change', calculate);
+        inputValue.addEventListener('input', calculate);
+        convertBtn.addEventListener('click', calculate);
+
+        swapBtn.addEventListener('click', () => {
+            const temp = fromUnitSelect.value;
+            fromUnitSelect.value = toUnitSelect.value;
+            toUnitSelect.value = temp;
+            calculate();
+        });
+
+        copyBtn.addEventListener('click', () => {
+            const textToCopy = resultDisplay.textContent;
+            if (textToCopy === "0") return;
+
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = "Copied!";
+                copyBtn.style.backgroundColor = "var(--input-bg)";
+                copyBtn.style.color = "var(--text-main)";
+                
+                setTimeout(() => {
+                    copyBtn.textContent = originalText;
+                    copyBtn.style.backgroundColor = "transparent";
+                    copyBtn.style.color = "var(--text-muted)";
+                }, 2000);
+            });
+        });
+
+        // Initialize application
+        initDropdowns();
+
+    </script>
+</body>
+</html>
