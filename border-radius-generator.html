@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Border Radius Generator – PassionTools</title>
+  <style>
+    /* ========== CSS VARIABLES / THEME SYSTEM ========== */
+    :root {
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --text-hover: #0f172a;
+      --border: #e2e8f0;
+      --border-light: #f1f5f9;
+      --input-bg: #f8fafc;
+      --slider-track: #e2e8f0;
+      --slider-thumb: #ef4444;
+      --accent: #ef4444;
+      --accent2: #a855f7;
+      --footer-bg: #111827;
+      --footer-text: #94a3b8;
+      --shadow: 0 4px 24px rgba(0,0,0,0.07);
+      --shadow-sm: 0 1px 4px rgba(0,0,0,0.06);
+      --preview-bg: #000000;
+      --preview-border: rgba(255,255,255,0.15);
+      --bulb-color: #64748b;
+      --bulb-hover: #0f172a;
+      --back-color: #64748b;
+      --back-hover: #ef4444;
+      --logo-passion: #0f172a;
+      --divider: #cbd5e1;
+      --preset-bg: #f1f5f9;
+      --preset-hover: #e2e8f0;
+      --preset-text: #334155;
+      --copy-bg: #10b981;
+      --download-bg: #3b82f6;
+      --clear-bg: #ef4444;
+      --random-bg: linear-gradient(135deg, #2563eb, #3b82f6, #0ea5e9);
+      --link-bg: #f1f5f9;
+      --transition: 0.3s ease;
+      --options-bg: #f8fafc;
+      --options-border: #e2e8f0;
+    }
+
+    [data-theme="dark"] {
+      --bg: #020617;
+      --card-bg: #111827;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-hover: #f8fafc;
+      --border: #1e293b;
+      --border-light: #1e293b;
+      --input-bg: #0f172a;
+      --slider-track: #334155;
+      --slider-thumb: #ef4444;
+      --shadow: 0 4px 24px rgba(0,0,0,0.3);
+      --shadow-sm: 0 1px 4px rgba(0,0,0,0.2);
+      --preview-bg: #000000;
+      --preview-border: rgba(255,255,255,0.1);
+      --bulb-color: #f8fafc;
+      --bulb-hover: #fbbf24;
+      --back-color: #94a3b8;
+      --back-hover: #ef4444;
+      --logo-passion: #f8fafc;
+      --divider: #334155;
+      --preset-bg: #1e293b;
+      --preset-hover: #334155;
+      --preset-text: #cbd5e1;
+      --link-bg: #1e293b;
+      --footer-bg: #020617;
+      --random-bg: linear-gradient(135deg, #1d4ed8, #2563eb, #0284c7);
+      --options-bg: #0f172a;
+      --options-border: #1e293b;
+    }
+
+    /* ========== GLOBAL RESET & TYPOGRAPHY ========== */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      transition: background var(--transition), color var(--transition);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.6;
+    }
+
+    /* ========== STICKY HEADER (70px) ========== */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      width: 100%;
+      height: 70px;
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      transition: background var(--transition), border-color var(--transition), box-shadow var(--transition);
+    }
+
+    /* Logo */
+    .logo {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      user-select: none;
+      text-decoration: none;
+      display: inline-flex;
+    }
+
+    .logo-passion {
+      color: var(--logo-passion);
+      transition: color var(--transition);
+    }
+
+    .logo-tools {
+      background: linear-gradient(135deg, #ef4444, #a855f7);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Header Right */
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 0;
+    }
+
+    /* Back to Tools */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--back-color);
+      transition: color 0.2s ease;
+      cursor: pointer;
+    }
+
+    .back-link:hover {
+      color: var(--back-hover);
+    }
+
+    .back-link:hover svg {
+      stroke: var(--back-hover);
+    }
+
+    .back-link svg {
+      stroke: var(--back-color);
+      transition: stroke 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    /* Vertical Divider */
+    .divider {
+      width: 1px;
+      height: 20px;
+      background: var(--divider);
+      margin: 0 16px;
+      flex-shrink: 0;
+      transition: background var(--transition);
+    }
+
+    /* Theme Toggle (Bulb) */
+    .theme-toggle {
+      background: none;
+      border: none;
+      padding: 4px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s ease;
+      outline: none;
+    }
+
+    .theme-toggle:hover {
+      transform: scale(1.1);
+    }
+
+    .theme-toggle svg {
+      width: 20px;
+      height: 20px;
+      transition: color 0.2s ease, fill 0.2s ease;
+    }
+
+    [data-theme="light"] .theme-toggle svg {
+      color: #64748b;
+    }
+
+    [data-theme="light"] .theme-toggle:hover svg {
+      color: #0f172a;
+    }
+
+    [data-theme="dark"] .theme-toggle svg {
+      color: #fbbf24;
+    }
+
+    /* ========== MAIN CONTENT ========== */
+    .main {
+      flex: 1;
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 20px 48px;
+    }
+
+    /* Page Title */
+    .page-title {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .page-title h1 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--text);
+      transition: color var(--transition);
+    }
+
+    .page-title h1 span {
+      background: linear-gradient(135deg, #ef4444, #a855f7);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .page-title p {
+      font-size: 15px;
+      color: var(--text-muted);
+      transition: color var(--transition);
+    }
+
+    /* Tool Card */
+    .tool-card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      transition: background var(--transition), border-color var(--transition), box-shadow var(--transition);
+    }
+
+    .tool-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+    }
+
+    /* ========== PREVIEW PANEL ========== */
+    .preview-panel {
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-right: 1px solid var(--border);
+      transition: border-color var(--transition);
+      min-height: 420px;
+    }
+
+    .preview-label {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      transition: color var(--transition);
+    }
+
+    .preview-box-container {
+      width: 300px;
+      height: 300px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ===== PREVIEW BOX - BLACK BACKGROUND ===== */
+    .preview-box {
+      width: 100%;
+      height: 100%;
+      background: var(--preview-bg);
+      border: 2px solid var(--preview-border);
+      transition: border-radius 0.35s cubic-bezier(.4,0,.2,1), background var(--transition), border-color var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .preview-box::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.02) 100%);
+      pointer-events: none;
+    }
+
+    /* ========== CONTROLS PANEL ========== */
+    .controls-panel {
+      padding: 28px 28px 20px;
+      overflow-y: auto;
+      max-height: 780px;
+    }
+
+    /* Section Headers */
+    .section-header {
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: color var(--transition);
+    }
+
+    .section-header::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+      transition: background var(--transition);
+    }
+
+    /* ===== OPTIONS BAR (Link Corners + Unit) - UPPER SECTION ===== */
+    .options-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+      padding: 12px 16px;
+      background: var(--options-bg);
+      border: 1px solid var(--options-border);
+      border-radius: 10px;
+      flex-wrap: wrap;
+      transition: background var(--transition), border-color var(--transition);
+    }
+
+    /* Link Corners Checkbox */
+    .link-corners {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      user-select: none;
+      transition: color var(--transition);
+    }
+
+    .link-corners input[type="checkbox"] {
+      accent-color: #ef4444;
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+
+    .link-icon {
+      display: inline-flex;
+      align-items: center;
+      margin-right: 2px;
+    }
+
+    .link-icon svg {
+      width: 15px;
+      height: 15px;
+      color: var(--text-muted);
+      transition: color var(--transition);
+    }
+
+    /* Unit Selector */
+    .unit-selector {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .unit-selector label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      transition: color var(--transition);
+    }
+
+    .unit-selector select {
+      padding: 6px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--input-bg);
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.2s ease, background var(--transition), color var(--transition);
+    }
+
+    .unit-selector select:focus {
+      border-color: #ef4444;
+    }
+
+    /* Corner Control Group */
+    .corner-group {
+      margin-bottom: 18px;
+    }
+
+    .corner-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color var(--transition);
+    }
+
+    .corner-label .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .dot-tl { background: #ef4444; }
+    .dot-tr { background: #3b82f6; }
+    .dot-br { background: #10b981; }
+    .dot-bl { background: #a855f7; }
+
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .slider-row label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      width: 16px;
+      text-align: right;
+      flex-shrink: 0;
+      transition: color var(--transition);
+    }
+
+    .slider-row input[type="range"] {
+      flex: 1;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 6px;
+      border-radius: 3px;
+      background: var(--slider-track);
+      outline: none;
+      cursor: pointer;
+      transition: background var(--transition);
+    }
+
+    .slider-row input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--slider-thumb);
+      cursor: pointer;
+      box-shadow: 0 1px 4px rgba(239,68,68,0.3);
+      transition: transform 0.15s ease;
+    }
+
+    .slider-row input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+
+    .slider-row input[type="range"]::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--slider-thumb);
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 1px 4px rgba(239,68,68,0.3);
+    }
+
+    .slider-row input[type="number"] {
+      width: 56px;
+      padding: 4px 6px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--input-bg);
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 500;
+      text-align: center;
+      outline: none;
+      font-family: inherit;
+      transition: border-color 0.2s ease, background var(--transition), color var(--transition);
+    }
+
+    .slider-row input[type="number"]:focus {
+      border-color: #ef4444;
+    }
+
+    /* Remove spinner for number inputs */
+    .slider-row input[type="number"]::-webkit-inner-spin-button,
+    .slider-row input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    .slider-row input[type="number"] {
+      -moz-appearance: textfield;
+    }
+
+    /* Presets */
+    .presets-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .preset-btn {
+      padding: 7px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--preset-bg);
+      color: var(--preset-text);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
+    }
+
+    .preset-btn:hover {
+      background: var(--preset-hover);
+      transform: translateY(-1px);
+    }
+
+    .preset-btn:active {
+      transform: translateY(0);
+    }
+
+    /* ===== RANDOM BUTTON - MODERN BLUE ===== */
+    .random-btn {
+      width: 100%;
+      padding: 11px;
+      border: none;
+      border-radius: 8px;
+      background: var(--random-bg);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: opacity 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(37,99,235,0.3);
+      letter-spacing: 0.3px;
+    }
+
+    .random-btn:hover {
+      opacity: 0.92;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(37,99,235,0.4);
+    }
+
+    .random-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 1px 4px rgba(37,99,235,0.2);
+    }
+
+    /* CSS Output */
+    .css-output-section {
+      margin-top: 4px;
+    }
+
+    .css-output-box {
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 16px;
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--text);
+      word-break: break-all;
+      margin-bottom: 12px;
+      transition: background var(--transition), border-color var(--transition), color var(--transition);
+      min-height: 48px;
+    }
+
+    .action-btns {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .action-btn {
+      flex: 1;
+      min-width: 90px;
+      padding: 9px 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      color: #fff;
+      transition: opacity 0.2s ease, transform 0.15s ease;
+    }
+
+    .action-btn:hover {
+      opacity: 0.85;
+      transform: translateY(-1px);
+    }
+
+    .action-btn:active {
+      transform: translateY(0);
+    }
+
+    .btn-copy { background: #10b981; }
+    .btn-download { background: #3b82f6; }
+    .btn-clear { background: #ef4444; }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #1e293b;
+      color: #f8fafc;
+      padding: 10px 24px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      opacity: 0;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      z-index: 9999;
+      pointer-events: none;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ========== FOOTER ========== */
+    .footer {
+      width: 100%;
+      background: var(--footer-bg);
+      text-align: center;
+      padding: 30px 20px;
+      transition: background var(--transition);
+    }
+
+    .footer p {
+      font-size: 14px;
+      color: #94a3b8;
+    }
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 1024px) {
+      .preview-box-container {
+        width: 260px;
+        height: 260px;
+      }
+
+      .controls-panel {
+        padding: 24px 20px 16px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .header {
+        padding: 0 16px;
+      }
+
+      .logo {
+        font-size: 20px;
+      }
+
+      .back-link span {
+        display: none;
+      }
+
+      .divider {
+        margin: 0 10px;
+      }
+
+      .main {
+        padding: 20px 12px 36px;
+      }
+
+      .page-title h1 {
+        font-size: 22px;
+      }
+
+      .tool-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .preview-panel {
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        padding: 24px 16px;
+        min-height: auto;
+      }
+
+      .preview-box-container {
+        width: 100%;
+        max-width: 280px;
+        height: 0;
+        padding-bottom: min(280px, 70vw);
+        position: relative;
+      }
+
+      .preview-box {
+        position: absolute;
+        inset: 0;
+      }
+
+      .controls-panel {
+        padding: 20px 16px 16px;
+        max-height: none;
+      }
+
+      .options-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .presets-grid {
+        gap: 6px;
+      }
+
+      .preset-btn {
+        padding: 6px 11px;
+        font-size: 11px;
+      }
+
+      .action-btns {
+        flex-direction: column;
+      }
+
+      .action-btn {
+        min-width: unset;
+      }
+    }
+
+    @media (max-width: 400px) {
+      .preview-box-container {
+        max-width: 220px;
+        padding-bottom: min(220px, 65vw);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========== HEADER ========== -->
+  <header class="header">
+    <a href="index.html" class="logo" aria-label="PassionTools Home">
+      <span class="logo-passion">Passion</span><span class="logo-tools">Tools</span>
+    </a>
+    <div class="header-right">
+      <a href="index.html" class="back-link" aria-label="Back to Tools">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        <span>Back to Tools</span>
+      </a>
+      <div class="divider"></div>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 18c0 3.5 5.5 3.5 5.5 0"/>
+          <path d="M12 2v1"/>
+          <path d="M4.22 4.22l.7.7"/>
+          <path d="M19.78 4.22l-.7.7"/>
+          <path d="M2 12h1"/>
+          <path d="M21 12h1"/>
+          <path d="M8 12a4 4 0 1 1 8 0 6 6 0 0 1-2 4H10a6 6 0 0 1-2-4z"/>
+          <path d="M10 16h4"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ========== MAIN CONTENT ========== -->
+  <main class="main">
+    <!-- Page Title -->
+    <div class="page-title">
+      <h1>🎨 <span>Border Radius</span> Generator</h1>
+      <p>Generate and preview custom CSS border-radius values visually</p>
+    </div>
+
+    <!-- Tool Card -->
+    <div class="tool-card">
+      <div class="tool-layout">
+
+        <!-- Preview Panel -->
+        <div class="preview-panel">
+          <div class="preview-label">Live Preview</div>
+          <div class="preview-box-container">
+            <div class="preview-box" id="previewBox"></div>
+          </div>
+        </div>
+
+        <!-- Controls Panel -->
+        <div class="controls-panel">
+
+          <!-- ===== OPTIONS BAR (Link Corners + Unit) - MOVED TO TOP ===== -->
+          <div class="options-bar">
+            <label class="link-corners">
+              <input type="checkbox" id="linkCorners">
+              <span class="link-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                </svg>
+              </span>
+              Link All Corners
+            </label>
+            <div class="unit-selector">
+              <label for="unitSelect">Unit:</label>
+              <select id="unitSelect">
+                <option value="px" selected>px</option>
+                <option value="%">%</option>
+                <option value="em">em</option>
+                <option value="rem">rem</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Presets -->
+          <div class="section-header">Presets</div>
+          <div class="presets-grid">
+            <button class="preset-btn" data-preset="rounded">Rounded</button>
+            <button class="preset-btn" data-preset="circle">Circle</button>
+            <button class="preset-btn" data-preset="blob">Blob</button>
+            <button class="preset-btn" data-preset="wave">Wave</button>
+            <button class="preset-btn" data-preset="leaf">Leaf</button>
+            <button class="preset-btn" data-preset="diamond">Diamond Curve</button>
+          </div>
+
+          <!-- Random Generator - Modern Blue -->
+          <button class="random-btn" id="randomBtn">🎲 Generate Random Shape</button>
+
+          <!-- Corner Controls -->
+          <div class="section-header">Corner Controls</div>
+
+          <!-- Top-Left -->
+          <div class="corner-group">
+            <div class="corner-label"><span class="dot dot-tl"></span> Top-Left</div>
+            <div class="slider-row">
+              <label>H</label>
+              <input type="range" min="0" max="200" value="0" data-corner="tl" data-axis="h">
+              <input type="number" min="0" max="200" value="0" data-corner="tl" data-axis="h">
+            </div>
+            <div class="slider-row">
+              <label>V</label>
+              <input type="range" min="0" max="200" value="0" data-corner="tl" data-axis="v">
+              <input type="number" min="0" max="200" value="0" data-corner="tl" data-axis="v">
+            </div>
+          </div>
+
+          <!-- Top-Right -->
+          <div class="corner-group">
+            <div class="corner-label"><span class="dot dot-tr"></span> Top-Right</div>
+            <div class="slider-row">
+              <label>H</label>
+              <input type="range" min="0" max="200" value="0" data-corner="tr" data-axis="h">
+              <input type="number" min="0" max="200" value="0" data-corner="tr" data-axis="h">
+            </div>
+            <div class="slider-row">
+              <label>V</label>
+              <input type="range" min="0" max="200" value="0" data-corner="tr" data-axis="v">
+              <input type="number" min="0" max="200" value="0" data-corner="tr" data-axis="v">
+            </div>
+          </div>
+
+          <!-- Bottom-Right -->
+          <div class="corner-group">
+            <div class="corner-label"><span class="dot dot-br"></span> Bottom-Right</div>
+            <div class="slider-row">
+              <label>H</label>
+              <input type="range" min="0" max="200" value="0" data-corner="br" data-axis="h">
+              <input type="number" min="0" max="200" value="0" data-corner="br" data-axis="h">
+            </div>
+            <div class="slider-row">
+              <label>V</label>
+              <input type="range" min="0" max="200" value="0" data-corner="br" data-axis="v">
+              <input type="number" min="0" max="200" value="0" data-corner="br" data-axis="v">
+            </div>
+          </div>
+
+          <!-- Bottom-Left -->
+          <div class="corner-group">
+            <div class="corner-label"><span class="dot dot-bl"></span> Bottom-Left</div>
+            <div class="slider-row">
+              <label>H</label>
+              <input type="range" min="0" max="200" value="0" data-corner="bl" data-axis="h">
+              <input type="number" min="0" max="200" value="0" data-corner="bl" data-axis="h">
+            </div>
+            <div class="slider-row">
+              <label>V</label>
+              <input type="range" min="0" max="200" value="0" data-corner="bl" data-axis="v">
+              <input type="number" min="0" max="200" value="0" data-corner="bl" data-axis="v">
+            </div>
+          </div>
+
+          <!-- CSS Output -->
+          <div class="section-header">CSS Output</div>
+          <div class="css-output-section">
+            <div class="css-output-box" id="cssOutput">border-radius: 0px;</div>
+            <div class="action-btns">
+              <button class="action-btn btn-copy" id="copyBtn">📋 Copy</button>
+              <button class="action-btn btn-download" id="downloadBtn">💾 Download</button>
+              <button class="action-btn btn-clear" id="clearBtn">🗑 Clear</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="footer">
+    <p>&copy; 2026 Passion Tools. Secure client-side processing.</p>
+  </footer>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- ========== JAVASCRIPT ========== -->
+  <script>
+    (function() {
+      'use strict';
+
+      /* ===== THEME SYSTEM ===== */
+      const html = document.documentElement;
+      const themeToggle = document.getElementById('themeToggle');
+
+      // Apply saved theme immediately (no flicker)
+      const savedTheme = localStorage.getItem('pt-theme') || 'light';
+      html.setAttribute('data-theme', savedTheme);
+
+      themeToggle.addEventListener('click', function() {
+        const current = html.getAttribute('data-theme');
+        const next = current === 'light' ? 'dark' : 'light';
+        html.setAttribute('data-theme', next);
+        localStorage.setItem('pt-theme', next);
+      });
+
+      /* ===== STATE ===== */
+      const state = {
+        tl: { h: 0, v: 0 },
+        tr: { h: 0, v: 0 },
+        br: { h: 0, v: 0 },
+        bl: { h: 0, v: 0 }
+      };
+
+      const corners = ['tl', 'tr', 'br', 'bl'];
+      const axes = ['h', 'v'];
+
+      /* ===== DOM REFERENCES ===== */
+      const previewBox = document.getElementById('previewBox');
+      const cssOutput = document.getElementById('cssOutput');
+      const linkCorners = document.getElementById('linkCorners');
+      const unitSelect = document.getElementById('unitSelect');
+      const copyBtn = document.getElementById('copyBtn');
+      const downloadBtn = document.getElementById('downloadBtn');
+      const clearBtn = document.getElementById('clearBtn');
+      const randomBtn = document.getElementById('randomBtn');
+      const toast = document.getElementById('toast');
+
+      /* ===== HELPERS ===== */
+
+      // Get all inputs for a specific corner/axis
+      function getInputs(corner, axis) {
+        return document.querySelectorAll(
+          'input[data-corner="' + corner + '"][data-axis="' + axis + '"]'
+        );
+      }
+
+      // Sync UI with state
+      function syncUI() {
+        corners.forEach(function(c) {
+          axes.forEach(function(a) {
+            var inputs = getInputs(c, a);
+            inputs.forEach(function(inp) {
+              inp.value = state[c][a];
+            });
+          });
+        });
+      }
+
+      // Update preview and CSS output
+      function update() {
+        var unit = unitSelect.value;
+        var tl_h = state.tl.h, tl_v = state.tl.v;
+        var tr_h = state.tr.h, tr_v = state.tr.v;
+        var br_h = state.br.h, br_v = state.br.v;
+        var bl_h = state.bl.h, bl_v = state.bl.v;
+
+        // Build the full border-radius (always use px for preview)
+        var brString = tl_h + 'px ' + tr_h + 'px ' + br_h + 'px ' + bl_h + 'px / ' +
+                       tl_v + 'px ' + tr_v + 'px ' + br_v + 'px ' + bl_v + 'px';
+
+        previewBox.style.borderRadius = brString;
+
+        // Build CSS string for output
+        var hAll = [tl_h, tr_h, br_h, bl_h];
+        var vAll = [tl_v, tr_v, br_v, bl_v];
+        var hSame = hAll.every(function(v) { return v === hAll[0]; });
+        var vSame = vAll.every(function(v) { return v === vAll[0]; });
+        var hvMatch = hAll.every(function(v, i) { return v === vAll[i]; });
+
+        var cssStr;
+
+        if (hSame && vSame && hAll[0] === vAll[0]) {
+          // All equal: shorthand
+          cssStr = 'border-radius: ' + hAll[0] + unit + ';';
+        } else if (hvMatch) {
+          // H matches V per-corner: no slash needed
+          cssStr = 'border-radius: ' + hAll.map(function(v) { return v + unit; }).join(' ') + ';';
+        } else {
+          // Full syntax
+          cssStr = 'border-radius: ' +
+            hAll.map(function(v) { return v + unit; }).join(' ') + ' / ' +
+            vAll.map(function(v) { return v + unit; }).join(' ') + ';';
+        }
+
+        cssOutput.textContent = cssStr;
+      }
+
+      /* ===== EVENT LISTENERS ===== */
+
+      // Attach input listeners to all sliders and number inputs
+      document.querySelectorAll('.slider-row input').forEach(function(input) {
+        var corner = input.getAttribute('data-corner');
+        var axis = input.getAttribute('data-axis');
+
+        function handleInput() {
+          var val = parseInt(input.value, 10);
+          if (isNaN(val) || val < 0) val = 0;
+          if (val > 200) val = 200;
+
+          if (linkCorners.checked) {
+            // Update all corners for both axes
+            corners.forEach(function(c) {
+              axes.forEach(function(a) {
+                state[c][a] = val;
+              });
+            });
+          } else {
+            state[corner][axis] = val;
+          }
+
+          syncUI();
+          update();
+        }
+
+        input.addEventListener('input', handleInput);
+        input.addEventListener('change', handleInput);
+      });
+
+      // Link corners toggle
+      linkCorners.addEventListener('change', function() {
+        if (linkCorners.checked) {
+          // Set all to current tl.h value
+          var val = state.tl.h;
+          corners.forEach(function(c) {
+            axes.forEach(function(a) {
+              state[c][a] = val;
+            });
+          });
+          syncUI();
+          update();
+        }
+      });
+
+      // Unit selector
+      unitSelect.addEventListener('change', update);
+
+      /* ===== PRESETS ===== */
+      var presets = {
+        rounded:  { tl:{h:20,v:20}, tr:{h:20,v:20}, br:{h:20,v:20}, bl:{h:20,v:20} },
+        circle:   { tl:{h:100,v:100}, tr:{h:100,v:100}, br:{h:100,v:100}, bl:{h:100,v:100} },
+        blob:     { tl:{h:60,v:120}, tr:{h:150,v:50}, br:{h:80,v:160}, bl:{h:140,v:70} },
+        wave:     { tl:{h:100,v:30}, tr:{h:30,v:100}, br:{h:100,v:30}, bl:{h:30,v:100} },
+        leaf:     { tl:{h:0,v:0}, tr:{h:100,v:100}, br:{h:0,v:0}, bl:{h:100,v:100} },
+        diamond:  { tl:{h:50,v:100}, tr:{h:100,v:50}, br:{h:50,v:100}, bl:{h:100,v:50} }
+      };
+
+      document.querySelectorAll('.preset-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var key = btn.getAttribute('data-preset');
+          var p = presets[key];
+          if (!p) return;
+          corners.forEach(function(c) {
+            state[c].h = p[c].h;
+            state[c].v = p[c].v;
+          });
+          linkCorners.checked = false;
+          syncUI();
+          update();
+        });
+      });
+
+      /* ===== RANDOM GENERATOR ===== */
+      randomBtn.addEventListener('click', function() {
+        corners.forEach(function(c) {
+          state[c].h = Math.floor(Math.random() * 180) + 10;
+          state[c].v = Math.floor(Math.random() * 180) + 10;
+        });
+        linkCorners.checked = false;
+        syncUI();
+        update();
+      });
+
+      /* ===== ACTION BUTTONS ===== */
+
+      // Toast helper
+      function showToast(msg) {
+        toast.textContent = msg;
+        toast.classList.add('show');
+        setTimeout(function() {
+          toast.classList.remove('show');
+        }, 2200);
+      }
+
+      // Copy
+      copyBtn.addEventListener('click', function() {
+        var text = cssOutput.textContent;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function() {
+            showToast('Copied to clipboard!');
+          }).catch(function() {
+            fallbackCopy(text);
+          });
+        } else {
+          fallbackCopy(text);
+        }
+      });
+
+      function fallbackCopy(text) {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+          document.execCommand('copy');
+          showToast('Copied to clipboard!');
+        } catch(e) {
+          showToast('Copy failed');
+        }
+        document.body.removeChild(ta);
+      }
+
+      // Download - Fully working CSS file download
+      downloadBtn.addEventListener('click', function() {
+        var cssValue = cssOutput.textContent;
+        var unit = unitSelect.value;
+
+        // Build a complete CSS snippet file
+        var fileContent = '/* =============================================\n';
+        fileContent += '   Border Radius - Generated by PassionTools\n';
+        fileContent += '   https://passiontools.com\n';
+        fileContent += '   ============================================= */\n\n';
+        fileContent += '.border-radius-style {\n';
+        fileContent += '  ' + cssValue + '\n';
+        fileContent += '}\n\n';
+        fileContent += '/* Individual corner values (for reference):\n';
+        fileContent += '   Top-Left:     H=' + state.tl.h + unit + '  V=' + state.tl.v + unit + '\n';
+        fileContent += '   Top-Right:    H=' + state.tr.h + unit + '  V=' + state.tr.v + unit + '\n';
+        fileContent += '   Bottom-Right: H=' + state.br.h + unit + '  V=' + state.br.v + unit + '\n';
+        fileContent += '   Bottom-Left:  H=' + state.bl.h + unit + '  V=' + state.bl.v + unit + '\n';
+        fileContent += '*/\n';
+
+        // Create and trigger download
+        var blob = new Blob([fileContent], { type: 'text/css;charset=utf-8' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'border-radius.css';
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+
+        // Cleanup after a short delay
+        setTimeout(function() {
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }, 100);
+
+        showToast('Downloaded border-radius.css');
+      });
+
+      // Clear
+      clearBtn.addEventListener('click', function() {
+        corners.forEach(function(c) {
+          state[c].h = 0;
+          state[c].v = 0;
+        });
+        linkCorners.checked = false;
+        syncUI();
+        update();
+        showToast('Values cleared');
+      });
+
+      /* ===== INITIAL RENDER ===== */
+      // Set a nice default (rounded)
+      var defaultPreset = presets.rounded;
+      corners.forEach(function(c) {
+        state[c].h = defaultPreset[c].h;
+        state[c].v = defaultPreset[c].v;
+      });
+      syncUI();
+      update();
+
+    })();
+  </script>
+
+</body>
+</html>
