@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Sorter | PassionTools</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            /* Brand Colors */
+            --brand-charcoal: #1f2937;
+            --brand-red: #ef4444;
+            --brand-purple: #a855f7;
+            --brand-gradient: linear-gradient(to right, #ef4444, #a855f7);
+            --midnight-black: #111827;
+            
+            /* Light Theme UI */
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-soft: #f1f5f9;
+            --border-color: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            
+            /* Accents */
+            --primary-blue: #3b82f6;
+            --primary-blue-hover: #2563eb;
+            --accent-green: #10b981;
+            --accent-green-hover: #059669;
+            --accent-orange: #f59e0b;
+            
+            /* Structure */
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #0f172a;
+            --bg-card: #1e293b;
+            --bg-soft: #334155;
+            --border-color: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --midnight-black: #020617;
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+            --shadow-lg: 0 10px 25px -5px rgba(0,0,0,0.5);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-body); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; transition: var(--transition); }
+
+        /* --- HEADER --- */
+        header { background-color: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 16px 0; position: sticky; top: 0; z-index: 100; transition: var(--transition); }
+        .container { width: 100%; max-width: 1400px; margin: 0 auto; padding: 0 20px; }
+        .header-content { display: flex; justify-content: space-between; align-items: center; height: 70px; }
+        
+        .logo { font-size: 24px; font-weight: 800; text-decoration: none; color: var(--text-main); letter-spacing: -0.5px; }
+        .logo span { background: var(--brand-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        .header-actions { display: flex; align-items: center; gap: 16px; }
+        .back-link { text-decoration: none; color: var(--text-muted); font-size: 15px; font-weight: 500; display: flex; align-items: center; gap: 8px; transition: var(--transition); }
+        .back-link:hover { color: var(--brand-red); opacity: 0.9; transform: translateX(-2px); }
+        
+        .header-divider { width: 1px; height: 20px; background-color: var(--border-color); }
+        .theme-toggle { background: transparent; border: none; color: var(--text-muted); font-size: 18px; cursor: pointer; display: flex; align-items: center; transition: var(--transition); }
+        .theme-toggle:hover { transform: scale(1.1); color: var(--text-main); }
+        [data-theme="dark"] .theme-toggle { color: #fbbf24; }
+
+        /* --- MAIN LAYOUT --- */
+        main { flex: 1; padding: 40px 0; display: flex; flex-direction: column; align-items: center; width: 100%; }
+        .hero-title { text-align: center; margin-bottom: 30px; padding: 0 20px; animation: fadeUp 0.4s ease; }
+        .hero-title h1 { font-size: 32px; font-weight: 800; margin-bottom: 10px; }
+        .hero-title p { color: var(--text-muted); font-size: 16px; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+            width: 100%;
+            animation: fadeUp 0.5s ease;
+        }
+
+        @media (min-width: 992px) {
+            .dashboard-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        /* --- CARDS --- */
+        .card { 
+            background: var(--bg-card); 
+            border-radius: var(--radius-lg); 
+            box-shadow: var(--shadow-md); 
+            border: 1px solid var(--border-color); 
+            padding: 24px; 
+            transition: var(--transition); 
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .line-count {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            background: var(--bg-soft);
+            padding: 4px 10px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .toolbar-group { display: flex; gap: 8px; flex-wrap: wrap; }
+
+        .icon-btn {
+            background: var(--bg-soft);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 8px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: var(--transition);
+        }
+
+        .icon-btn:hover { background: var(--bg-card); border-color: var(--primary-blue); color: var(--primary-blue); }
+        .icon-btn.danger:hover { border-color: var(--brand-red); color: var(--brand-red); }
+
+        /* --- TEXTAREAS --- */
+        textarea {
+            width: 100%;
+            flex: 1;
+            min-height: 350px;
+            padding: 16px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background: var(--bg-soft);
+            color: var(--text-main);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            resize: vertical;
+            outline: none;
+            transition: var(--transition);
+            white-space: pre;
+            overflow-wrap: normal;
+            overflow-x: auto;
+        }
+
+        textarea:focus {
+            border-color: var(--primary-blue);
+            background: var(--bg-card);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+        
+        textarea[readonly] { cursor: default; }
+
+        /* --- SETTINGS & OPTIONS --- */
+        .options-panel {
+            margin-top: 20px;
+            background: var(--bg-soft);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .option-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Toggle Switch */
+        .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border-color); transition: .4s; border-radius: 24px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        input:checked + .slider { background-color: var(--primary-blue); }
+        input:checked + .slider:before { transform: translateX(20px); }
+
+        /* Custom Select */
+        .select-group { display: flex; flex-direction: column; gap: 8px; }
+        .custom-select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background-color: var(--bg-card);
+            color: var(--text-main);
+            font-size: 14px;
+            font-weight: 600;
+            outline: none;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            transition: var(--transition);
+        }
+        .custom-select:focus { border-color: var(--primary-blue); }
+
+        /* Primary Action Buttons */
+        .primary-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .btn-modern {
+            width: 100%;
+            padding: 16px;
+            border-radius: var(--radius-md);
+            border: none;
+            color: white;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-blue {
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-hover));
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+        .btn-blue:hover { 
+            background: linear-gradient(135deg, var(--primary-blue-hover), #1d4ed8);
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4); 
+        }
+
+        .btn-purple {
+            background: linear-gradient(135deg, var(--brand-purple), #9333ea);
+            box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3);
+        }
+        .btn-purple:hover {
+            background: linear-gradient(135deg, #9333ea, #7e22ce);
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 16px rgba(168, 85, 247, 0.4); 
+        }
+
+        .btn-green {
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-green-hover));
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+        .btn-green:hover {
+            background: linear-gradient(135deg, var(--accent-green-hover), #047857);
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4); 
+        }
+
+        /* --- STATS DASHBOARD --- */
+        .stats-dashboard {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .stat-box {
+            background: var(--bg-soft);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .stat-box:hover { transform: translateY(-2px); border-color: var(--primary-blue); box-shadow: var(--shadow-sm); }
+        
+        .stat-val { font-size: 28px; font-weight: 800; color: var(--text-main); margin-bottom: 4px; font-family: 'JetBrains Mono', monospace; }
+        .stat-label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* --- TOAST --- */
+        .toast {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
+            background: var(--text-main); color: var(--bg-card); padding: 12px 24px;
+            border-radius: 30px; font-weight: 500; font-size: 14px;
+            display: flex; align-items: center; gap: 8px; box-shadow: var(--shadow-lg);
+            transition: var(--transition); opacity: 0; z-index: 2000;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .toast.success i { color: var(--accent-green); }
+        .toast.info i { color: var(--primary-blue); }
+
+        /* --- FOOTER --- */
+        footer { background-color: var(--midnight-black); color: #ffffff; padding: 40px 0; text-align: center; font-size: 14px; margin-top: auto; transition: var(--transition); }
+
+        /* --- MOBILE RESPONSIVENESS --- */
+        @media (max-width: 768px) {
+            .card-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+            .toolbar-group { width: 100%; justify-content: space-between; }
+        }
+        @media (max-width: 480px) {
+            .card { border-radius: 0; border-left: none; border-right: none; padding: 20px; }
+            main { padding: 20px 0; }
+            .options-grid { grid-template-columns: 1fr; }
+            .primary-actions { grid-template-columns: 1fr; }
+            .stats-dashboard { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">Passion<span>Tools</span></a>
+                <div class="header-actions">
+                    <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Tools</a>
+                    <div class="header-divider"></div>
+                    <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
+                        <i class="far fa-lightbulb"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="hero-title">
+                <h1>Text Sorter</h1>
+                <p>Sort text lines alphabetically, numerically, or randomly. Secure and processed locally.</p>
+            </div>
+
+            <div class="dashboard-grid">
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-file-alt" style="color: var(--primary-blue)"></i> Original Text
+                            <span class="line-count" id="inputLinesCount">Lines: 0</span>
+                        </div>
+                        <div class="toolbar-group">
+                            <button class="icon-btn" id="btnPaste"><i class="fas fa-clipboard"></i> Paste</button>
+                            <button class="icon-btn danger" id="btnClear"><i class="fas fa-trash-alt"></i> Clear</button>
+                        </div>
+                    </div>
+
+                    <textarea id="textInput" placeholder="Paste your text here...
+Banana
+apple
+10 items
+2 items
+cherry"></textarea>
+
+                    <div class="options-panel">
+                        <div class="select-group" style="margin-bottom: 20px;">
+                            <span class="option-label"><i class="fas fa-sort-amount-down"></i> Sort Method</span>
+                            <select id="optSort" class="custom-select">
+                                <option value="az">Alphabetical (A to Z)</option>
+                                <option value="za">Alphabetical (Z to A)</option>
+                                <option value="natural">Natural Sort (1, 2, 10)</option>
+                                <option value="numAsc">Numeric (Ascending)</option>
+                                <option value="numDesc">Numeric (Descending)</option>
+                                <option value="lengthAsc">By Length (Shortest to Longest)</option>
+                                <option value="lengthDesc">By Length (Longest to Shortest)</option>
+                            </select>
+                        </div>
+
+                        <div class="options-grid">
+                            <div class="option-item">
+                                <span class="option-label"><i class="fas fa-font"></i> Case Sensitive</span>
+                                <label class="switch">
+                                    <input type="checkbox" id="optCaseSensitive">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="option-item">
+                                <span class="option-label"><i class="fas fa-compress-alt"></i> Trim Whitespace</span>
+                                <label class="switch">
+                                    <input type="checkbox" id="optTrim" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="option-item">
+                                <span class="option-label"><i class="fas fa-eraser"></i> Remove Empty Lines</span>
+                                <label class="switch">
+                                    <input type="checkbox" id="optRemoveEmpty" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="option-item">
+                                <span class="option-label"><i class="fas fa-object-group"></i> Remove Duplicates</span>
+                                <label class="switch">
+                                    <input type="checkbox" id="optRemoveDuplicates">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="primary-actions">
+                            <button class="btn-modern btn-blue" id="btnSort">
+                                <i class="fas fa-sort"></i> Sort Text
+                            </button>
+                            <button class="btn-modern btn-purple" id="btnShuffle">
+                                <i class="fas fa-random"></i> Shuffle Randomly
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-check-circle" style="color: var(--accent-green)"></i> Sorted Result
+                            <span class="line-count" id="outputLinesCount">Lines: 0</span>
+                        </div>
+                        <div class="toolbar-group">
+                            <button class="btn-modern btn-blue" id="btnCopy" style="padding: 8px 16px; font-size: 13px;">
+                                <i class="far fa-copy"></i> Copy
+                            </button>
+                            <button class="btn-modern btn-green" id="btnDownload" style="padding: 8px 16px; font-size: 13px;">
+                                <i class="fas fa-download"></i> Save .txt
+                            </button>
+                        </div>
+                    </div>
+
+                    <textarea id="textOutput" readonly placeholder="Your sorted text will appear here..."></textarea>
+
+                    <div class="stats-dashboard">
+                        <div class="stat-box">
+                            <div class="stat-val" id="statOriginal">0</div>
+                            <div class="stat-label">Original Lines</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-val" id="statProcessed" style="color: var(--accent-green);">0</div>
+                            <div class="stat-label">Output Lines</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            © 2026 PassionTools. Secure client-side processing.
+        </div>
+    </footer>
+
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMsg">Success</span>
+    </div>
+
+    <script>
+        /**
+         * PASSIONTOOLS - TEXT SORTER
+         * High-performance sorting engine
+         */
+
+        const DOM = {
+            themeToggle: document.getElementById('themeToggle'),
+            iconLightbulb: document.querySelector('.theme-toggle i'),
+            
+            // Inputs & Outputs
+            textInput: document.getElementById('textInput'),
+            textOutput: document.getElementById('textOutput'),
+            inputLinesCount: document.getElementById('inputLinesCount'),
+            outputLinesCount: document.getElementById('outputLinesCount'),
+            
+            // Options
+            optSort: document.getElementById('optSort'),
+            optCaseSensitive: document.getElementById('optCaseSensitive'),
+            optTrim: document.getElementById('optTrim'),
+            optRemoveEmpty: document.getElementById('optRemoveEmpty'),
+            optRemoveDuplicates: document.getElementById('optRemoveDuplicates'),
+            
+            // Buttons
+            btnSort: document.getElementById('btnSort'),
+            btnShuffle: document.getElementById('btnShuffle'),
+            btnPaste: document.getElementById('btnPaste'),
+            btnClear: document.getElementById('btnClear'),
+            btnCopy: document.getElementById('btnCopy'),
+            btnDownload: document.getElementById('btnDownload'),
+            
+            // Stats
+            statOriginal: document.getElementById('statOriginal'),
+            statProcessed: document.getElementById('statProcessed'),
+            
+            // Toast
+            toast: document.getElementById('toast'),
+            toastMsg: document.getElementById('toastMsg')
+        };
+
+        // --- Theme Management ---
+        function checkThemePreference() {
+            if (localStorage.getItem('passion_theme') === 'dark' || 
+               (!localStorage.getItem('passion_theme') && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.body.setAttribute('data-theme', 'dark');
+                DOM.iconLightbulb.className = 'fas fa-lightbulb';
+                DOM.iconLightbulb.style.color = '#fbbf24';
+            } else {
+                document.body.removeAttribute('data-theme');
+                DOM.iconLightbulb.className = 'far fa-lightbulb';
+                DOM.iconLightbulb.style.color = '';
+            }
+        }
+
+        DOM.themeToggle.addEventListener('click', () => {
+            const isDark = document.body.getAttribute('data-theme') === 'dark';
+            if (isDark) {
+                document.body.removeAttribute('data-theme');
+                localStorage.setItem('passion_theme', 'light');
+                DOM.iconLightbulb.className = 'far fa-lightbulb';
+                DOM.iconLightbulb.style.color = '';
+            } else {
+                document.body.setAttribute('data-theme', 'dark');
+                localStorage.setItem('passion_theme', 'dark');
+                DOM.iconLightbulb.className = 'fas fa-lightbulb';
+                DOM.iconLightbulb.style.color = '#fbbf24';
+            }
+        });
+
+        // --- Core Sorting Engine ---
+        function processText(mode = 'sort') {
+            const rawText = DOM.textInput.value;
+            if (!rawText) {
+                DOM.textOutput.value = '';
+                updateStats(0, 0);
+                return;
+            }
+
+            // Options
+            const sortType = DOM.optSort.value;
+            const isCaseSensitive = DOM.optCaseSensitive.checked;
+            const isTrim = DOM.optTrim.checked;
+            const isRemoveEmpty = DOM.optRemoveEmpty.checked;
+            const isRemoveDuplicates = DOM.optRemoveDuplicates.checked;
+
+            // Split by newline
+            let lines = rawText.split(/\r?\n/);
+            const originalCount = lines.length;
+
+            // Pre-processing
+            if (isTrim) {
+                lines = lines.map(line => line.trim());
+            }
+            if (isRemoveEmpty) {
+                lines = lines.filter(line => line !== '');
+            }
+            if (isRemoveDuplicates) {
+                if (isCaseSensitive) {
+                    lines = [...new Set(lines)];
+                } else {
+                    const seen = new Set();
+                    lines = lines.filter(line => {
+                        const lower = line.toLowerCase();
+                        if (seen.has(lower)) return false;
+                        seen.add(lower);
+                        return true;
+                    });
+                }
+            }
+
+            // Action: Shuffle or Sort
+            if (mode === 'shuffle') {
+                for (let i = lines.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [lines[i], lines[j]] = [lines[j], lines[i]];
+                }
+            } else {
+                // Sorting Logic
+                const collatorOpts = { sensitivity: isCaseSensitive ? 'variant' : 'base' };
+                
+                switch (sortType) {
+                    case 'az':
+                        lines.sort((a, b) => a.localeCompare(b, undefined, collatorOpts));
+                        break;
+                    case 'za':
+                        lines.sort((a, b) => b.localeCompare(a, undefined, collatorOpts));
+                        break;
+                    case 'natural':
+                        collatorOpts.numeric = true;
+                        lines.sort((a, b) => a.localeCompare(b, undefined, collatorOpts));
+                        break;
+                    case 'numAsc':
+                        lines.sort((a, b) => {
+                            const numA = parseFloat(a) || 0;
+                            const numB = parseFloat(b) || 0;
+                            return numA - numB;
+                        });
+                        break;
+                    case 'numDesc':
+                        lines.sort((a, b) => {
+                            const numA = parseFloat(a) || 0;
+                            const numB = parseFloat(b) || 0;
+                            return numB - numA;
+                        });
+                        break;
+                    case 'lengthAsc':
+                        lines.sort((a, b) => a.length - b.length || a.localeCompare(b, undefined, collatorOpts));
+                        break;
+                    case 'lengthDesc':
+                        lines.sort((a, b) => b.length - a.length || a.localeCompare(b, undefined, collatorOpts));
+                        break;
+                }
+            }
+
+            // Output formatting
+            const resultText = lines.join('\n');
+            DOM.textOutput.value = resultText;
+            
+            // Update UI
+            updateStats(originalCount, lines.length);
+
+            // Save to localStorage
+            localStorage.setItem('passion_sorter_text', rawText);
+        }
+
+        // Live Processing
+        let inputDebounce;
+        DOM.textInput.addEventListener('input', () => {
+            clearTimeout(inputDebounce);
+            inputDebounce = setTimeout(() => {
+                const text = DOM.textInput.value;
+                const count = text === '' ? 0 : text.split(/\r?\n/).length;
+                DOM.inputLinesCount.textContent = `Lines: ${count}`;
+                
+                // Live preview for inputs under 50k chars
+                if(text.length < 50000) {
+                    processText('sort');
+                }
+            }, 300);
+        });
+
+        // Instant processing triggers for options
+        [DOM.optSort, DOM.optCaseSensitive, DOM.optTrim, DOM.optRemoveEmpty, DOM.optRemoveDuplicates].forEach(el => {
+            el.addEventListener('change', () => {
+                if(DOM.textInput.value.length < 50000) {
+                    processText('sort');
+                }
+            });
+        });
+
+        // --- Action Listeners ---
+        DOM.btnSort.addEventListener('click', () => {
+            const originalText = DOM.btnSort.innerHTML;
+            DOM.btnSort.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            
+            setTimeout(() => {
+                processText('sort');
+                DOM.btnSort.innerHTML = originalText;
+                showToast('Text Sorted Successfully!', 'success');
+            }, 50);
+        });
+
+        DOM.btnShuffle.addEventListener('click', () => {
+            const originalText = DOM.btnShuffle.innerHTML;
+            DOM.btnShuffle.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Shuffling...';
+            
+            setTimeout(() => {
+                processText('shuffle');
+                DOM.btnShuffle.innerHTML = originalText;
+                showToast('Text Shuffled Randomly!', 'success');
+            }, 50);
+        });
+
+        DOM.btnClear.addEventListener('click', () => {
+            DOM.textInput.value = '';
+            DOM.textOutput.value = '';
+            DOM.inputLinesCount.textContent = 'Lines: 0';
+            DOM.outputLinesCount.textContent = 'Lines: 0';
+            updateStats(0, 0);
+            DOM.textInput.focus();
+        });
+
+        DOM.btnPaste.addEventListener('click', async () => {
+            try {
+                const text = await navigator.clipboard.readText();
+                DOM.textInput.value += text;
+                DOM.textInput.dispatchEvent(new Event('input'));
+                showToast('Text pasted successfully', 'info');
+            } catch (err) {
+                alert('Clipboard access denied. Please paste manually using Ctrl+V or Cmd+V.');
+            }
+        });
+
+        DOM.btnCopy.addEventListener('click', () => {
+            const result = DOM.textOutput.value;
+            if (!result) return;
+            navigator.clipboard.writeText(result).then(() => {
+                showToast('Result copied to clipboard!', 'success');
+            });
+        });
+
+        DOM.btnDownload.addEventListener('click', () => {
+            const result = DOM.textOutput.value;
+            if (!result) return;
+            
+            const blob = new Blob([result], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            
+            a.href = url;
+            a.download = `passiontools_sorted_${new Date().getTime()}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showToast('File downloaded successfully!', 'success');
+        });
+
+        // --- Helpers ---
+        function updateStats(original, processed) {
+            animateValue(DOM.statOriginal, original);
+            animateValue(DOM.statProcessed, processed);
+            DOM.outputLinesCount.textContent = `Lines: ${processed}`;
+        }
+
+        function animateValue(obj, end) {
+            const start = parseInt(obj.innerHTML.replace(/,/g, '')) || 0;
+            if (start === end) return;
+            
+            if(end > 10000) {
+                obj.innerHTML = end.toLocaleString();
+                return;
+            }
+
+            const duration = 500; 
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const currentVal = Math.floor(progress * (end - start) + start);
+                
+                obj.innerHTML = currentVal.toLocaleString();
+                
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                } else {
+                    obj.innerHTML = end.toLocaleString();
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        function showToast(msg, type = 'success') {
+            DOM.toastMsg.textContent = msg;
+            DOM.toast.className = `toast show ${type}`;
+            const icon = type === 'success' ? 'fa-check-circle' : 'fa-info-circle';
+            DOM.toast.querySelector('i').className = `fas ${icon}`;
+            setTimeout(() => DOM.toast.classList.remove('show'), 3000);
+        }
+
+        // --- Initialization ---
+        function init() {
+            checkThemePreference();
+            const savedText = localStorage.getItem('passion_sorter_text');
+            if (savedText) {
+                DOM.textInput.value = savedText;
+                DOM.textInput.dispatchEvent(new Event('input'));
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+
+    </script>
+</body>
+</html>
