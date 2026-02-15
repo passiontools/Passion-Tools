@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Number Generator - PassionTools</title>
+    <style>
+        /* ==========================================================================
+           🎨 GLOBAL TYPOGRAPHY & THEME VARIABLES
+           ========================================================================== */
+        :root {
+            /* Light Theme */
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --input-bg: #f8fafc;
+            --input-border: #cbd5e1;
+            --accent: #ef4444;
+            --accent-hover: #dc2626;
+            --bulb-hover: #0f172a;
+            --bulb-active: #0f172a;
+            --modern-blue: #3b82f6;
+            --modern-blue-dark: #2563eb;
+            --danger-bg: #fef2f2;
+            --danger-text: #ef4444;
+            --danger-border: #fca5a5;
+            --warning-bg: #fffbeb;
+            --warning-text: #d97706;
+            --warning-border: #fcd34d;
+            
+            /* Footer */
+            --footer-bg: #111827;
+            --footer-text: #94a3b8;
+        }
+
+        [data-theme="dark"] {
+            /* Dark Theme */
+            --bg-color: #020617;
+            --card-bg: #111827;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --input-bg: #1e293b;
+            --input-border: #475569;
+            --bulb-hover: #f8fafc;
+            --bulb-active: #fbbf24;
+            --danger-bg: rgba(239, 68, 68, 0.15);
+            --danger-text: #f87171;
+            --danger-border: #ef4444;
+            --warning-bg: rgba(245, 158, 11, 0.15);
+            --warning-text: #fbbf24;
+            --warning-border: #f59e0b;
+
+            /* Footer */
+            --footer-bg: #020617;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* ==========================================================================
+           🔷 HEADER
+           ========================================================================== */
+        header {
+            position: sticky;
+            top: 0;
+            height: 70px;
+            width: 100%;
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .header-container {
+            width: 100%;
+            max-width: 900px;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .logo-passion { color: var(--text-main); }
+        .logo-tools {
+            background: linear-gradient(135deg, #ef4444, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .nav-link {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-muted);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-link:hover { color: var(--accent); }
+
+        .vertical-divider {
+            height: 20px;
+            width: 1px;
+            background-color: var(--border-color);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            border-radius: 6px;
+        }
+
+        .theme-toggle svg { width: 20px; height: 20px; }
+        .theme-toggle:hover { color: var(--bulb-hover); }
+        [data-theme="dark"] .theme-toggle svg { color: var(--bulb-active); }
+
+        /* ==========================================================================
+           📦 MAIN TOOL SECTION
+           ========================================================================== */
+        main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+            width: 100%;
+        }
+
+        .tool-container {
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            padding: 30px;
+            border: 1px solid var(--border-color);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .card h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        /* 🎲 FORM CONTROLS */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .form-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: relative;
+        }
+
+        .form-group label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        input[type="number"], input[type="text"], select {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--input-border);
+            background-color: var(--input-bg);
+            color: var(--text-main);
+            font-size: 16px;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--modern-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        input:disabled, select:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background-color: var(--border-color);
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 0;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .checkbox-wrapper input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--modern-blue);
+            cursor: pointer;
+        }
+
+        .checkbox-wrapper label {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-main);
+            cursor: pointer;
+            margin: 0;
+        }
+
+        /* ❌ ALERTS & VALIDATION */
+        .alert {
+            display: none;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 20px;
+            animation: fadeIn 0.3s ease;
+            line-height: 1.4;
+        }
+
+        .alert-danger {
+            background-color: var(--danger-bg);
+            color: var(--danger-text);
+            border: 1px solid var(--danger-border);
+        }
+
+        .alert-warning {
+            background-color: var(--warning-bg);
+            color: var(--warning-text);
+            border: 1px solid var(--warning-border);
+        }
+
+        /* 🔵 BUTTONS */
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .btn {
+            border: none;
+            padding: 14px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .btn-primary {
+            flex: 1;
+            background: linear-gradient(135deg, var(--modern-blue), var(--modern-blue-dark));
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+
+        .btn-primary:not(:disabled):hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+        }
+
+        .btn-secondary {
+            background-color: var(--input-bg);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:not(:disabled):hover {
+            background-color: var(--border-color);
+        }
+
+        /* 📊 SUMMARY & RESULTS */
+        .results-container {
+            display: none;
+            flex-direction: column;
+            gap: 20px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        @media (min-width: 768px) {
+            .summary-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+
+        .summary-card {
+            background: var(--input-bg);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .summary-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+        }
+
+        .summary-val {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--modern-blue);
+            font-variant-numeric: tabular-nums;
+            word-break: break-all;
+        }
+
+        .export-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .btn-sm {
+            padding: 8px 14px;
+            font-size: 13px;
+            border-radius: 6px;
+        }
+
+        .numbers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            gap: 12px;
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        /* Custom Scrollbar */
+        .numbers-grid::-webkit-scrollbar { width: 8px; }
+        .numbers-grid::-webkit-scrollbar-track { background: var(--input-bg); border-radius: 4px; }
+        .numbers-grid::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+        .numbers-grid::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+        .num-box {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 12px 8px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 15px;
+            font-variant-numeric: tabular-nums;
+            word-break: break-all;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) backwards;
+        }
+
+        /* ⚙️ ANIMATIONS */
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 🔻 FOOTER */
+        footer {
+            background-color: var(--footer-bg);
+            color: var(--footer-text);
+            text-align: center;
+            padding: 30px 20px;
+            font-size: 14px;
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-container">
+            <a href="index.html" class="logo" aria-label="PassionTools Home">
+                <span class="logo-passion">Passion</span><span class="logo-tools">Tools</span>
+            </a>
+            <div class="header-controls">
+                <a href="index.html" class="nav-link" aria-label="Back to Tools">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    Back to Tools
+                </a>
+                <div class="vertical-divider"></div>
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.9 1.2 1.5 1.5 2.5"/>
+                        <path d="M9 18h6"/>
+                        <path d="M10 22h4"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="tool-container">
+            <div class="card">
+                <div class="card-header">
+                    <h1>🎲 Advanced Random Number Generator</h1>
+                </div>
+                
+                <div class="alert alert-danger" id="errorAlert" role="alert" aria-live="assertive"></div>
+                <div class="alert alert-warning" id="warningAlert" role="alert" aria-live="polite"></div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="minVal">Minimum Value</label>
+                        <input type="number" id="minVal" value="1" placeholder="e.g. 1" required aria-required="true">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="maxVal">Maximum Value</label>
+                        <input type="number" id="maxVal" value="100" placeholder="e.g. 100" required aria-required="true">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="qtyVal">Quantity (1 - 10,000)</label>
+                        <input type="number" id="qtyVal" value="10" min="1" max="10000" required aria-required="true">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="typeVal">Number Type</label>
+                        <select id="typeVal" aria-label="Select number type">
+                            <option value="integer">Integer (Whole Numbers)</option>
+                            <option value="decimal">Decimal (Floating Point)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="decimalsGroup" style="display: none;">
+                        <label for="decimalsVal">Decimal Places (1 - 10)</label>
+                        <input type="number" id="decimalsVal" value="2" min="1" max="10">
+                    </div>
+
+                    <div class="form-group" id="seedGroup" style="display: none;">
+                        <label for="seedVal">Custom Seed String</label>
+                        <input type="text" id="seedVal" placeholder="e.g. passion123">
+                    </div>
+                </div>
+
+                <div class="form-grid" style="margin-bottom: 5px;">
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="uniqueVal">
+                        <label for="uniqueVal">No Duplicates (Unique Numbers)</label>
+                    </div>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="useSeedVal">
+                        <label for="useSeedVal">Use Custom Seed (Deterministic)</label>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-secondary" id="clearBtn" aria-label="Clear configuration and results">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
+                        Reset
+                    </button>
+                    <button class="btn btn-primary" id="generateBtn" aria-label="Generate Random Numbers">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                        Generate Numbers
+                    </button>
+                </div>
+            </div>
+
+            <div class="card results-container" id="resultsSection">
+                <div class="card-header" style="margin-bottom: 10px;">
+                    <h2 style="font-size: 20px;">Generation Results</h2>
+                </div>
+
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <span class="summary-label">Count</span>
+                        <span class="summary-val" id="sumCount">0</span>
+                    </div>
+                    <div class="summary-card">
+                        <span class="summary-label">Min Generated</span>
+                        <span class="summary-val" id="sumMin">0</span>
+                    </div>
+                    <div class="summary-card">
+                        <span class="summary-label">Max Generated</span>
+                        <span class="summary-val" id="sumMax">0</span>
+                    </div>
+                    <div class="summary-card">
+                        <span class="summary-label">Average</span>
+                        <span class="summary-val" id="sumAvg">0</span>
+                    </div>
+                </div>
+
+                <div class="export-actions">
+                    <button class="btn btn-secondary btn-sm" id="copyBtn" aria-label="Copy to clipboard">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        Copy All
+                    </button>
+                    <button class="btn btn-secondary btn-sm" id="downloadTxtBtn" aria-label="Download TXT">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        Save .TXT
+                    </button>
+                    <button class="btn btn-secondary btn-sm" id="downloadCsvBtn" aria-label="Download CSV">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                        Save .CSV
+                    </button>
+                </div>
+
+                <div class="numbers-grid" id="numbersGrid" aria-live="polite">
+                    </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        © 2026 Passion Tools. Secure client-side processing.
+    </footer>
+
+    <script>
+        /**
+         * PassionTools Random Number Generator - Core Logic
+         * Implements ES6+, high-performance generation, modular architecture,
+         * and memory-safe DOM rendering for large datasets.
+         */
+
+        // --- 1. THEME MANAGEMENT ---
+        const themeToggleBtn = document.getElementById('themeToggle');
+        const htmlElement = document.documentElement;
+        const savedTheme = localStorage.getItem('passionTheme') || 'light';
+        htmlElement.setAttribute('data-theme', savedTheme);
+
+        themeToggleBtn.addEventListener('click', () => {
+            const currentTheme = htmlElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            htmlElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('passionTheme', newTheme);
+        });
+
+        // --- 2. DOM ELEMENT CACHING ---
+        const els = {
+            min: document.getElementById('minVal'),
+            max: document.getElementById('maxVal'),
+            qty: document.getElementById('qtyVal'),
+            type: document.getElementById('typeVal'),
+            decGroup: document.getElementById('decimalsGroup'),
+            dec: document.getElementById('decimalsVal'),
+            unique: document.getElementById('uniqueVal'),
+            useSeed: document.getElementById('useSeedVal'),
+            seedGroup: document.getElementById('seedGroup'),
+            seedStr: document.getElementById('seedVal'),
+            
+            errorAlert: document.getElementById('errorAlert'),
+            warningAlert: document.getElementById('warningAlert'),
+            
+            btnGen: document.getElementById('generateBtn'),
+            btnClear: document.getElementById('clearBtn'),
+            
+            resSection: document.getElementById('resultsSection'),
+            resGrid: document.getElementById('numbersGrid'),
+            
+            sumCount: document.getElementById('sumCount'),
+            sumMin: document.getElementById('sumMin'),
+            sumMax: document.getElementById('sumMax'),
+            sumAvg: document.getElementById('sumAvg'),
+
+            btnCopy: document.getElementById('copyBtn'),
+            btnTxt: document.getElementById('downloadTxtBtn'),
+            btnCsv: document.getElementById('downloadCsvBtn')
+        };
+
+        let generatedData = []; // Store state globally for exports
+
+        // --- 3. PRNG UTILITIES (For Seeded Randomness) ---
+        // xmur3 string hashing to generate 32-bit state
+        function xmur3(str) {
+            for(var i = 0, h = 1779033703 ^ str.length; i < str.length; i++) {
+                h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
+                h = h << 13 | h >>> 19;
+            } return function() {
+                h = Math.imul(h ^ (h >>> 16), 2246822507);
+                h = Math.imul(h ^ (h >>> 13), 3266489909);
+                return (h ^= h >>> 16) >>> 0;
+            }
+        }
+        // Mulberry32 deterministic generator
+        function mulberry32(a) {
+            return function() {
+              var t = a += 0x6D2B79F5;
+              t = Math.imul(t ^ t >>> 15, t | 1);
+              t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+              return ((t ^ t >>> 14) >>> 0) / 4294967296;
+            }
+        }
+
+        // --- 4. UI INTERACTION LOGIC ---
+        els.type.addEventListener('change', () => {
+            els.decGroup.style.display = els.type.value === 'decimal' ? 'flex' : 'none';
+            validateRealTime();
+        });
+
+        els.useSeed.addEventListener('change', () => {
+            els.seedGroup.style.display = els.useSeed.checked ? 'flex' : 'none';
+        });
+
+        // Real-time basic validation to guide user
+        function validateRealTime() {
+            hideAlerts();
+            const min = parseFloat(els.min.value);
+            const max = parseFloat(els.max.value);
+            const qty = parseInt(els.qty.value, 10);
+            const unique = els.unique.checked;
+            const type = els.type.value;
+
+            if (!isNaN(min) && !isNaN(max) && min >= max) {
+                showWarning("Maximum value should be strictly greater than Minimum value.");
+                return false;
+            }
+
+            if (!isNaN(qty) && qty > 10000) {
+                showWarning("Maximum quantity allowed is 10,000 to ensure browser stability.");
+                return false;
+            }
+
+            if (!isNaN(min) && !isNaN(max) && !isNaN(qty) && unique && type === 'integer') {
+                const range = max - min + 1;
+                if (qty > range) {
+                    showError(`Cannot generate ${qty} unique integers between ${min} and ${max}. Only ${range} unique values exist.`);
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        ['min', 'max', 'qty', 'unique'].forEach(id => {
+            els[id].addEventListener('input', validateRealTime);
+            els[id].addEventListener('change', validateRealTime);
+        });
+
+        function showError(msg) {
+            els.errorAlert.textContent = msg;
+            els.errorAlert.style.display = 'block';
+            els.warningAlert.style.display = 'none';
+            els.btnGen.disabled = true;
+        }
+
+        function showWarning(msg) {
+            els.warningAlert.textContent = msg;
+            els.warningAlert.style.display = 'block';
+            els.errorAlert.style.display = 'none';
+            els.btnGen.disabled = false;
+        }
+
+        function hideAlerts() {
+            els.errorAlert.style.display = 'none';
+            els.warningAlert.style.display = 'none';
+            els.btnGen.disabled = false;
+        }
+
+        // --- 5. CORE GENERATION ENGINE ---
+        function generateNumbers() {
+            if (!validateRealTime()) return;
+
+            // Gather inputs
+            const min = parseFloat(els.min.value);
+            const max = parseFloat(els.max.value);
+            const qty = parseInt(els.qty.value, 10);
+            const type = els.type.value;
+            const dec = parseInt(els.dec.value, 10) || 2;
+            const unique = els.unique.checked;
+            const useSeed = els.useSeed.checked;
+            const seedStr = els.seedStr.value || "passion";
+
+            // Ultimate validation catch
+            if (isNaN(min) || isNaN(max) || isNaN(qty)) {
+                return showError("Please ensure all numeric fields are filled correctly.");
+            }
+
+            // UI State loading setup (yields thread to browser to paint UI)
+            els.btnGen.disabled = true;
+            els.btnGen.innerHTML = `
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation: spin 1s linear infinite;"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>
+                Processing...
+            `;
+            
+            // Add keyframes for spinner dynamically if not exist
+            if (!document.getElementById('spinStyle')) {
+                const style = document.createElement('style');
+                style.id = 'spinStyle';
+                style.innerHTML = `@keyframes spin { 100% { transform: rotate(360deg); } }`;
+                document.head.appendChild(style);
+            }
+
+            setTimeout(() => {
+                executeGeneration(min, max, qty, type, dec, unique, useSeed, seedStr);
+            }, 50);
+        }
+
+        function executeGeneration(min, max, qty, type, dec, unique, useSeed, seedStr) {
+            let rngFunc = Math.random;
+
+            // Setup Seed if requested
+            if (useSeed) {
+                const seed = xmur3(seedStr)();
+                rngFunc = mulberry32(seed);
+            }
+
+            let results = [];
+            const rangeSize = max - min + 1;
+
+            try {
+                // Optimization: Dense Unique Integer Array
+                // If requesting a large chunk of a small range, pre-fill and shuffle to avoid infinite retry loops.
+                if (type === 'integer' && unique && rangeSize <= 100000 && qty > rangeSize / 3) {
+                    let fullArr = new Int32Array(rangeSize);
+                    for (let i = 0; i < rangeSize; i++) fullArr[i] = min + i;
+                    
+                    // Partial Fisher-Yates (only shuffle the amount we need)
+                    for (let i = 0; i < qty; i++) {
+                        const j = i + Math.floor(rngFunc() * (rangeSize - i));
+                        const temp = fullArr[i];
+                        fullArr[i] = fullArr[j];
+                        fullArr[j] = temp;
+                        results.push(fullArr[i]);
+                    }
+                } 
+                // Standard approach for Sparse / Decimals / Non-Unique
+                else {
+                    const trackingSet = new Set();
+                    let loopGuard = 0;
+                    const maxLoops = qty * 50; // Safety brake
+
+                    while (results.length < qty && loopGuard < maxLoops) {
+                        loopGuard++;
+                        let num;
+
+                        if (type === 'integer') {
+                            num = Math.floor(rngFunc() * (max - min + 1)) + min;
+                        } else {
+                            // High precision decimal generation
+                            num = (rngFunc() * (max - min) + min);
+                            num = Number(num.toFixed(dec));
+                        }
+
+                        if (unique) {
+                            if (!trackingSet.has(num)) {
+                                trackingSet.add(num);
+                                results.push(num);
+                            }
+                        } else {
+                            results.push(num);
+                        }
+                    }
+
+                    if (loopGuard >= maxLoops) throw new Error("Generation timeout");
+                }
+
+                // Prepare string rendering for decimals to guarantee trailing zeroes visually
+                if (type === 'decimal') {
+                    generatedData = results.map(n => n.toFixed(dec));
+                } else {
+                    generatedData = results.slice();
+                }
+
+                renderResults(generatedData, type);
+
+            } catch (err) {
+                showError("Failed to generate numbers. The constraints may be too strict or range too wide.");
+                resetGenerateButton();
+            }
+        }
+
+        // --- 6. RENDERING & DATA BINDING ---
+        function renderResults(dataArray, type) {
+            // 1. Calculate Summary
+            const numArr = dataArray.map(Number);
+            const minGen = Math.min(...numArr);
+            const maxGen = Math.max(...numArr);
+            const sum = numArr.reduce((a, b) => a + b, 0);
+            const avg = sum / numArr.length;
+
+            els.sumCount.textContent = numArr.length.toLocaleString();
+            els.sumMin.textContent = type === 'decimal' ? minGen.toFixed(els.dec.value) : minGen;
+            els.sumMax.textContent = type === 'decimal' ? maxGen.toFixed(els.dec.value) : maxGen;
+            els.sumAvg.textContent = Number.isInteger(avg) ? avg : avg.toFixed(3);
+
+            // 2. High-Performance DOM Injection using DocumentFragment
+            els.resGrid.innerHTML = '';
+            const fragment = document.createDocumentFragment();
+            
+            // Limit animation delays to prevent CSS overload on 10k items
+            const maxAnimatedItems = Math.min(dataArray.length, 300);
+
+            for (let i = 0; i < dataArray.length; i++) {
+                const box = document.createElement('div');
+                box.className = 'num-box';
+                box.textContent = dataArray[i];
+                
+                if (i < maxAnimatedItems) {
+                    box.style.animationDelay = `${i * 3}ms`;
+                } else {
+                    box.style.animation = 'none'; // Disable popIn for deep items
+                }
+                fragment.appendChild(box);
+            }
+
+            els.resGrid.appendChild(fragment);
+            els.resSection.style.display = 'flex';
+
+            // Scroll into view safely
+            setTimeout(() => {
+                els.resSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+
+            resetGenerateButton();
+        }
+
+        function resetGenerateButton() {
+            els.btnGen.disabled = false;
+            els.btnGen.innerHTML = `
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                Generate Numbers
+            `;
+        }
+
+        function clearAll() {
+            els.min.value = 1;
+            els.max.value = 100;
+            els.qty.value = 10;
+            els.type.value = 'integer';
+            els.dec.value = 2;
+            els.unique.checked = false;
+            els.useSeed.checked = false;
+            els.seedStr.value = '';
+            
+            els.decGroup.style.display = 'none';
+            els.seedGroup.style.display = 'none';
+            
+            hideAlerts();
+            els.resSection.style.display = 'none';
+            els.resGrid.innerHTML = '';
+            generatedData = [];
+        }
+
+        // --- 7. EXPORT FEATURES ---
+        function triggerButtonFeedback(btn, text, iconSvg) {
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = `${iconSvg} ${text}`;
+            setTimeout(() => { btn.innerHTML = originalHTML; }, 2000);
+        }
+
+        els.btnCopy.addEventListener('click', () => {
+            if (!generatedData.length) return;
+            const str = generatedData.join(', ');
+            navigator.clipboard.writeText(str).then(() => {
+                const svg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+                triggerButtonFeedback(els.btnCopy, "Copied!", svg);
+            });
+        });
+
+        els.btnTxt.addEventListener('click', () => {
+            if (!generatedData.length) return;
+            const str = generatedData.join('\n');
+            downloadFile(str, 'passiontools_random_numbers.txt', 'text/plain');
+            const svg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+            triggerButtonFeedback(els.btnTxt, "Saved!", svg);
+        });
+
+        els.btnCsv.addEventListener('click', () => {
+            if (!generatedData.length) return;
+            const str = "Random_Numbers\n" + generatedData.join('\n');
+            downloadFile(str, 'passiontools_random_numbers.csv', 'text/csv');
+            const svg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+            triggerButtonFeedback(els.btnCsv, "Saved!", svg);
+        });
+
+        function downloadFile(content, filename, mimeType) {
+            const blob = new Blob([content], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // --- 8. INITIALIZATION ---
+        els.btnGen.addEventListener('click', generateNumbers);
+        els.btnClear.addEventListener('click', clearAll);
+
+    </script>
+</body>
+</html>
