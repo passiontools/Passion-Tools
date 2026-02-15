@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Reverse – Advanced Reversal Engine | PassionTools</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            /* Brand Colors */
+            --brand-charcoal: #1f2937;
+            --brand-red: #ef4444;
+            --brand-purple: #a855f7;
+            --brand-gradient: linear-gradient(135deg, #ef4444, #a855f7);
+            
+            /* Light Theme UI */
+            --bg-body: #f0f4f8; /* Soft background for glass effect */
+            --bg-mesh: radial-gradient(at 0% 0%, rgba(239, 68, 68, 0.05) 0px, transparent 50%),
+                       radial-gradient(at 100% 0%, rgba(168, 85, 247, 0.05) 0px, transparent 50%);
+            --bg-card: rgba(255, 255, 255, 0.7); /* Glassmorphism */
+            --bg-solid: #ffffff;
+            --bg-soft: rgba(241, 245, 249, 0.8);
+            --border-color: rgba(226, 232, 240, 0.8);
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            
+            /* Accents */
+            --primary-blue: #3b82f6;
+            --primary-blue-hover: #2563eb;
+            --accent-green: #10b981;
+            --accent-orange: #f59e0b;
+            
+            /* Structure */
+            --radius-xl: 24px;
+            --radius-lg: 18px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            --shadow-soft: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+            --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.03);
+            
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #0f172a;
+            --bg-mesh: radial-gradient(at 0% 0%, rgba(239, 68, 68, 0.1) 0px, transparent 50%),
+                       radial-gradient(at 100% 0%, rgba(168, 85, 247, 0.1) 0px, transparent 50%);
+            --bg-card: rgba(30, 41, 59, 0.7);
+            --bg-solid: #1e293b;
+            --bg-soft: rgba(15, 23, 42, 0.6);
+            --border-color: rgba(51, 65, 85, 0.8);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        
+        body { 
+            background-color: var(--bg-body); 
+            background-image: var(--bg-mesh);
+            background-attachment: fixed;
+            color: var(--text-main); 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            transition: var(--transition); 
+        }
+
+        /* --- HEADER --- */
+        header { 
+            background-color: var(--bg-solid); 
+            border-bottom: 1px solid var(--border-color); 
+            padding: 16px 0; 
+            position: sticky; 
+            top: 0; 
+            z-index: 100; 
+            transition: var(--transition); 
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+        .container { width: 100%; max-width: 1400px; margin: 0 auto; padding: 0 20px; }
+        .header-content { display: flex; justify-content: space-between; align-items: center; height: 70px; }
+        
+        .logo { font-size: 24px; font-weight: 800; text-decoration: none; color: var(--text-main); letter-spacing: -0.5px; }
+        .logo span { background: var(--brand-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        .header-actions { display: flex; align-items: center; gap: 16px; }
+        .back-link { text-decoration: none; color: var(--text-muted); font-size: 15px; font-weight: 500; display: flex; align-items: center; gap: 8px; transition: var(--transition); }
+        .back-link:hover { color: var(--brand-red); opacity: 0.9; transform: translateX(-2px); }
+        
+        .header-divider { width: 1px; height: 20px; background-color: var(--border-color); }
+        .theme-toggle { background: transparent; border: none; color: var(--text-muted); font-size: 18px; cursor: pointer; display: flex; align-items: center; transition: var(--transition); }
+        .theme-toggle:hover { transform: scale(1.1); color: var(--text-main); }
+        [data-theme="dark"] .theme-toggle { color: #fbbf24; }
+
+        /* --- MAIN LAYOUT --- */
+        main { flex: 1; padding: 40px 0; display: flex; flex-direction: column; align-items: center; width: 100%; }
+        .hero-title { text-align: center; margin-bottom: 30px; padding: 0 20px; animation: fadeUp 0.5s ease; }
+        .hero-title h1 { font-size: 36px; font-weight: 800; margin-bottom: 12px; }
+        .hero-title p { color: var(--text-muted); font-size: 16px; max-width: 600px; margin: 0 auto; line-height: 1.5; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+            width: 100%;
+            animation: fadeUp 0.6s ease;
+        }
+
+        @media (min-width: 992px) {
+            .dashboard-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        /* --- GLASSMORPHISM CARDS --- */
+        .glass-card { 
+            background: var(--bg-card); 
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: var(--radius-xl); 
+            box-shadow: var(--shadow-soft); 
+            border: 1px solid var(--border-color); 
+            padding: 24px; 
+            transition: var(--transition); 
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title i { color: var(--primary-blue); }
+
+        .toolbar-group { display: flex; gap: 8px; flex-wrap: wrap; }
+
+        .icon-btn {
+            background: var(--bg-solid);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 8px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: var(--transition);
+        }
+
+        .icon-btn:hover { border-color: var(--primary-blue); color: var(--primary-blue); transform: translateY(-1px); }
+        .icon-btn.danger:hover { border-color: var(--brand-red); color: var(--brand-red); }
+
+        /* --- TEXTAREAS --- */
+        .editor-wrapper {
+            position: relative;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        textarea {
+            width: 100%;
+            flex: 1;
+            min-height: 250px;
+            padding: 20px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            background: var(--bg-soft);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            resize: vertical;
+            outline: none;
+            transition: var(--transition);
+            box-shadow: var(--shadow-inner);
+        }
+
+        textarea:focus {
+            border-color: var(--primary-blue);
+            background: var(--bg-solid);
+        }
+        
+        textarea[readonly] { cursor: default; }
+
+        /* Status Counters */
+        .editor-status {
+            display: flex;
+            gap: 16px;
+            margin-top: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            padding: 0 4px;
+        }
+
+        .status-badge {
+            background: var(--bg-solid);
+            padding: 4px 10px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* --- MIDDLE CONTROLS / OPTIONS --- */
+        .options-panel {
+            background: var(--bg-solid);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            border: 1px solid var(--border-color);
+            margin-top: 20px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .option-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Toggle Switch */
+        .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border-color); transition: .4s; border-radius: 24px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        input:checked + .slider { background-color: var(--primary-blue); }
+        input:checked + .slider:before { transform: translateX(20px); }
+
+        /* Custom Select */
+        .select-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+        .custom-select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background-color: var(--bg-soft);
+            color: var(--text-main);
+            font-size: 15px;
+            font-weight: 600;
+            outline: none;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            transition: var(--transition);
+        }
+        .custom-select:focus { border-color: var(--primary-blue); background-color: var(--bg-solid); }
+
+        /* Modern Blue Process Button */
+        .btn-process {
+            width: 100%;
+            padding: 16px;
+            border-radius: var(--radius-md);
+            border: none;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-hover));
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-process:hover { 
+            background: linear-gradient(135deg, var(--primary-blue-hover), #1d4ed8);
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4); 
+        }
+
+        /* Output Card Additions */
+        .proc-time {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 12px;
+            text-align: right;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Animations */
+        .flip-animation {
+            animation: flipIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes flipIn {
+            0% { transform: perspective(1000px) rotateX(-90deg); opacity: 0; }
+            100% { transform: perspective(1000px) rotateX(0deg); opacity: 1; }
+        }
+
+        /* --- TOAST --- */
+        .toast {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
+            background: var(--text-main); color: var(--bg-solid); padding: 14px 28px;
+            border-radius: 30px; font-weight: 600; font-size: 14px;
+            display: flex; align-items: center; gap: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            transition: var(--transition); opacity: 0; z-index: 2000;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .toast i { color: var(--accent-green); font-size: 16px; }
+
+        /* --- FOOTER --- */
+        footer { background-color: var(--midnight-black); color: #ffffff; padding: 40px 0; text-align: center; font-size: 14px; margin-top: auto; transition: var(--transition); }
+
+        /* --- MOBILE RESPONSIVENESS --- */
+        @media (max-width: 768px) {
+            .card-header { flex-direction: column; align-items: flex-start; gap: 16px; }
+            .toolbar-group { width: 100%; justify-content: space-between; }
+            .icon-btn { flex: 1; justify-content: center; }
+            .options-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">Passion<span>Tools</span></a>
+                <div class="header-actions">
+                    <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Tools</a>
+                    <div class="header-divider"></div>
+                    <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
+                        <i class="far fa-lightbulb"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="hero-title">
+                <h1>Advanced Reversal Engine</h1>
+                <p>Powerful text manipulation. Reverse words, lines, or characters while preserving spacing, emojis, and punctuation.</p>
+            </div>
+
+            <div class="dashboard-grid">
+                
+                <div class="glass-card">
+                    <div class="card-header">
+                        <div class="card-title"><i class="fas fa-pen-nib"></i> Source Text</div>
+                        <div class="toolbar-group">
+                            <button class="icon-btn" id="btnPaste"><i class="fas fa-clipboard"></i> Paste</button>
+                            <button class="icon-btn danger" id="btnClear"><i class="fas fa-trash-alt"></i> Clear</button>
+                        </div>
+                    </div>
+
+                    <div class="editor-wrapper">
+                        <textarea id="textInput" placeholder="Type or paste text here to reverse...&#10;E.g., Hello World! 🌍 123"></textarea>
+                        <div class="editor-status">
+                            <span class="status-badge" id="inChars">Chars: 0</span>
+                            <span class="status-badge" id="inWords">Words: 0</span>
+                            <span class="status-badge" id="inLines">Lines: 0</span>
+                        </div>
+                    </div>
+
+                    <div class="options-panel">
+                        <div class="select-group">
+                            <label class="option-label"><i class="fas fa-random"></i> Reversal Mode</label>
+                            <select id="revMode" class="custom-select">
+                                <option value="entire">Reverse Entire Text (Full String)</option>
+                                <option value="words">Reverse Each Word Individually</option>
+                                <option value="wordOrder">Reverse Word Order (Sentence Reversal)</option>
+                                <option value="lines">Reverse Line Order</option>
+                                <option value="charsInLines">Reverse Characters in Each Line</option>
+                                <option value="mirror">Mirror Text (Visual Flip)</option>
+                            </select>
+                        </div>
+
+                        <div class="options-grid">
+                            <div class="option-item">
+                                <span class="option-label"><i class="fas fa-bolt"></i> Live Mode (Auto-Reverse)</span>
+                                <label class="switch">
+                                    <input type="checkbox" id="optLive" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="option-item">
+                                <span class="option-label"><i class="fas fa-hashtag"></i> Ignore Numbers</span>
+                                <label class="switch">
+                                    <input type="checkbox" id="optIgnoreNums">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <button class="btn-process" id="btnReverse">
+                            <i class="fas fa-sync-alt"></i> Execute Reversal
+                        </button>
+                    </div>
+                </div>
+
+                <div class="glass-card" id="outputCard">
+                    <div class="card-header">
+                        <div class="card-title"><i class="fas fa-check-double" style="color: var(--accent-green)"></i> Reversed Output</div>
+                        <div class="toolbar-group">
+                            <button class="icon-btn" id="btnSwap" title="Send Output to Input"><i class="fas fa-exchange-alt"></i> Swap</button>
+                            <button class="icon-btn" id="btnCopy" style="color: var(--primary-blue); border-color: var(--border-color);"><i class="far fa-copy"></i> Copy</button>
+                            <button class="icon-btn" id="btnDownload" style="color: var(--accent-green); border-color: var(--border-color);"><i class="fas fa-download"></i> Save</button>
+                        </div>
+                    </div>
+
+                    <div class="editor-wrapper">
+                        <textarea id="textOutput" readonly placeholder="Reversed text will appear here..."></textarea>
+                    </div>
+                    
+                    <div class="proc-time" id="procTime">Processing time: 0 ms</div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            © 2026 PassionTools. Secure client-side processing.
+        </div>
+    </footer>
+
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMsg">Success</span>
+    </div>
+
+    <script>
+        /**
+         * PASSIONTOOLS - ADVANCED REVERSAL ENGINE
+         */
+
+        const DOM = {
+            themeToggle: document.getElementById('themeToggle'),
+            iconLightbulb: document.querySelector('.theme-toggle i'),
+            
+            textInput: document.getElementById('textInput'),
+            textOutput: document.getElementById('textOutput'),
+            outputCard: document.getElementById('outputCard'),
+            
+            inChars: document.getElementById('inChars'),
+            inWords: document.getElementById('inWords'),
+            inLines: document.getElementById('inLines'),
+            procTime: document.getElementById('procTime'),
+            
+            revMode: document.getElementById('revMode'),
+            optLive: document.getElementById('optLive'),
+            optIgnoreNums: document.getElementById('optIgnoreNums'),
+            
+            btnReverse: document.getElementById('btnReverse'),
+            btnPaste: document.getElementById('btnPaste'),
+            btnClear: document.getElementById('btnClear'),
+            btnSwap: document.getElementById('btnSwap'),
+            btnCopy: document.getElementById('btnCopy'),
+            btnDownload: document.getElementById('btnDownload'),
+            
+            toast: document.getElementById('toast'),
+            toastMsg: document.getElementById('toastMsg')
+        };
+
+        // --- Theme Management ---
+        function checkThemePreference() {
+            if (localStorage.getItem('passion_theme') === 'dark' || 
+               (!localStorage.getItem('passion_theme') && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.body.setAttribute('data-theme', 'dark');
+                DOM.iconLightbulb.className = 'fas fa-lightbulb';
+                DOM.iconLightbulb.style.color = '#fbbf24';
+            } else {
+                document.body.removeAttribute('data-theme');
+                DOM.iconLightbulb.className = 'far fa-lightbulb';
+                DOM.iconLightbulb.style.color = '';
+            }
+        }
+
+        DOM.themeToggle.addEventListener('click', () => {
+            const isDark = document.body.getAttribute('data-theme') === 'dark';
+            if (isDark) {
+                document.body.removeAttribute('data-theme');
+                localStorage.setItem('passion_theme', 'light');
+                DOM.iconLightbulb.className = 'far fa-lightbulb';
+                DOM.iconLightbulb.style.color = '';
+            } else {
+                document.body.setAttribute('data-theme', 'dark');
+                localStorage.setItem('passion_theme', 'dark');
+                DOM.iconLightbulb.className = 'fas fa-lightbulb';
+                DOM.iconLightbulb.style.color = '#fbbf24';
+            }
+        });
+
+        // --- Engine Helpers ---
+
+        // Robust string splitter that respects Emojis and Unicode graphemes
+        function splitGraphemes(str) {
+            if (window.Intl && Intl.Segmenter) {
+                const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
+                return Array.from(segmenter.segment(str)).map(s => s.segment);
+            }
+            return [...str]; // Fallback
+        }
+
+        // Mirror Dictionary
+        const mirrorDict = {
+            'a': 'ɒ', 'b': 'd', 'c': 'ɔ', 'd': 'b', 'e': 'ɘ', 'f': 'ʇ', 'g': 'ǫ', 'h': 'ɥ', 
+            'i': 'i', 'j': 'ꞁ', 'k': 'ʞ', 'l': 'l', 'm': 'm', 'n': 'n', 'o': 'o', 'p': 'q', 
+            'q': 'p', 'r': 'ɿ', 's': 'ƨ', 't': 'Ɉ', 'u': 'u', 'v': 'v', 'w': 'w', 'x': 'x', 
+            'y': 'y', 'z': 'z',
+            'A': 'A', 'B': 'ᙠ', 'C': 'Ɔ', 'D': 'ᗡ', 'E': 'Ǝ', 'F': 'ꟻ', 'G': '⅁', 'H': 'H', 
+            'I': 'I', 'J': 'Ⴑ', 'K': '⋊', 'L': '⅃', 'M': 'M', 'N': 'И', 'O': 'O', 'P': 'ꟼ', 
+            'Q': 'Ọ', 'R': 'Я', 'S': 'Ƨ', 'T': 'T', 'U': 'U', 'V': 'V', 'W': 'W', 'X': 'X', 
+            'Y': 'Y', 'Z': 'S',
+            '1': '߁', '2': 'ᒿ', '3': 'Ɛ', '4': 'ᔭ', '5': 'ट', '6': '9', '7': 'Ɫ', '8': '8', 
+            '9': '6', '0': '0',
+            '?': '⸮', '!': '¡', '<': '>', '>': '<', '[': ']', ']': '[', '(': ')', ')': '(',
+            '{': '}', '}': '{', '«': '»', '»': '«'
+        };
+
+        function applyMirror(str) {
+            return splitGraphemes(str).map(char => mirrorDict[char] || char).reverse().join('');
+        }
+
+        // Smart Reversal Core (handles ignore numbers)
+        function smartReverse(textArr, ignoreNums) {
+            if (!ignoreNums) return textArr.slice().reverse().join('');
+            
+            const numRegex = /\d/;
+            // Extract non-numbers, reverse them
+            const nonNums = textArr.filter(c => !numRegex.test(c)).reverse();
+            // Re-insert numbers in original positions
+            return textArr.map(c => numRegex.test(c) ? c : nonNums.shift()).join('');
+        }
+
+        // --- Core Execution ---
+        function executeReversal(triggerAnimation = false) {
+            const start = performance.now();
+            const text = DOM.textInput.value;
+            
+            // Update Counters
+            DOM.inChars.textContent = `Chars: ${text.length}`;
+            DOM.inWords.textContent = `Words: ${text.trim() === '' ? 0 : text.trim().split(/\s+/).length}`;
+            DOM.inLines.textContent = `Lines: ${text === '' ? 0 : text.split('\n').length}`;
+
+            if (!text) {
+                DOM.textOutput.value = '';
+                DOM.procTime.textContent = 'Processing time: 0 ms';
+                return;
+            }
+
+            const mode = DOM.revMode.value;
+            const ignoreNums = DOM.optIgnoreNums.checked;
+            let result = '';
+
+            switch(mode) {
+                case 'entire':
+                    result = smartReverse(splitGraphemes(text), ignoreNums);
+                    break;
+                case 'words':
+                    // Split by whitespace boundaries to preserve spaces/tabs
+                    result = text.split(/(\s+)/).map(part => {
+                        if (/\s+/.test(part)) return part; // Keep spacing exact
+                        return smartReverse(splitGraphemes(part), ignoreNums);
+                    }).join('');
+                    break;
+                case 'wordOrder':
+                    result = text.split(/(\s+)/).reverse().join('');
+                    break;
+                case 'lines':
+                    result = text.split('\n').reverse().join('\n');
+                    break;
+                case 'charsInLines':
+                    result = text.split('\n').map(line => smartReverse(splitGraphemes(line), ignoreNums)).join('\n');
+                    break;
+                case 'mirror':
+                    // Mirror typically implies full string reverse + glyph swap.
+                    // Ignoring numbers in mirror mode is complex, so we skip ignoreNums for mirror.
+                    result = applyMirror(text);
+                    break;
+            }
+
+            DOM.textOutput.value = result;
+
+            const end = performance.now();
+            DOM.procTime.textContent = `Processing time: ${(end - start).toFixed(2)} ms`;
+
+            if (triggerAnimation) {
+                DOM.textOutput.classList.remove('flip-animation');
+                void DOM.textOutput.offsetWidth; // trigger reflow
+                DOM.textOutput.classList.add('flip-animation');
+            }
+
+            localStorage.setItem('passion_reverse_text', text);
+            localStorage.setItem('passion_reverse_mode', mode);
+        }
+
+        // --- Event Listeners ---
+        
+        let typingTimer;
+        DOM.textInput.addEventListener('input', () => {
+            if (DOM.optLive.checked) {
+                clearTimeout(typingTimer);
+                typingTimer = setTimeout(() => executeReversal(false), 50); // slight debounce for performance
+            } else {
+                // Just update counters
+                const text = DOM.textInput.value;
+                DOM.inChars.textContent = `Chars: ${text.length}`;
+                DOM.inWords.textContent = `Words: ${text.trim() === '' ? 0 : text.trim().split(/\s+/).length}`;
+                DOM.inLines.textContent = `Lines: ${text === '' ? 0 : text.split('\n').length}`;
+            }
+        });
+
+        DOM.revMode.addEventListener('change', () => {
+            if (DOM.optLive.checked) executeReversal(true);
+        });
+
+        DOM.optIgnoreNums.addEventListener('change', () => {
+            if (DOM.optLive.checked) executeReversal(true);
+        });
+
+        DOM.btnReverse.addEventListener('click', () => executeReversal(true));
+
+        DOM.btnClear.addEventListener('click', () => {
+            DOM.textInput.value = '';
+            DOM.textOutput.value = '';
+            executeReversal(false);
+            DOM.textInput.focus();
+        });
+
+        DOM.btnPaste.addEventListener('click', async () => {
+            try {
+                const text = await navigator.clipboard.readText();
+                DOM.textInput.value += text;
+                executeReversal(DOM.optLive.checked);
+                showToast('Text pasted');
+            } catch (err) {
+                alert('Clipboard access denied. Please paste manually using Ctrl+V or Cmd+V.');
+            }
+        });
+
+        DOM.btnSwap.addEventListener('click', () => {
+            if (!DOM.textOutput.value) return;
+            DOM.textInput.value = DOM.textOutput.value;
+            DOM.textOutput.value = '';
+            
+            // To prevent instant double-reversal if Live is on, briefly disable it
+            const wasLive = DOM.optLive.checked;
+            DOM.optLive.checked = false;
+            
+            setTimeout(() => {
+                DOM.optLive.checked = wasLive;
+                if(wasLive) executeReversal(true);
+            }, 100);
+        });
+
+        DOM.btnCopy.addEventListener('click', () => {
+            const result = DOM.textOutput.value;
+            if (!result) return;
+            navigator.clipboard.writeText(result).then(() => showToast('Copied to clipboard!'));
+        });
+
+        DOM.btnDownload.addEventListener('click', () => {
+            const result = DOM.textOutput.value;
+            if (!result) return;
+            
+            const blob = new Blob([result], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `passiontools_reversed_${new Date().getTime()}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('File saved successfully!');
+        });
+
+        // Toast Helper
+        function showToast(msg) {
+            DOM.toastMsg.textContent = msg;
+            DOM.toast.classList.add('show');
+            setTimeout(() => DOM.toast.classList.remove('show'), 3000);
+        }
+
+        // --- Init ---
+        function init() {
+            checkThemePreference();
+            const savedText = localStorage.getItem('passion_reverse_text');
+            const savedMode = localStorage.getItem('passion_reverse_mode');
+            
+            if (savedMode) DOM.revMode.value = savedMode;
+            if (savedText) {
+                DOM.textInput.value = savedText;
+                executeReversal(false);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+
+    </script>
+</body>
+</html>
