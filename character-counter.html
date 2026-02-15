@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Character Counter & Analyzer | PassionTools</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            /* Brand Colors */
+            --brand-charcoal: #1f2937;
+            --brand-red: #ef4444;
+            --brand-purple: #a855f7;
+            --brand-gradient: linear-gradient(135deg, #ef4444, #a855f7);
+            --midnight-black: #111827;
+            
+            /* Light Theme UI */
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-soft: #f1f5f9;
+            --border-color: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            
+            /* Accents */
+            --primary-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-orange: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-indigo: #6366f1;
+            --accent-teal: #14b8a6;
+            
+            /* Structure */
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #0f172a;
+            --bg-card: #1e293b;
+            --bg-soft: #334155;
+            --border-color: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --midnight-black: #020617;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-body); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; transition: var(--transition); }
+
+        /* --- HEADER --- */
+        header { background-color: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 16px 0; position: sticky; top: 0; z-index: 100; transition: var(--transition); }
+        .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        .header-content { display: flex; justify-content: space-between; align-items: center; height: 70px; }
+        
+        .logo { font-size: 24px; font-weight: 800; text-decoration: none; color: var(--text-main); letter-spacing: -0.5px; }
+        .logo span { background: var(--brand-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        .header-actions { display: flex; align-items: center; gap: 16px; }
+        .back-link { text-decoration: none; color: var(--text-muted); font-size: 15px; font-weight: 500; display: flex; align-items: center; gap: 8px; transition: var(--transition); }
+        .back-link:hover { color: var(--brand-red); opacity: 0.9; transform: translateX(-2px); }
+        
+        .header-divider { width: 1px; height: 20px; background-color: var(--border-color); }
+        .theme-toggle { background: transparent; border: none; color: var(--text-muted); font-size: 18px; cursor: pointer; display: flex; align-items: center; transition: var(--transition); }
+        .theme-toggle:hover { transform: scale(1.1); color: var(--text-main); }
+        [data-theme="dark"] .theme-toggle { color: #fbbf24; }
+
+        /* --- MAIN LAYOUT --- */
+        main { flex: 1; padding: 40px 0; display: flex; flex-direction: column; align-items: center; }
+        .hero-title { text-align: center; margin-bottom: 30px; padding: 0 20px; animation: fadeUp 0.4s ease; }
+        .hero-title h1 { font-size: 32px; font-weight: 800; margin-bottom: 10px; }
+        .hero-title p { color: var(--text-muted); font-size: 16px; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+            width: 100%;
+            animation: fadeUp 0.5s ease;
+        }
+
+        @media (min-width: 1024px) {
+            .dashboard-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        /* --- CARDS --- */
+        .card { 
+            background: var(--bg-card); 
+            border-radius: var(--radius-lg); 
+            box-shadow: var(--shadow-md); 
+            border: 1px solid var(--border-color); 
+            padding: 24px; 
+            transition: var(--transition); 
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* --- EDITOR SECTION --- */
+        .editor-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .toolbar-group { display: flex; gap: 8px; }
+
+        .icon-btn {
+            background: var(--bg-soft);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 8px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: var(--transition);
+        }
+
+        .icon-btn:hover { background: var(--border-color); color: var(--primary-blue); }
+        .icon-btn.danger:hover { color: var(--brand-red); }
+
+        textarea {
+            width: 100%;
+            flex: 1;
+            min-height: 200px;
+            padding: 20px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background: var(--bg-soft);
+            color: var(--text-main);
+            font-size: 16px;
+            line-height: 1.6;
+            resize: vertical;
+            outline: none;
+            transition: var(--transition);
+            margin-bottom: 16px;
+        }
+
+        textarea:focus {
+            border-color: var(--primary-blue);
+            background: var(--bg-card);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+
+        /* --- LIMIT TRACKER --- */
+        .limit-tracker {
+            background: var(--bg-soft);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            border: 1px solid var(--border-color);
+        }
+
+        .limit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .limit-presets {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .preset-btn {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 20px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .preset-btn:hover, .preset-btn.active {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+
+        .limit-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .limit-input {
+            width: 90px;
+            padding: 6px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            background: var(--bg-card);
+            color: var(--text-main);
+            font-size: 13px;
+            font-weight: 600;
+            text-align: right;
+            outline: none;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--primary-blue);
+            width: 0%;
+            border-radius: 4px;
+            transition: width 0.3s ease, background-color 0.3s ease;
+        }
+
+        .limit-status {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .status-text.warning { color: var(--accent-orange); }
+        .status-text.error { color: var(--brand-red); animation: shake 0.4s ease; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-4px); }
+            50% { transform: translateX(4px); }
+            75% { transform: translateX(-4px); }
+        }
+
+        /* --- STATS GRID --- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-box {
+            background: var(--bg-soft);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-box:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+            border-color: var(--primary-blue);
+        }
+
+        .stat-box::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 4px; height: 100%;
+            background: var(--accent-color, var(--primary-blue));
+            opacity: 0.8;
+        }
+
+        .stat-val {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 4px;
+            line-height: 1.2;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* --- DISTRIBUTION BARS --- */
+        .dist-group { margin-bottom: 24px; }
+        .dist-group:last-child { margin-bottom: 0; }
+        
+        .dist-item { margin-bottom: 12px; }
+        .dist-item:last-child { margin-bottom: 0; }
+
+        .dist-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        .dist-label { color: var(--text-main); display: flex; align-items: center; gap: 6px; }
+        .dist-count { color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
+
+        .dist-track {
+            width: 100%;
+            height: 6px;
+            background: var(--bg-soft);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .dist-fill {
+            height: 100%;
+            background: var(--fill-color, var(--primary-blue));
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Lists for A-Z, 0-9 */
+        .freq-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 12px;
+        }
+        
+        .freq-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-soft);
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            font-size: 13px;
+        }
+
+        .freq-char {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            color: var(--primary-blue);
+            background: var(--bg-card);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .freq-val { color: var(--text-muted); font-weight: 600; }
+
+        /* --- ADVANCED INSIGHTS --- */
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+        }
+
+        .insight-badge {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            border-radius: var(--radius-sm);
+            background: var(--bg-soft);
+            border: 1px solid var(--border-color);
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .insight-badge span { color: var(--text-muted); }
+        .insight-badge strong { color: var(--text-main); font-family: 'JetBrains Mono', monospace; }
+
+        /* --- FOOTER --- */
+        footer { background-color: var(--midnight-black); color: #ffffff; padding: 40px 0; text-align: center; font-size: 14px; margin-top: auto; transition: var(--transition); }
+
+        /* --- TOAST --- */
+        .toast {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
+            background: var(--text-main); color: var(--bg-card); padding: 12px 24px;
+            border-radius: 30px; font-weight: 500; font-size: 14px;
+            display: flex; align-items: center; gap: 8px; box-shadow: var(--shadow-lg);
+            transition: var(--transition); opacity: 0; z-index: 2000;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .toast.success i { color: var(--accent-green); }
+
+        /* --- MOBILE RESPONSIVENESS --- */
+        @media (max-width: 768px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .editor-toolbar { flex-direction: column; align-items: flex-start; gap: 12px; }
+            .toolbar-group { width: 100%; justify-content: space-between; }
+            .limit-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+            .freq-list { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">Passion<span>Tools</span></a>
+                <div class="header-actions">
+                    <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Tools</a>
+                    <div class="header-divider"></div>
+                    <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
+                        <i class="far fa-lightbulb"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="hero-title">
+                <h1>Character Counter</h1>
+                <p>Deep character-level text analysis, limits tracking, and frequency distribution.</p>
+            </div>
+
+            <div class="dashboard-grid">
+                
+                <div class="dashboard-main" style="display: flex; flex-direction: column; gap: 24px;">
+                    
+                    <div class="card" style="flex: 1;">
+                        <div class="editor-toolbar">
+                            <div class="card-title" style="margin:0;"><i class="fas fa-keyboard" style="color: var(--primary-blue)"></i> Input Text</div>
+                            <div class="toolbar-group">
+                                <button class="icon-btn" id="btnPaste"><i class="fas fa-clipboard"></i> Paste</button>
+                                <button class="icon-btn" id="btnCopyCount"><i class="fas fa-copy"></i> Copy Count</button>
+                                <button class="icon-btn danger" id="btnClear"><i class="fas fa-trash-alt"></i> Clear</button>
+                            </div>
+                        </div>
+
+                        <textarea id="textInput" placeholder="Start typing or paste your text here to analyze characters..."></textarea>
+                        
+                        <div class="limit-tracker">
+                            <div class="limit-header">
+                                <div class="limit-presets">
+                                    <button class="preset-btn" data-limit="280">Twitter (280)</button>
+                                    <button class="preset-btn" data-limit="160">SMS (160)</button>
+                                    <button class="preset-btn" data-limit="2200">Instagram (2200)</button>
+                                    <button class="preset-btn" data-limit="63206">Facebook</button>
+                                    <button class="preset-btn active" data-limit="0">No Limit</button>
+                                </div>
+                                <div class="limit-input-wrapper">
+                                    <label for="customLimit" style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Custom:</label>
+                                    <input type="number" id="customLimit" class="limit-input" value="0" min="0">
+                                </div>
+                            </div>
+                            
+                            <div class="progress-container">
+                                <div class="progress-bar" id="progressBar"></div>
+                            </div>
+                            
+                            <div class="limit-status">
+                                <span id="limitUsage">0 / ∞</span>
+                                <span id="limitStatusText" class="status-text"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="dashboard-sidebar">
+                    
+                    <div class="stats-grid">
+                        <div class="stat-box" style="--accent-color: var(--primary-blue);">
+                            <div class="stat-val" id="stTotal">0</div>
+                            <div class="stat-label">Total Characters</div>
+                        </div>
+                        <div class="stat-box" style="--accent-color: var(--accent-indigo);">
+                            <div class="stat-val" id="stNoSpace">0</div>
+                            <div class="stat-label">Excluding Spaces</div>
+                        </div>
+                        <div class="stat-box" style="--accent-color: var(--accent-green);">
+                            <div class="stat-val" id="stLetters">0</div>
+                            <div class="stat-label">Letters</div>
+                        </div>
+                        <div class="stat-box" style="--accent-color: var(--accent-orange);">
+                            <div class="stat-val" id="stNumbers">0</div>
+                            <div class="stat-label">Numbers</div>
+                        </div>
+                        <div class="stat-box" style="--accent-color: var(--brand-purple);">
+                            <div class="stat-val" id="stSymbols">0</div>
+                            <div class="stat-label">Symbols</div>
+                        </div>
+                        <div class="stat-box" style="--accent-color: var(--accent-rose);">
+                            <div class="stat-val" id="stSpaces">0</div>
+                            <div class="stat-label">Spaces</div>
+                        </div>
+                        <div class="stat-box" style="--accent-color: var(--accent-teal);">
+                            <div class="stat-val" id="stPunctuation">0</div>
+                            <div class="stat-label">Punctuation</div>
+                        </div>
+                        <div class="stat-box" style="--accent-color: var(--text-muted);">
+                            <div class="stat-val" id="stUnicode">0</div>
+                            <div class="stat-label">Code Points</div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        
+                        <div class="dist-group">
+                            <div class="card-title"><i class="fas fa-chart-pie" style="color: var(--accent-indigo)"></i> Distribution</div>
+                            
+                            <div class="dist-item">
+                                <div class="dist-header">
+                                    <span class="dist-label">Uppercase</span>
+                                    <span class="dist-count"><span id="valUpper">0</span> (<span id="pctUpper">0</span>%)</span>
+                                </div>
+                                <div class="dist-track"><div class="dist-fill" id="barUpper" style="--fill-color: var(--primary-blue);"></div></div>
+                            </div>
+                            
+                            <div class="dist-item">
+                                <div class="dist-header">
+                                    <span class="dist-label">Lowercase</span>
+                                    <span class="dist-count"><span id="valLower">0</span> (<span id="pctLower">0</span>%)</span>
+                                </div>
+                                <div class="dist-track"><div class="dist-fill" id="barLower" style="--fill-color: var(--accent-teal);"></div></div>
+                            </div>
+
+                            <div class="dist-item" style="margin-top: 16px;">
+                                <div class="dist-header">
+                                    <span class="dist-label">Vowels</span>
+                                    <span class="dist-count"><span id="valVowels">0</span> (<span id="pctVowels">0</span>%)</span>
+                                </div>
+                                <div class="dist-track"><div class="dist-fill" id="barVowels" style="--fill-color: var(--accent-purple);"></div></div>
+                            </div>
+
+                            <div class="dist-item">
+                                <div class="dist-header">
+                                    <span class="dist-label">Consonants</span>
+                                    <span class="dist-count"><span id="valConsonants">0</span> (<span id="pctConsonants">0</span>%)</span>
+                                </div>
+                                <div class="dist-track"><div class="dist-fill" id="barConsonants" style="--fill-color: var(--accent-orange);"></div></div>
+                            </div>
+                        </div>
+
+                        <div class="dist-group">
+                            <div class="card-title"><i class="fas fa-sort-amount-down" style="color: var(--accent-rose)"></i> Most Frequent (Top 4)</div>
+                            <div class="freq-list" id="freqListContainer">
+                                <div style="font-size: 13px; color: var(--text-muted); grid-column: 1 / -1;">Type to see character frequency...</div>
+                            </div>
+                        </div>
+
+                        <div class="dist-group">
+                            <div class="card-title"><i class="fas fa-search" style="color: var(--accent-green)"></i> Advanced Detection</div>
+                            <div class="insights-grid">
+                                <div class="insight-badge"><span>Line Breaks</span> <strong id="detLines">0</strong></div>
+                                <div class="insight-badge"><span>Emojis</span> <strong id="detEmojis">0</strong></div>
+                                <div class="insight-badge"><span>Tab Spaces</span> <strong id="detTabs">0</strong></div>
+                                <div class="insight-badge"><span>Invisible Chars</span> <strong id="detInvis">0</strong></div>
+                                <div class="insight-badge" style="grid-column: 1 / -1;">
+                                    <span>Repeated Consecutive Chars</span> <strong id="detRepeats">0</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            © 2026 PassionTools. Secure client-side processing.
+        </div>
+    </footer>
+
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMsg">Success</span>
+    </div>
+
+    <script>
+        /**
+         * PASSIONTOOLS - CHARACTER COUNTER & ANALYZER
+         */
+
+        const DOM = {
+            themeToggle: document.getElementById('themeToggle'),
+            iconLightbulb: document.querySelector('.theme-toggle i'),
+            textInput: document.getElementById('textInput'),
+            btnPaste: document.getElementById('btnPaste'),
+            btnClear: document.getElementById('btnClear'),
+            btnCopyCount: document.getElementById('btnCopyCount'),
+            
+            // Limit Tracker
+            customLimit: document.getElementById('customLimit'),
+            presetBtns: document.querySelectorAll('.preset-btn'),
+            progressBar: document.getElementById('progressBar'),
+            limitUsage: document.getElementById('limitUsage'),
+            limitStatusText: document.getElementById('limitStatusText'),
+            
+            // Stats
+            stTotal: document.getElementById('stTotal'),
+            stNoSpace: document.getElementById('stNoSpace'),
+            stLetters: document.getElementById('stLetters'),
+            stNumbers: document.getElementById('stNumbers'),
+            stSymbols: document.getElementById('stSymbols'),
+            stSpaces: document.getElementById('stSpaces'),
+            stPunctuation: document.getElementById('stPunctuation'),
+            stUnicode: document.getElementById('stUnicode'),
+            
+            // Distribution
+            valUpper: document.getElementById('valUpper'), pctUpper: document.getElementById('pctUpper'), barUpper: document.getElementById('barUpper'),
+            valLower: document.getElementById('valLower'), pctLower: document.getElementById('pctLower'), barLower: document.getElementById('barLower'),
+            valVowels: document.getElementById('valVowels'), pctVowels: document.getElementById('pctVowels'), barVowels: document.getElementById('barVowels'),
+            valConsonants: document.getElementById('valConsonants'), pctConsonants: document.getElementById('pctConsonants'), barConsonants: document.getElementById('barConsonants'),
+            
+            // Advanced & Frequency
+            freqListContainer: document.getElementById('freqListContainer'),
+            detLines: document.getElementById('detLines'),
+            detEmojis: document.getElementById('detEmojis'),
+            detTabs: document.getElementById('detTabs'),
+            detInvis: document.getElementById('detInvis'),
+            detRepeats: document.getElementById('detRepeats'),
+            
+            toast: document.getElementById('toast'),
+            toastMsg: document.getElementById('toastMsg')
+        };
+
+        let currentLimit = 0; // 0 means no limit
+
+        // --- Theme Management ---
+        function checkThemePreference() {
+            if (localStorage.getItem('passion_theme') === 'dark' || 
+               (!localStorage.getItem('passion_theme') && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.body.setAttribute('data-theme', 'dark');
+                DOM.iconLightbulb.className = 'fas fa-lightbulb';
+                DOM.iconLightbulb.style.color = '#fbbf24';
+            } else {
+                document.body.removeAttribute('data-theme');
+                DOM.iconLightbulb.className = 'far fa-lightbulb';
+                DOM.iconLightbulb.style.color = '';
+            }
+        }
+
+        DOM.themeToggle.addEventListener('click', () => {
+            const isDark = document.body.getAttribute('data-theme') === 'dark';
+            if (isDark) {
+                document.body.removeAttribute('data-theme');
+                localStorage.setItem('passion_theme', 'light');
+                DOM.iconLightbulb.className = 'far fa-lightbulb';
+                DOM.iconLightbulb.style.color = '';
+            } else {
+                document.body.setAttribute('data-theme', 'dark');
+                localStorage.setItem('passion_theme', 'dark');
+                DOM.iconLightbulb.className = 'fas fa-lightbulb';
+                DOM.iconLightbulb.style.color = '#fbbf24';
+            }
+        });
+
+        // --- Core Analysis Engine ---
+        function analyzeText() {
+            const text = DOM.textInput.value;
+            
+            // Properly count characters including surrogate pairs (Emojis)
+            const charsArr = [...text];
+            const totalChars = charsArr.length;
+            const codePoints = text.length; // Raw length (UTF-16 code units)
+            
+            // Basic Counts
+            const spaces = (text.match(/ /g) || []).length;
+            const noSpaceChars = totalChars - spaces;
+            const letters = (text.match(/[a-zA-Z]/g) || []).length;
+            const numbers = (text.match(/[0-9]/g) || []).length;
+            const lineBreaks = (text.match(/\n/g) || []).length;
+            const tabs = (text.match(/\t/g) || []).length;
+            const emojis = (text.match(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu) || []).length;
+            const punctuation = (text.match(/[.,\/#!$%\^&\*;:{}=\-_`~()'"?\[\]]/g) || []).length;
+            const invisible = (text.match(/[\u200B-\u200D\uFEFF]/g) || []).length;
+            
+            // Symbols = Total - (Letters + Numbers + Spaces + LineBreaks + Tabs + Invisible)
+            // (Note: Punctuation is a subset of Symbols here)
+            const symbols = totalChars - letters - numbers - spaces - lineBreaks - tabs - invisible;
+
+            // Update Basic Stats
+            DOM.stTotal.textContent = totalChars;
+            DOM.stNoSpace.textContent = noSpaceChars;
+            DOM.stLetters.textContent = letters;
+            DOM.stNumbers.textContent = numbers;
+            DOM.stSymbols.textContent = symbols > 0 ? symbols : 0;
+            DOM.stSpaces.textContent = spaces;
+            DOM.stPunctuation.textContent = punctuation;
+            DOM.stUnicode.textContent = codePoints;
+
+            // Distribution
+            const upper = (text.match(/[A-Z]/g) || []).length;
+            const lower = (text.match(/[a-z]/g) || []).length;
+            const vowels = (text.match(/[aeiou]/gi) || []).length;
+            const consonants = (text.match(/[bcdfghjklmnpqrstvwxyz]/gi) || []).length;
+
+            updateDistBar(DOM.valUpper, DOM.pctUpper, DOM.barUpper, upper, letters);
+            updateDistBar(DOM.valLower, DOM.pctLower, DOM.barLower, lower, letters);
+            updateDistBar(DOM.valVowels, DOM.pctVowels, DOM.barVowels, vowels, letters);
+            updateDistBar(DOM.valConsonants, DOM.pctConsonants, DOM.barConsonants, consonants, letters);
+
+            // Advanced Detection
+            DOM.detLines.textContent = lineBreaks;
+            DOM.detEmojis.textContent = emojis;
+            DOM.detTabs.textContent = tabs;
+            DOM.detInvis.textContent = invisible;
+
+            // Repeated consecutive chars (e.g., "aaa", "...")
+            const repeatedMatch = text.match(/(.)\1{2,}/g) || [];
+            DOM.detRepeats.textContent = repeatedMatch.length;
+
+            // Limit Tracker
+            updateLimitTracker(totalChars);
+
+            // Frequencies
+            calculateFrequencies(charsArr);
+
+            // Save state
+            localStorage.setItem('passion_char_counter', text);
+        }
+
+        function updateDistBar(valEl, pctEl, barEl, count, total) {
+            valEl.textContent = count;
+            let pct = 0;
+            if (total > 0) pct = ((count / total) * 100).toFixed(1);
+            pctEl.textContent = pct;
+            barEl.style.width = `${pct}%`;
+        }
+
+        function updateLimitTracker(totalChars) {
+            if (currentLimit === 0) {
+                DOM.limitUsage.textContent = `${totalChars} / ∞`;
+                DOM.limitStatusText.textContent = "";
+                DOM.progressBar.style.width = "0%";
+                DOM.progressBar.style.backgroundColor = "var(--primary-blue)";
+                DOM.limitStatusText.className = "status-text";
+                return;
+            }
+
+            DOM.limitUsage.textContent = `${totalChars} / ${currentLimit}`;
+            let pct = (totalChars / currentLimit) * 100;
+            
+            if (pct > 100) {
+                DOM.progressBar.style.width = "100%";
+                DOM.progressBar.style.backgroundColor = "var(--brand-red)";
+                DOM.limitStatusText.textContent = `-${totalChars - currentLimit} over limit`;
+                DOM.limitStatusText.className = "status-text error";
+            } else if (pct >= 80) {
+                DOM.progressBar.style.width = `${pct}%`;
+                DOM.progressBar.style.backgroundColor = "var(--accent-orange)";
+                DOM.limitStatusText.textContent = `${currentLimit - totalChars} remaining`;
+                DOM.limitStatusText.className = "status-text warning";
+            } else {
+                DOM.progressBar.style.width = `${pct}%`;
+                DOM.progressBar.style.backgroundColor = "var(--primary-blue)";
+                DOM.limitStatusText.textContent = `${currentLimit - totalChars} remaining`;
+                DOM.limitStatusText.className = "status-text";
+            }
+        }
+
+        function calculateFrequencies(charsArr) {
+            if (charsArr.length === 0) {
+                DOM.freqListContainer.innerHTML = '<div style="font-size: 13px; color: var(--text-muted); grid-column: 1 / -1;">Type to see character frequency...</div>';
+                return;
+            }
+
+            const freqMap = {};
+            charsArr.forEach(char => {
+                // Ignore spaces, tabs, linebreaks for display
+                if(char !== ' ' && char !== '\n' && char !== '\t' && char !== '\r') {
+                    const c = char.toUpperCase(); // Group by uppercase for consistency
+                    freqMap[c] = (freqMap[c] || 0) + 1;
+                }
+            });
+
+            const sortedChars = Object.keys(freqMap).sort((a, b) => freqMap[b] - freqMap[a]).slice(0, 4);
+
+            if (sortedChars.length === 0) {
+                DOM.freqListContainer.innerHTML = '<div style="font-size: 13px; color: var(--text-muted); grid-column: 1 / -1;">No visible characters yet.</div>';
+                return;
+            }
+
+            let html = '';
+            sortedChars.forEach(char => {
+                const displayChar = char === '&' ? '&amp;' : char === '<' ? '&lt;' : char === '>' ? '&gt;' : char;
+                html += `
+                    <div class="freq-item">
+                        <span class="freq-char">${displayChar}</span>
+                        <span class="freq-val">${freqMap[char]}</span>
+                    </div>
+                `;
+            });
+            
+            DOM.freqListContainer.innerHTML = html;
+        }
+
+        // --- Event Listeners ---
+        DOM.textInput.addEventListener('input', analyzeText);
+
+        DOM.btnClear.addEventListener('click', () => {
+            DOM.textInput.value = '';
+            analyzeText();
+            DOM.textInput.focus();
+        });
+
+        DOM.btnPaste.addEventListener('click', async () => {
+            try {
+                const text = await navigator.clipboard.readText();
+                DOM.textInput.value += text;
+                analyzeText();
+                showToast('Text pasted from clipboard');
+            } catch (err) {
+                alert('Clipboard access denied. Please paste manually using Ctrl+V or Cmd+V.');
+            }
+        });
+
+        DOM.btnCopyCount.addEventListener('click', () => {
+            const count = DOM.stTotal.textContent;
+            navigator.clipboard.writeText(count).then(() => {
+                showToast(`Copied count: ${count}`, true);
+            });
+        });
+
+        // Limit Listeners
+        DOM.presetBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                DOM.presetBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                const limit = parseInt(btn.dataset.limit);
+                currentLimit = limit;
+                DOM.customLimit.value = limit;
+                
+                analyzeText(); 
+            });
+        });
+
+        DOM.customLimit.addEventListener('input', (e) => {
+            DOM.presetBtns.forEach(b => b.classList.remove('active'));
+            let val = parseInt(e.target.value) || 0;
+            if(val < 0) { val = 0; e.target.value = 0; }
+            currentLimit = val;
+            analyzeText();
+        });
+
+        // Toast Helper
+        function showToast(msg, isSuccess = true) {
+            DOM.toastMsg.textContent = msg;
+            DOM.toast.className = `toast show ${isSuccess ? 'success' : ''}`;
+            setTimeout(() => DOM.toast.classList.remove('show'), 3000);
+        }
+
+        // --- Initialization ---
+        function init() {
+            checkThemePreference();
+            const savedText = localStorage.getItem('passion_char_counter');
+            if (savedText) {
+                DOM.textInput.value = savedText;
+                analyzeText();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+
+    </script>
+</body>
+</html>
