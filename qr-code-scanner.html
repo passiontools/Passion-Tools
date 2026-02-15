@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Scanner – PassionTools</title>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Global Colors */
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #0f172a;
+            --text-secondary: #475569;
+            --border: #e2e8f0;
+            --input-bg: #f1f5f9;
+            --header-bg: rgba(255, 255, 255, 0.85);
+            --shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+            --shadow-hover: 0 8px 32px rgba(0, 0, 0, 0.1);
+            
+            /* Header Specific Colors */
+            --logo-passion: #0f172a;
+            --nav-color: #64748b;
+            --nav-hover: #ef4444;
+            --divider-color: #cbd5e1;
+            --bulb-color: #64748b;
+            --bulb-hover: #0f172a;
+            
+            /* Footer */
+            --footer-bg: #111827;
+            --footer-text: #94a3b8;
+        }
+
+        [data-theme="dark"] {
+            --bg: #020617;
+            --card-bg: #111827;
+            --text: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border: #1e293b;
+            --input-bg: #1e293b;
+            --header-bg: rgba(2, 6, 23, 0.85);
+            --shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+            --shadow-hover: 0 8px 32px rgba(0, 0, 0, 0.4);
+            
+            --logo-passion: #f8fafc;
+            --nav-color: #94a3b8;
+            --divider-color: #334155;
+            --bulb-color: #f8fafc;
+            --bulb-hover: #fbbf24;
+            
+            --footer-bg: #020617;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.35s ease, color 0.35s ease;
+            line-height: 1.6;
+        }
+
+        /* ========== HEADER ========== */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            height: 70px;
+            width: 100%;
+            background: var(--header-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            transition: background 0.35s ease, border-color 0.35s ease;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            user-select: none;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-passion {
+            color: var(--logo-passion);
+            transition: color 0.35s ease;
+        }
+
+        .logo-tools {
+            background: linear-gradient(135deg, #ef4444, #a855f7);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .back-link {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--nav-color);
+            text-decoration: none;
+            transition: color 0.25s ease, gap 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .back-link:hover {
+            color: var(--nav-hover);
+            gap: 10px;
+        }
+
+        .back-link svg {
+            width: 18px;
+            height: 18px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: transform 0.25s ease;
+        }
+
+        .back-link:hover svg {
+            transform: translateX(-3px);
+        }
+
+        .header-divider {
+            width: 1px;
+            height: 20px;
+            background: var(--divider-color);
+            transition: background 0.35s ease;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--bulb-color);
+            transition: color 0.25s ease, transform 0.25s ease;
+            border-radius: 8px;
+        }
+
+        .theme-toggle:hover {
+            color: var(--bulb-hover);
+            transform: scale(1.1);
+        }
+
+        .theme-toggle svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        [data-theme="dark"] .theme-toggle:hover {
+            filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.5));
+        }
+
+        /* ========== MAIN ========== */
+        .main {
+            flex: 1;
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 32px 20px 48px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 8px;
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: var(--text);
+            transition: color 0.35s ease;
+        }
+
+        .page-subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 16px;
+            margin-bottom: 36px;
+            transition: color 0.35s ease;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 32px;
+            box-shadow: var(--shadow);
+            transition: background 0.35s ease, border-color 0.35s ease, box-shadow 0.3s ease, transform 0.3s ease;
+            width: 100%;
+            max-width: 500px; /* Slimmer card for scanning */
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-hover);
+        }
+
+        /* ========== TAB SELECTOR ========== */
+        .tab-selector {
+            display: flex;
+            gap: 0;
+            background: var(--input-bg);
+            border-radius: 10px;
+            padding: 4px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border);
+            transition: background 0.35s ease, border-color 0.35s ease;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 9px 12px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #2563eb, #4f46e5);
+            color: #ffffff;
+            box-shadow: 0 2px 10px rgba(37, 99, 235, 0.3);
+        }
+
+        .tab-btn:not(.active):hover {
+            color: var(--text);
+            background: rgba(0,0,0,0.03);
+        }
+
+        [data-theme="dark"] .tab-btn:not(.active):hover {
+            background: rgba(255,255,255,0.04);
+        }
+
+        .tab-btn svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* ========== ZONES ========== */
+        .scan-zone {
+            display: none;
+            flex-direction: column;
+            gap: 16px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .scan-zone.active {
+            display: flex;
+        }
+
+        /* ========== LIVE CAMERA VIEW ========== */
+        .video-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            background: #000;
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--border);
+            transition: border-color 0.3s ease;
+        }
+
+        .video-container.active {
+            border-color: #a855f7;
+        }
+
+        #videoFeed {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        #videoFeed.active {
+            display: block;
+        }
+
+        /* Scanning Laser & Bracket Overlay */
+        .scan-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            display: none;
+            z-index: 10;
+        }
+
+        .scan-overlay.active {
+            display: block;
+        }
+
+        .scan-overlay::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 12px;
+        }
+
+        .scan-laser {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: #a855f7;
+            box-shadow: 0 0 10px #a855f7, 0 0 20px #a855f7;
+            top: 10%;
+            animation: scan 2s infinite linear alternate;
+        }
+
+        @keyframes scan {
+            0% { top: 5%; }
+            100% { top: 95%; }
+        }
+
+        .camera-placeholder {
+            color: #94a3b8;
+            font-size: 14px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            padding: 20px;
+        }
+
+        /* ========== DRAG & DROP UPLOAD ========== */
+        .upload-zone {
+            border: 2px dashed var(--border);
+            border-radius: 10px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            background: var(--input-bg);
+            transition: all 0.25s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 250px;
+        }
+
+        .upload-zone:hover, .upload-zone.dragover {
+            border-color: #a855f7;
+            background: rgba(168, 85, 247, 0.05);
+        }
+
+        .upload-icon {
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            transition: color 0.3s ease;
+        }
+
+        .upload-zone:hover .upload-icon {
+            color: #a855f7;
+        }
+
+        .upload-text {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .upload-hint {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .image-preview-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--card-bg);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            z-index: 2;
+        }
+
+        .image-preview-container.show {
+            display: flex;
+        }
+
+        #imagePreview {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 6px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .remove-img-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(15, 23, 42, 0.7);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s;
+            backdrop-filter: blur(4px);
+        }
+
+        .remove-img-btn:hover {
+            background: #ef4444;
+        }
+
+        /* ========== BUTTONS ========== */
+        .btn {
+            width: 100%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 22px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .btn svg {
+            flex-shrink: 0;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #2563eb, #4f46e5);
+            color: #ffffff;
+            box-shadow: 0 2px 12px rgba(37, 99, 235, 0.25);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .btn-primary:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-outline:hover {
+            background: var(--input-bg);
+            border-color: var(--text-secondary);
+        }
+
+        .btn-stop {
+            background: transparent;
+            color: #ef4444;
+            border: 1px solid #ef4444;
+        }
+
+        .btn-stop:hover {
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+            background: var(--text-secondary) !important;
+            color: #fff !important;
+        }
+
+        /* ========== RESULT AREA ========== */
+        .result-box {
+            margin-top: 24px;
+            padding: 20px;
+            border-radius: 10px;
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .result-box.show {
+            display: block;
+        }
+
+        .result-header {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .result-header-left {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .decoded-text {
+            font-size: 16px;
+            color: var(--text);
+            word-break: break-word;
+            white-space: pre-wrap;
+            line-height: 1.5;
+            margin-bottom: 16px;
+            padding: 12px;
+            background: var(--card-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .result-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-copy {
+            flex: 1;
+            background: var(--card-bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-copy:hover {
+            border-color: #10b981;
+            color: #10b981;
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .btn-link {
+            flex: 1;
+            background: #10b981;
+            color: white;
+            text-decoration: none;
+            display: none;
+        }
+
+        .btn-link.show {
+            display: inline-flex;
+        }
+
+        .btn-link:hover {
+            background: #059669;
+        }
+
+        .reset-link {
+            font-size: 13px;
+            color: #3b82f6;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        /* Messages */
+        .message {
+            margin-top: 16px;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            display: none;
+            text-align: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .message.error {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            display: block;
+        }
+
+        /* ========== FOOTER ========== */
+        .footer {
+            text-align: center;
+            padding: 30px 20px;
+            font-size: 14px;
+            color: var(--footer-text);
+            background: var(--footer-bg);
+            transition: background 0.35s ease;
+            margin-top: auto;
+        }
+
+        /* ========== TOAST ========== */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: #1e293b;
+            color: #f8fafc;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 9999;
+            opacity: 0;
+            transition: all 0.35s ease;
+            pointer-events: none;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 768px) {
+            .header { padding: 0 16px; }
+            .logo { font-size: 20px; }
+            .back-link { font-size: 13px; }
+            .page-title { font-size: 24px; }
+            .page-subtitle { font-size: 14px; margin-bottom: 28px; }
+            .card { padding: 24px 16px; border-radius: 0; border-left: none; border-right: none; }
+            .main { padding: 20px 0 40px; }
+            .result-actions { flex-direction: column; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <a href="index.html" class="logo">
+            <span class="logo-passion">Passion</span><span class="logo-tools">Tools</span>
+        </a>
+        <div class="header-right">
+            <a href="index.html" class="back-link">
+                <svg viewBox="0 0 24 24"><path d="M19 12H5m0 0l7 7m-7-7l7-7"/></svg>
+                Back to Tools
+            </a>
+            <div class="header-divider"></div>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <svg viewBox="0 0 24 24" id="themeIcon" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 21h6M12 3a6 6 0 0 0-4 10.47V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3.53A6 6 0 0 0 12 3z"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <main class="main">
+        <h1 class="page-title">QR Code Scanner</h1>
+        <p class="page-subtitle">Instantly scan QR codes using your camera or upload an image.</p>
+
+        <div class="card">
+            
+            <div class="tab-selector">
+                <button class="tab-btn active" data-tab="camera" onclick="switchTab('camera')">
+                    <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                    Camera
+                </button>
+                <button class="tab-btn" data-tab="image" onclick="switchTab('image')">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                    Image
+                </button>
+            </div>
+
+            <div id="statusMsg" class="message"></div>
+
+            <div id="cameraZone" class="scan-zone active">
+                <div class="video-container" id="videoContainer">
+                    <div class="camera-placeholder" id="cameraPlaceholder">
+                        <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 7V5a2 2 0 0 1 2-2h2"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 3h2a2 2 0 0 1 2 2v2"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 17v2a2 2 0 0 1-2 2h-2"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M7 21H5a2 2 0 0 1-2-2v-2"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                        Allow camera access to scan
+                    </div>
+                    <video id="videoFeed" playsinline></video>
+                    <div class="scan-overlay" id="scanOverlay">
+                        <div class="scan-laser"></div>
+                    </div>
+                </div>
+
+                <div id="cameraActions">
+                    <button class="btn btn-primary" id="startCameraBtn">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                        Start Camera
+                    </button>
+                    <button class="btn btn-stop" id="stopCameraBtn" style="display:none;">
+                        Stop Camera
+                    </button>
+                </div>
+            </div>
+
+            <div id="imageZone" class="scan-zone">
+                <div class="upload-zone" id="dropZone">
+                    <svg class="upload-icon" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                    </svg>
+                    <div class="upload-text">Click to upload or drag image here</div>
+                    <div class="upload-hint">Supports PNG, JPG, JPEG, WEBP</div>
+                    <input type="file" id="fileInput" accept="image/*">
+                    
+                    <div class="image-preview-container" id="previewContainer">
+                        <img id="imagePreview" src="" alt="Image Preview">
+                        <button class="remove-img-btn" id="removeImgBtn" aria-label="Remove image">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" id="scanImgBtn" disabled>
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"></path><path d="M17 3h2a2 2 0 0 1 2 2v2"></path><path d="M21 17v2a2 2 0 0 1-2 2h-2"></path><path d="M7 21H5a2 2 0 0 1-2-2v-2"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    Extract QR Data
+                </button>
+            </div>
+
+            <div class="result-box" id="resultBox">
+                <div class="result-header">
+                    <div class="result-header-left">
+                        <svg width="16" height="16" fill="none" stroke="#10b981" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                        Scan Successful
+                    </div>
+                    <span class="reset-link" onclick="resetAll()">Scan Another</span>
+                </div>
+                <div class="decoded-text" id="decodedText"></div>
+                
+                <div class="result-actions">
+                    <button class="btn btn-copy" id="copyBtn">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        Copy Text
+                    </button>
+                    <a href="#" target="_blank" class="btn btn-link btn" id="linkBtn">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                        Open Link
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="footer">
+        © 2026 Passion Tools. Secure client-side processing.
+    </footer>
+
+    <div class="toast" id="toast"></div>
+
+    <canvas id="scanCanvas" style="display:none;"></canvas>
+
+    <script>
+        // ===== THEME SYSTEM (Bulb Icon) =====
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        const html = document.documentElement;
+        const bulbOff = '<path d="M9 21h6"/><path d="M12 3a6 6 0 0 0-4 10.47V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3.53A6 6 0 0 0 12 3z"/>';
+        const bulbOn = '<path d="M9 21h6" stroke-width="2"/><path d="M12 3a6 6 0 0 0-4 10.47V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3.53A6 6 0 0 0 12 3z" fill="currentColor"/><line x1="12" y1="0" x2="12" y2="1"/><line x1="4.22" y1="4.22" x2="4.93" y2="4.93"/><line x1="0" y1="12" x2="1" y2="12"/><line x1="4.22" y1="19.78" x2="4.93" y2="19.07"/><line x1="19.78" y1="4.22" x2="19.07" y2="4.93"/><line x1="23" y1="12" x2="22" y2="12"/><line x1="19.78" y1="19.78" x2="19.07" y2="19.07"/>';
+
+        function setTheme(theme) {
+            html.setAttribute('data-theme', theme);
+            localStorage.setItem('passiontools-theme', theme);
+            themeIcon.innerHTML = theme === 'dark' ? bulbOn : bulbOff;
+        }
+
+        const savedTheme = localStorage.getItem('passiontools-theme') || 'light';
+        setTheme(savedTheme);
+
+        themeToggle.addEventListener('click', () => {
+            setTheme(html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+        });
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2800);
+        }
+
+        // ===== SHARED UI LOGIC =====
+        const statusMsg = document.getElementById('statusMsg');
+        const resultBox = document.getElementById('resultBox');
+        const decodedText = document.getElementById('decodedText');
+        const copyBtn = document.getElementById('copyBtn');
+        const linkBtn = document.getElementById('linkBtn');
+        const scanCanvas = document.getElementById('scanCanvas');
+        const ctx = scanCanvas.getContext('2d', { willReadFrequently: true });
+
+        function showError(msg) {
+            statusMsg.textContent = msg;
+            statusMsg.className = 'message error';
+            resultBox.classList.remove('show');
+        }
+
+        function hideError() {
+            statusMsg.className = 'message';
+        }
+
+        function displayResult(text) {
+            decodedText.textContent = text;
+            resultBox.classList.add('show');
+            showToast("✅ QR Code successfully decoded!");
+
+            if (isValidUrl(text)) {
+                linkBtn.href = text;
+                linkBtn.classList.add('show');
+            } else {
+                linkBtn.classList.remove('show');
+            }
+        }
+
+        function isValidUrl(string) {
+            try { new URL(string); return true; } catch (_) { return false; }
+        }
+
+        function resetAll() {
+            resultBox.classList.remove('show');
+            hideError();
+            if(currentTab === 'camera') {
+                // Return to waiting state for camera
+                stopCamera();
+            } else {
+                resetImageScanner();
+            }
+        }
+
+        // ===== TAB SYSTEM =====
+        let currentTab = 'camera';
+        function switchTab(tab) {
+            if(currentTab === tab) return;
+            currentTab = tab;
+            
+            // Update UI buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tab === tab);
+            });
+            
+            // Toggle Zones
+            document.getElementById('cameraZone').classList.toggle('active', tab === 'camera');
+            document.getElementById('imageZone').classList.toggle('active', tab === 'image');
+            
+            // Cleanup state
+            resultBox.classList.remove('show');
+            hideError();
+            
+            if (tab === 'image') {
+                stopCamera(); // Turn off camera to save battery
+            }
+        }
+
+        // ===== LIVE CAMERA SCANNING LOGIC =====
+        let videoStream = null;
+        let animationFrameId = null;
+        const videoFeed = document.getElementById('videoFeed');
+        const videoContainer = document.getElementById('videoContainer');
+        const cameraPlaceholder = document.getElementById('cameraPlaceholder');
+        const scanOverlay = document.getElementById('scanOverlay');
+        const startCameraBtn = document.getElementById('startCameraBtn');
+        const stopCameraBtn = document.getElementById('stopCameraBtn');
+
+        startCameraBtn.addEventListener('click', async () => {
+            hideError();
+            resultBox.classList.remove('show');
+            try {
+                // Request back camera
+                videoStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+                videoFeed.srcObject = videoStream;
+                videoFeed.setAttribute("playsinline", true); // Required for iOS
+                videoFeed.play();
+                
+                // Update UI
+                cameraPlaceholder.style.display = 'none';
+                videoFeed.classList.add('active');
+                scanOverlay.classList.add('active');
+                videoContainer.classList.add('active');
+                startCameraBtn.style.display = 'none';
+                stopCameraBtn.style.display = 'inline-flex';
+                
+                requestAnimationFrame(tick);
+            } catch (err) {
+                showError("Camera access denied or not available. Please check device permissions.");
+                console.error("Camera Error:", err);
+            }
+        });
+
+        stopCameraBtn.addEventListener('click', stopCamera);
+
+        function stopCamera() {
+            if (videoStream) {
+                videoStream.getTracks().forEach(track => track.stop());
+                videoStream = null;
+            }
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+                animationFrameId = null;
+            }
+            // Revert UI
+            videoFeed.classList.remove('active');
+            scanOverlay.classList.remove('active');
+            videoContainer.classList.remove('active');
+            cameraPlaceholder.style.display = 'flex';
+            startCameraBtn.style.display = 'inline-flex';
+            stopCameraBtn.style.display = 'none';
+        }
+
+        function tick() {
+            if (videoFeed.readyState === videoFeed.HAVE_ENOUGH_DATA) {
+                scanCanvas.height = videoFeed.videoHeight;
+                scanCanvas.width = videoFeed.videoWidth;
+                ctx.drawImage(videoFeed, 0, 0, scanCanvas.width, scanCanvas.height);
+                
+                const imageData = ctx.getImageData(0, 0, scanCanvas.width, scanCanvas.height);
+                const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                    inversionAttempts: "dontInvert",
+                });
+                
+                if (code) {
+                    stopCamera(); // Stop parsing once found
+                    displayResult(code.data);
+                    return; // Exit loop
+                }
+            }
+            if(videoStream && videoStream.active) {
+                animationFrameId = requestAnimationFrame(tick);
+            }
+        }
+
+        // ===== IMAGE UPLOAD SCANNING LOGIC =====
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const previewContainer = document.getElementById('previewContainer');
+        const imagePreview = document.getElementById('imagePreview');
+        const removeImgBtn = document.getElementById('removeImgBtn');
+        const scanImgBtn = document.getElementById('scanImgBtn');
+
+        dropZone.addEventListener('click', (e) => {
+            if (e.target !== removeImgBtn && !removeImgBtn.contains(e.target)) fileInput.click();
+        });
+
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault(); dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) handleFile(e.target.files[0]);
+        });
+
+        removeImgBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); resetImageScanner();
+        });
+
+        function handleFile(file) {
+            if (!file.type.startsWith('image/')) {
+                showError("Please upload a valid image file.");
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                imagePreview.src = e.target.result;
+                previewContainer.classList.add('show');
+                scanImgBtn.disabled = false;
+                hideError();
+                resultBox.classList.remove('show');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function resetImageScanner() {
+            fileInput.value = '';
+            imagePreview.src = '';
+            previewContainer.classList.remove('show');
+            scanImgBtn.disabled = true;
+            resultBox.classList.remove('show');
+            hideError();
+        }
+
+        scanImgBtn.addEventListener('click', () => {
+            if (!imagePreview.src) return showError("No image loaded.");
+            hideError();
+            
+            const img = new Image();
+            img.onload = () => {
+                const MAX_DIMENSION = 1200;
+                let width = img.width, height = img.height;
+                if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
+                    const ratio = Math.min(MAX_DIMENSION / width, MAX_DIMENSION / height);
+                    width = Math.floor(width * ratio);
+                    height = Math.floor(height * ratio);
+                }
+                scanCanvas.width = width; scanCanvas.height = height;
+                ctx.drawImage(img, 0, 0, width, height);
+
+                try {
+                    const imageData = ctx.getImageData(0, 0, width, height);
+                    const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: "dontInvert" });
+                    
+                    if (code) displayResult(code.data);
+                    else showError("Could not find a valid QR code. Try an image with a clearer code.");
+                } catch (err) {
+                    showError("An error occurred while scanning the image.");
+                    console.error(err);
+                }
+            };
+            img.src = imagePreview.src;
+        });
+
+        // ===== CLIPBOARD COPY =====
+        copyBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(decodedText.textContent).then(() => {
+                showToast('📋 Copied to clipboard!');
+            }).catch(() => showError("Failed to copy text."));
+        });
+    </script>
+</body>
+</html>
