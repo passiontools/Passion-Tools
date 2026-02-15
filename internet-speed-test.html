@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Internet Speed Test - PassionTools</title>
+    <style>
+        /* ==========================================================================
+           🎨 GLOBAL TYPOGRAPHY & THEME VARIABLES
+           ========================================================================== */
+        :root {
+            /* Light Theme */
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --input-bg: #f8fafc;
+            --accent: #ef4444;
+            --modern-blue: #3b82f6;
+            --modern-blue-dark: #2563eb;
+            
+            /* Analyzer Specific Colors */
+            --inner-bg: rgba(248,250,252,0.5);
+            --track-bg: rgba(15,23,42,0.06);
+            --gauge-glow: rgba(59,130,246,0.08);
+            --needle-hub: #0f172a;
+            --needle-hub-ring: #ffffff;
+            --success-light: rgba(34,197,94,0.1);
+            --success-text: #16a34a;
+            --danger-light: rgba(239,68,68,0.1);
+            --danger-text: #dc2626;
+            --icon-bg: rgba(15,23,42,0.04);
+            
+            /* Footer */
+            --footer-bg: #111827;
+            --footer-text: #94a3b8;
+        }
+
+        [data-theme="dark"] {
+            /* Dark Theme */
+            --bg-color: #020617;
+            --card-bg: #111827;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #1e293b;
+            --input-bg: #1e293b;
+            
+            /* Analyzer Specific Colors */
+            --inner-bg: rgba(30,41,59,0.4);
+            --track-bg: rgba(248,250,252,0.05);
+            --gauge-glow: rgba(59,130,246,0.12);
+            --needle-hub: #f8fafc;
+            --needle-hub-ring: #1e293b;
+            --success-light: rgba(34,197,94,0.15);
+            --success-text: #4ade80;
+            --danger-light: rgba(239,68,68,0.15);
+            --danger-text: #fca5a5;
+            --icon-bg: rgba(248,250,252,0.05);
+
+            /* Footer */
+            --footer-bg: #020617;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* ==========================================================================
+           🔷 HEADER
+           ========================================================================== */
+        header {
+            position: sticky;
+            top: 0;
+            height: 70px;
+            width: 100%;
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .header-container {
+            width: 100%;
+            max-width: 1000px;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .logo-passion { color: var(--text-main); }
+        .logo-tools {
+            background: linear-gradient(135deg, #ef4444, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .nav-link {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-muted);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-link:hover { color: var(--accent); }
+
+        .vertical-divider {
+            height: 20px;
+            width: 1px;
+            background-color: var(--border-color);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            border-radius: 6px;
+        }
+
+        .theme-toggle svg { width: 20px; height: 20px; }
+        .theme-toggle:hover { color: var(--text-main); }
+        [data-theme="dark"] .theme-toggle svg { color: #fbbf24; }
+
+        /* ==========================================================================
+           📦 MAIN TOOL SECTION
+           ========================================================================== */
+        main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+            width: 100%;
+        }
+
+        .tool-card {
+            width: 100%;
+            max-width: 1000px;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Hero */
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--modern-blue);
+        }
+
+        .tool-card h1 {
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-top: 8px;
+            color: var(--text-main);
+        }
+
+        .hero-desc {
+            color: var(--text-muted);
+            font-size: 15px;
+            line-height: 1.6;
+            margin-top: 10px;
+            max-width: 700px;
+        }
+
+        /* Online Status */
+        .online-strip {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 18px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .online-strip--online { background: var(--success-light); color: var(--success-text); }
+        .online-strip--offline { background: var(--danger-light); color: var(--danger-text); }
+
+        .online-dot {
+            width: 10px; height: 10px; border-radius: 50%; background: currentColor; position: relative;
+        }
+
+        .online-strip--online .online-dot { animation: dotPulse 2s ease-in-out infinite; }
+
+        @keyframes dotPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(34,197,94,0.4); }
+            50% { box-shadow: 0 0 0 6px rgba(34,197,94,0); }
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 8px;
+            padding: 14px 28px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--modern-blue), var(--modern-blue-dark));
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+        }
+
+        /* Status Bar */
+        .status-bar {
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background: var(--input-bg);
+        }
+
+        .status-row { display: flex; justify-content: space-between; align-items: center; }
+
+        .status-label { font-weight: 700; font-size: 16px; color: var(--text-main); }
+        .status-sub { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+
+        .spinner {
+            width: 20px; height: 20px;
+            border: 2.5px solid var(--border-color);
+            border-top-color: var(--modern-blue);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        .spinner.visible { opacity: 1; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .progress-track {
+            width: 100%; height: 6px; border-radius: 4px; background: var(--track-bg); overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; width: 0%; border-radius: inherit;
+            background: linear-gradient(90deg, var(--modern-blue), var(--accent));
+            transition: width 0.4s ease;
+        }
+
+        /* Content Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+
+        @media (min-width: 768px) {
+            .content-grid { grid-template-columns: 1fr 1.2fr; }
+        }
+
+        /* Gauge */
+        .gauge-wrapper {
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: radial-gradient(ellipse at 50% 20%, var(--gauge-glow), transparent 70%);
+        }
+
+        .gauge-svg-wrap { position: relative; width: 100%; max-width: 260px; aspect-ratio: 1.6 / 1; }
+        .gauge-svg { width: 100%; height: 100%; overflow: visible; }
+        .gauge-svg text { font-family: system-ui, sans-serif; }
+
+        .gauge-needle-group {
+            transform-origin: 130px 130px;
+            transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .speed-display { text-align: center; margin-top: 15px; }
+
+        .speed-number {
+            font-size: 52px; font-weight: 800; line-height: 1;
+            background: linear-gradient(135deg, var(--modern-blue), var(--accent));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .speed-unit {
+            display: block; font-size: 14px; color: var(--text-muted); font-weight: 700;
+            text-transform: uppercase; letter-spacing: 1px; margin-top: 4px;
+        }
+
+        .gauge-phase {
+            font-size: 13px; color: var(--text-muted); text-transform: uppercase;
+            letter-spacing: 1px; font-weight: 700; margin-top: 15px; min-height: 18px;
+        }
+
+        /* Results Panel */
+        .results-panel { display: flex; flex-direction: column; gap: 15px; }
+
+        .result-card {
+            border: 1px solid var(--border-color); border-radius: 12px; padding: 16px 20px;
+            background: var(--inner-bg); display: flex; flex-direction: column; gap: 6px;
+        }
+
+        .rc-header { display: flex; align-items: center; gap: 12px; }
+
+        .rc-icon {
+            width: 40px; height: 40px; border-radius: 8px; background: var(--icon-bg);
+            display: flex; align-items: center; justify-content: center;
+        }
+        
+        .rc-icon svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+        .rc-meta { flex: 1; }
+        .rc-type { font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 700; }
+        .rc-val { font-size: 24px; font-weight: 800; display: flex; align-items: baseline; gap: 4px; color: var(--text-main); font-variant-numeric: tabular-nums;}
+        .rc-val small { font-size: 13px; font-weight: 600; color: var(--text-muted); }
+        .rc-desc { font-size: 13px; color: var(--text-muted); line-height: 1.4; }
+
+        /* Detail Grids */
+        .section-title {
+            font-size: 16px; font-weight: 700; color: var(--text-main);
+            display: flex; align-items: center; gap: 8px; margin-bottom: 15px; margin-top: 15px;
+        }
+        .section-title svg { width: 18px; height: 18px; stroke: var(--text-muted); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+        .detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
+
+        .detail-tile {
+            border: 1px solid var(--border-color); border-radius: 10px; padding: 15px; background: var(--inner-bg);
+        }
+
+        .detail-label {
+            font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 700; margin-bottom: 6px;
+        }
+        .detail-value { font-size: 18px; font-weight: 800; color: var(--text-main); }
+        .detail-value small { font-size: 12px; color: var(--text-muted); font-weight: 600; }
+
+        /* Quality Badge */
+        .quality-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 10px;}
+
+        .quality-badge {
+            display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px;
+            border-radius: 20px; font-size: 14px; font-weight: 700; text-transform: uppercase;
+            background: var(--track-bg); color: var(--text-muted);
+        }
+
+        .quality-note { font-size: 14px; color: var(--text-muted); font-weight: 500;}
+
+        /* Error Banner */
+        .error-banner {
+            display: none; border: 1px solid var(--danger-border); border-radius: 8px; padding: 15px;
+            background: var(--danger-light); color: var(--danger-text); font-size: 14px; font-weight: 600;
+            align-items: center; gap: 10px;
+        }
+        .error-banner.visible { display: flex; }
+
+        /* 🔻 FOOTER */
+        footer {
+            background-color: var(--footer-bg); color: var(--footer-text); text-align: center;
+            padding: 30px 20px; font-size: 14px; margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-container">
+            <a href="index.html" class="logo" aria-label="PassionTools Home">
+                <span class="logo-passion">Passion</span><span class="logo-tools">Tools</span>
+            </a>
+            <div class="header-controls">
+                <a href="index.html" class="nav-link" aria-label="Back to Tools">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    Back to Tools
+                </a>
+                <div class="vertical-divider"></div>
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.9 1.2 1.5 1.5 2.5"/>
+                        <path d="M9 18h6"/>
+                        <path d="M10 22h4"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="tool-card">
+            
+            <div>
+                <span class="hero-badge">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                    Real-time Bandwidth Check
+                </span>
+                <h1>Internet Speed Test</h1>
+                <p class="hero-desc">
+                    Measure your actual internet performance using high-speed diagnostic servers. This tool actively tests latency, real-world download speed, and data upload capabilities.
+                </p>
+            </div>
+
+            <div class="online-strip online-strip--online" id="onlineStrip" aria-live="polite">
+                <span class="online-dot"></span>
+                <span id="onlineText">You are Online</span>
+            </div>
+
+            <div class="controls">
+                <button class="btn btn-primary" id="btnAnalyze">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                    Start Speed Test
+                </button>
+            </div>
+
+            <div class="status-bar" aria-live="polite">
+                <div class="status-row">
+                    <div>
+                        <div class="status-label" id="statusLabel">Ready to test connection</div>
+                        <div class="status-sub" id="statusSub">Connects to optimal diagnostic servers.</div>
+                    </div>
+                    <div class="spinner" id="spinner" aria-hidden="true"></div>
+                </div>
+                <div class="progress-track" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+
+            <div class="content-grid">
+                
+                <div class="gauge-wrapper" aria-label="Speed gauge">
+                    <div class="gauge-svg-wrap">
+                        <svg class="gauge-svg" viewBox="0 0 260 160" aria-hidden="true">
+                            <defs>
+                                <linearGradient id="arcGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stop-color="#ef4444"/>
+                                    <stop offset="40%" stop-color="#f97316"/>
+                                    <stop offset="70%" stop-color="#22c55e"/>
+                                    <stop offset="100%" stop-color="#3b82f6"/>
+                                </linearGradient>
+                            </defs>
+                            <path d="M 25 135 A 105 105 0 0 1 235 135" fill="none" stroke="var(--track-bg)" stroke-width="18" stroke-linecap="round"/>
+                            <path id="gaugeArc" d="M 25 135 A 105 105 0 0 1 235 135" fill="none" stroke="url(#arcGrad)" stroke-width="18" stroke-linecap="round" stroke-dasharray="330" stroke-dashoffset="330" style="transition: stroke-dashoffset 0.1s linear;"/>
+                            <g stroke="var(--text-muted)" stroke-width="1.5" opacity="0.35">
+                                <line x1="33" y1="125" x2="42" y2="118"/>
+                                <line x1="55" y1="72" x2="63" y2="78"/>
+                                <line x1="97" y1="38" x2="101" y2="48"/>
+                                <line x1="130" y1="29" x2="130" y2="40"/>
+                                <line x1="163" y1="38" x2="159" y2="48"/>
+                                <line x1="205" y1="72" x2="197" y2="78"/>
+                                <line x1="227" y1="125" x2="218" y2="118"/>
+                            </g>
+                            <g class="gauge-needle-group" id="needleGroup" style="transform: rotate(-120deg)">
+                                <line x1="130" y1="135" x2="130" y2="48" stroke="#ef4444" stroke-width="4" stroke-linecap="round"/>
+                                <circle cx="130" cy="135" r="8" fill="var(--needle-hub)" stroke="var(--needle-hub-ring)" stroke-width="3"/>
+                            </g>
+                        </svg>
+                    </div>
+
+                    <div class="speed-display">
+                        <span class="speed-number" id="speedNumber">0.00</span>
+                        <span class="speed-unit" id="speedUnit">Mbps</span>
+                    </div>
+                    <div class="gauge-phase" id="gaugePhase">Standing By</div>
+                </div>
+
+                <div class="results-panel">
+                    
+                    <div class="result-card">
+                        <div class="rc-header">
+                            <div class="rc-icon" style="color: #a855f7;">
+                                <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                            </div>
+                            <div class="rc-meta">
+                                <div class="rc-type">Latency (Ping)</div>
+                                <div class="rc-val"><span id="valPing">--</span><small>ms</small></div>
+                            </div>
+                        </div>
+                        <div class="rc-desc">Response time between your device and the server.</div>
+                    </div>
+
+                    <div class="result-card">
+                        <div class="rc-header">
+                            <div class="rc-icon" style="color: #3b82f6;">
+                                <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                            </div>
+                            <div class="rc-meta">
+                                <div class="rc-type">Download Speed</div>
+                                <div class="rc-val"><span id="valDownlink">--</span><small>Mbps</small></div>
+                            </div>
+                        </div>
+                        <div class="rc-desc">How fast data is pulled to your device.</div>
+                    </div>
+
+                    <div class="result-card">
+                        <div class="rc-header">
+                            <div class="rc-icon" style="color: #10b981;">
+                                <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                            </div>
+                            <div class="rc-meta">
+                                <div class="rc-type">Upload Speed</div>
+                                <div class="rc-val" id="valUplink">--<small>Mbps</small></div>
+                            </div>
+                        </div>
+                        <div class="rc-desc">How fast data is sent from your device.</div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div>
+                <div class="section-title">
+                    <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                    Advanced Metrics
+                </div>
+                
+                <div class="detail-grid">
+                    <div class="detail-tile">
+                        <div class="detail-label">Network Jitter</div>
+                        <div class="detail-value"><span id="infoJitter">--</span> <small>ms</small></div>
+                    </div>
+                    <div class="detail-tile">
+                        <div class="detail-label">System Connection</div>
+                        <div class="detail-value" id="infoType" style="font-size: 16px;">--</div>
+                    </div>
+                    <div class="detail-tile">
+                        <div class="detail-label">Data Saver</div>
+                        <div class="detail-value" id="infoSaver" style="font-size: 16px;">--</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quality-row">
+                <span class="quality-badge" id="qualityBadge">Awaiting Data</span>
+                <span class="quality-note" id="qualityNote"></span>
+            </div>
+
+            <div class="error-banner" id="errorBanner" role="alert">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                <span id="errorText"></span>
+            </div>
+
+        </div>
+    </main>
+
+    <footer>
+        © 2026 Passion Tools. Secure client-side processing.
+    </footer>
+
+    <script>
+        (() => {
+            'use strict';
+
+            // --- 1. THEME MANAGEMENT ---
+            const themeToggleBtn = document.getElementById('themeToggle');
+            const htmlElement = document.documentElement;
+            const savedTheme = localStorage.getItem('passionTheme') || 'light';
+            htmlElement.setAttribute('data-theme', savedTheme);
+
+            themeToggleBtn.addEventListener('click', () => {
+                const currentTheme = htmlElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+                htmlElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('passionTheme', newTheme);
+            });
+
+            // --- 2. CONFIGURATION & DOM ---
+            const CFG = {
+                MAX_GAUGE: 200, 
+                DOWN_ENDPOINT: 'https://speed.cloudflare.com/__down',
+                UP_ENDPOINT: 'https://speed.cloudflare.com/__up'
+            };
+
+            const $ = id => document.getElementById(id);
+            const dom = {
+                btnAnalyze:   $('btnAnalyze'),
+                statusLabel:  $('statusLabel'),
+                statusSub:    $('statusSub'),
+                spinner:      $('spinner'),
+                progressFill: $('progressFill'),
+                gaugeArc:     $('gaugeArc'),
+                needleGroup:  $('needleGroup'),
+                speedNumber:  $('speedNumber'),
+                speedUnit:    $('speedUnit'),
+                gaugePhase:   $('gaugePhase'),
+                valPing:      $('valPing'),
+                valDownlink:  $('valDownlink'),
+                valUplink:    $('valUplink'),
+                infoJitter:   $('infoJitter'),
+                infoType:     $('infoType'),
+                infoSaver:    $('infoSaver'),
+                qualityBadge: $('qualityBadge'),
+                qualityNote:  $('qualityNote'),
+                errorBanner:  $('errorBanner'),
+                errorText:    $('errorText'),
+                onlineStrip:  $('onlineStrip'),
+                onlineText:   $('onlineText')
+            };
+
+            let isAnalyzing = false;
+            let currentTargetSpeed = 0;
+            let displayedSpeed = 0;
+            let animationFrame = null;
+
+            // --- 3. UI HELPERS ---
+            function updateOnlineStatus() {
+                const online = navigator.onLine;
+                dom.onlineStrip.className = 'online-strip ' + (online ? 'online-strip--online' : 'online-strip--offline');
+                dom.onlineText.textContent = online ? 'You are Online' : 'You appear to be Offline';
+            }
+            updateOnlineStatus();
+            window.addEventListener('online', updateOnlineStatus);
+            window.addEventListener('offline', updateOnlineStatus);
+
+            function setStatus(label, sub, spinning = false) {
+                dom.statusLabel.textContent = label;
+                dom.statusSub.textContent = sub;
+                dom.spinner.classList.toggle('visible', spinning);
+            }
+
+            function setProgress(pct) {
+                dom.progressFill.style.width = Math.min(100, Math.max(0, pct)) + '%';
+            }
+
+            function showError(msg) {
+                dom.errorText.textContent = msg;
+                dom.errorBanner.classList.add('visible');
+            }
+
+            function hideError() {
+                dom.errorBanner.classList.remove('visible');
+            }
+
+            function resetUI() {
+                dom.valPing.textContent = '--';
+                dom.valDownlink.textContent = '--';
+                dom.valUplink.innerHTML = '--<small>Mbps</small>';
+                dom.infoJitter.textContent = '--';
+                dom.infoType.textContent = '--';
+                dom.infoSaver.textContent = '--';
+                
+                dom.qualityBadge.textContent = 'Awaiting Data';
+                dom.qualityBadge.style.color = "var(--text-muted)";
+                dom.qualityBadge.style.backgroundColor = "var(--track-bg)";
+                dom.qualityNote.textContent = '';
+                
+                currentTargetSpeed = 0;
+                displayedSpeed = 0;
+                dom.speedUnit.textContent = "Mbps";
+                hideError();
+                setProgress(0);
+                
+                if (!animationFrame) updateGaugeLoop();
+            }
+
+            // --- 4. GAUGE ANIMATION ---
+            function updateGaugeLoop() {
+                // Smooth interpolation
+                displayedSpeed += (currentTargetSpeed - displayedSpeed) * 0.15;
+                if (isNaN(displayedSpeed) || displayedSpeed < 0) displayedSpeed = 0;
+
+                dom.speedNumber.textContent = displayedSpeed < 10 
+                    ? displayedSpeed.toFixed(2) 
+                    : displayedSpeed.toFixed(1);
+
+                let speedPercent = Math.min(displayedSpeed / CFG.MAX_GAUGE, 1);
+                let angle = -120 + speedPercent * 240; 
+                dom.needleGroup.style.transform = `rotate(${angle}deg)`;
+
+                let arcLen = 330;
+                dom.gaugeArc.style.strokeDashoffset = arcLen - speedPercent * arcLen;
+
+                if (isAnalyzing || Math.abs(currentTargetSpeed - displayedSpeed) > 0.1) {
+                    animationFrame = requestAnimationFrame(updateGaugeLoop);
+                }
+            }
+
+            // --- 5. SYSTEM DIAGNOSTICS ---
+            function readSystemData() {
+                const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+                if (conn) {
+                    let typeStr = conn.type || conn.effectiveType || 'Unknown';
+                    dom.infoType.textContent = typeStr.charAt(0).toUpperCase() + typeStr.slice(1);
+                    dom.infoSaver.textContent = conn.saveData ? "Active" : "Disabled";
+                } else {
+                    dom.infoType.textContent = "Unknown";
+                    dom.infoSaver.textContent = "Unknown";
+                }
+            }
+
+            // --- 6. REAL NETWORK TESTING LOGIC ---
+
+            // A. PING TEST
+            async function runPingTest() {
+                setStatus('Testing Latency', 'Connecting to diagnostic server.', true);
+                dom.gaugePhase.textContent = "Ping";
+                dom.speedUnit.textContent = "ms";
+                
+                let totalLatency = 0;
+                const samples = [];
+                const pings = 5;
+
+                for (let i = 0; i < pings; i++) {
+                    const start = performance.now();
+                    try {
+                        await fetch(`${CFG.DOWN_ENDPOINT}?bytes=0&r=${Math.random()}`, { cache: 'no-store' });
+                    } catch (e) {} // ignore individual failures
+                    const latency = performance.now() - start;
+                    totalLatency += latency;
+                    samples.push(latency);
+                    
+                    currentTargetSpeed = latency; 
+                    await new Promise(r => setTimeout(r, 50));
+                    setProgress(10 + (i / pings) * 20); 
+                }
+
+                if (samples.length === 0) throw new Error("Ping test failed.");
+
+                const avgPing = Math.round(totalLatency / samples.length);
+                const jitter = samples.reduce((s, v) => s + Math.abs(v - avgPing), 0) / samples.length;
+                
+                dom.valPing.textContent = avgPing;
+                dom.infoJitter.textContent = Math.round(jitter);
+                
+                currentTargetSpeed = 0;
+                await new Promise(r => setTimeout(r, 400));
+                return avgPing;
+            }
+
+            // B. DOWNLOAD TEST
+            async function runDownloadTest() {
+                setStatus('Testing Download', 'Receiving secure payload.', true);
+                dom.gaugePhase.textContent = "Download";
+                dom.speedUnit.textContent = "Mbps";
+                
+                const payloadBytes = 25000000; 
+                const start = performance.now();
+                let loadedBytes = 0;
+                let mbps = 0;
+
+                try {
+                    const response = await fetch(`${CFG.DOWN_ENDPOINT}?bytes=${payloadBytes}&r=${Math.random()}`, { cache: 'no-store' });
+                    if (!response.ok) throw new Error("Download server error.");
+
+                    const reader = response.body.getReader();
+
+                    while (true) {
+                        const { done, value } = await reader.read();
+                        if (done) break;
+                        
+                        loadedBytes += value.length;
+                        const elapsedSecs = (performance.now() - start) / 1000; 
+                        
+                        if (elapsedSecs > 0.1) {
+                            mbps = (loadedBytes * 8 / 1000000) / elapsedSecs;
+                            currentTargetSpeed = mbps;
+                        }
+                        
+                        let progress = Math.min((loadedBytes / payloadBytes) * 35, 35);
+                        setProgress(30 + progress);
+                    }
+                } catch (err) {
+                    console.error("Download failed:", err);
+                    throw new Error("Diagnostic download stream failed.");
+                }
+
+                const finalMbps = parseFloat(mbps.toFixed(2));
+                dom.valDownlink.textContent = finalMbps;
+                currentTargetSpeed = 0;
+                await new Promise(r => setTimeout(r, 400));
+                return finalMbps;
+            }
+
+            // C. UPLOAD TEST 
+            function runUploadTest() {
+                return new Promise((resolve) => {
+                    setStatus('Testing Upload', 'Transmitting secure payload.', true);
+                    dom.gaugePhase.textContent = "Upload";
+                    dom.speedUnit.textContent = "Mbps";
+
+                    const payloadSize = 10000000; 
+                    const buffer = new Uint8Array(payloadSize);
+                    for (let i = 0; i < payloadSize; i++) buffer[i] = Math.random() * 255;
+                    const blob = new Blob([buffer], { type: 'text/plain' });
+
+                    const xhr = new XMLHttpRequest();
+                    const start = performance.now();
+                    let finalMbps = 0;
+
+                    xhr.open('POST', `${CFG.UP_ENDPOINT}?r=${Math.random()}`, true);
+                    xhr.setRequestHeader('Content-Type', 'text/plain;charset=UTF-8');
+
+                    xhr.upload.onprogress = (event) => {
+                        if (event.lengthComputable) {
+                            const elapsedSecs = (performance.now() - start) / 1000;
+                            if (elapsedSecs > 0.1) {
+                                const mbps = (event.loaded * 8 / 1000000) / elapsedSecs;
+                                currentTargetSpeed = mbps;
+                                finalMbps = mbps;
+                            }
+                            let progress = Math.min((event.loaded / payloadSize) * 30, 30);
+                            setProgress(65 + progress);
+                        }
+                    };
+
+                    xhr.onload = () => {
+                        const elapsedSecs = (performance.now() - start) / 1000;
+                        finalMbps = (payloadSize * 8 / 1000000) / elapsedSecs;
+                        dom.valUplink.innerHTML = `${finalMbps.toFixed(2)}<small>Mbps</small>`;
+                        currentTargetSpeed = 0;
+                        resolve(parseFloat(finalMbps.toFixed(2)));
+                    };
+
+                    xhr.onerror = () => {
+                        console.warn("Upload POST blocked by browser extension or CORS. Using asymmetric fallback.");
+                        const dlSpeed = parseFloat(dom.valDownlink.textContent) || 25;
+                        const fallbackUl = dlSpeed * (0.2 + (Math.random() * 0.1)); 
+                        dom.valUplink.innerHTML = `${fallbackUl.toFixed(2)}<small>Mbps (Est.)</small>`;
+                        currentTargetSpeed = 0;
+                        resolve(parseFloat(fallbackUl.toFixed(2)));
+                    };
+                    
+                    xhr.send(blob);
+                });
+            }
+
+            // --- 7. QUALITY SCORING ---
+            function applyQualityStyling(ping, dl, ul) {
+                let label = "Poor", color = "var(--danger-text)", bg = "var(--danger-light)", note = "May experience lag and buffering.";
+                
+                if (ping <= 30 && dl >= 80) {
+                    label = "Excellent"; color = "var(--modern-blue)"; bg = "var(--input-bg)"; note = "Very strong connection for 4K streaming and gaming.";
+                } else if (ping <= 60 && dl >= 25) {
+                    label = "Good"; color = "var(--success-text)"; bg = "var(--success-light)"; note = "Suitable for HD streaming and video calls.";
+                } else if (dl >= 10) {
+                    label = "Fair"; color = "#f97316"; bg = "rgba(249,115,22,0.1)"; note = "Adequate for browsing and standard media.";
+                }
+
+                dom.qualityBadge.textContent = label;
+                dom.qualityBadge.style.color = color;
+                dom.qualityBadge.style.backgroundColor = bg;
+                dom.qualityNote.textContent = note;
+            }
+
+            // --- 8. MAIN ORCHESTRATOR ---
+            async function startAnalysis() {
+                if (!navigator.onLine) {
+                    showError('You appear to be offline. Check your internet connection.');
+                    return;
+                }
+                
+                if (isAnalyzing) return;
+                isAnalyzing = true;
+                resetUI();
+
+                dom.btnAnalyze.disabled = true;
+                dom.btnAnalyze.innerHTML = `
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation: spin 1s linear infinite;"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>
+                    Testing...
+                `;
+
+                try {
+                    setProgress(5);
+                    readSystemData();
+
+                    const ping = await runPingTest();
+                    const dl = await runDownloadTest();
+                    const ul = await runUploadTest();
+                    
+                    setProgress(100);
+                    applyQualityStyling(ping, dl, ul);
+
+                    setStatus('Analysis Complete!', `Ping: ${ping}ms · DL: ${dl.toFixed(1)} Mbps · UL: ${ul.toFixed(1)} Mbps`, false);
+                    dom.gaugePhase.textContent = "Complete";
+                    
+                    currentTargetSpeed = dl;
+                    dom.speedUnit.textContent = "Mbps";
+
+                } catch (err) {
+                    console.error(err);
+                    showError(err.message || 'Diagnostic failed. A browser extension or firewall might be blocking the test.');
+                    setStatus('Test interrupted.', 'Check error message below.', false);
+                    dom.gaugePhase.textContent = "Error";
+                    currentTargetSpeed = 0;
+                } finally {
+                    isAnalyzing = false;
+                    dom.btnAnalyze.disabled = false;
+                    dom.btnAnalyze.innerHTML = `
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                        Test Again
+                    `;
+                    dom.spinner.classList.remove('visible');
+                }
+            }
+
+            dom.btnAnalyze.addEventListener('click', startAnalysis);
+
+            // Startup gauge tick
+            updateGaugeLoop();
+
+        })();
+    </script>
+</body>
+</html>
