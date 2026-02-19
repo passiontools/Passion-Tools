@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image to Text (OCR) – PassionTools</title>
+  <meta name="description" content="Extract text from images with high accuracy using client-side OCR. Free, private, no uploads.">
+
+  <!-- Tesseract.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+  <style>
+    /* ===== CSS VARIABLES & THEME SYSTEM ===== */
+    :root {
+      --font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --max-width: 1100px;
+      --header-height: 70px;
+      --radius: 12px;
+      --transition: 0.25s ease;
+
+      /* Light Theme (default) */
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --text-hover: #0f172a;
+      --border: #e2e8f0;
+      --input-bg: #f1f5f9;
+      --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.06);
+      --shadow-lg: 0 4px 24px rgba(0,0,0,0.10);
+      --logo-passion: #0f172a;
+      --bulb-color: #64748b;
+      --bulb-hover: #0f172a;
+      --footer-bg: #111827;
+      --footer-text: #94a3b8;
+      --drop-bg: #f8fafc;
+      --drop-border: #cbd5e1;
+      --drop-active-bg: #eff6ff;
+      --drop-active-border: #3b82f6;
+      --progress-track: #e2e8f0;
+      --progress-fill: linear-gradient(135deg, #ef4444, #a855f7);
+      --btn-primary-bg: linear-gradient(135deg, #ef4444, #a855f7);
+      --btn-primary-text: #ffffff;
+      --btn-secondary-bg: #f1f5f9;
+      --btn-secondary-text: #334155;
+      --btn-secondary-border: #e2e8f0;
+      --textarea-bg: #f8fafc;
+      --textarea-border: #e2e8f0;
+      --success: #22c55e;
+      --error: #ef4444;
+      --warning: #f59e0b;
+    }
+
+    [data-theme="dark"] {
+      --bg: #020617;
+      --card-bg: #111827;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-hover: #ef4444;
+      --border: #1e293b;
+      --input-bg: #1e293b;
+      --shadow: 0 1px 3px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.2);
+      --shadow-lg: 0 4px 24px rgba(0,0,0,0.4);
+      --logo-passion: #f8fafc;
+      --bulb-color: #f8fafc;
+      --bulb-hover: #fbbf24;
+      --footer-bg: #020617;
+      --footer-text: #94a3b8;
+      --drop-bg: #0f172a;
+      --drop-border: #334155;
+      --drop-active-bg: #0f172a;
+      --drop-active-border: #3b82f6;
+      --progress-track: #1e293b;
+      --btn-secondary-bg: #1e293b;
+      --btn-secondary-text: #e2e8f0;
+      --btn-secondary-border: #334155;
+      --textarea-bg: #0f172a;
+      --textarea-border: #1e293b;
+    }
+
+    /* ===== RESET & BASE ===== */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: background var(--transition), color var(--transition);
+      line-height: 1.6;
+    }
+
+    /* ===== HEADER ===== */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      height: var(--header-height);
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+      transition: background var(--transition), border-color var(--transition);
+    }
+
+    .header-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 20px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      text-decoration: none;
+      user-select: none;
+    }
+
+    .logo-passion {
+      color: var(--logo-passion);
+      transition: color var(--transition);
+    }
+
+    .logo-tools {
+      background: linear-gradient(135deg, #ef4444, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .back-link {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .back-link:hover {
+      color: #ef4444;
+    }
+
+    .back-link:hover svg {
+      stroke: #ef4444;
+    }
+
+    .back-link svg {
+      width: 16px;
+      height: 16px;
+      stroke: var(--text-muted);
+      transition: stroke 0.2s ease;
+    }
+
+    .divider {
+      width: 1px;
+      height: 20px;
+      background: var(--border);
+    }
+
+    .theme-toggle {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s ease;
+    }
+
+    .theme-toggle:hover {
+      background: var(--input-bg);
+    }
+
+    .theme-toggle svg {
+      width: 22px;
+      height: 22px;
+      transition: fill 0.2s ease, stroke 0.2s ease;
+    }
+
+    [data-theme="light"] .theme-toggle svg {
+      fill: none;
+      stroke: var(--bulb-color);
+      stroke-width: 2;
+    }
+
+    [data-theme="light"] .theme-toggle:hover svg {
+      stroke: var(--bulb-hover);
+    }
+
+    [data-theme="dark"] .theme-toggle svg {
+      fill: #fbbf24;
+      stroke: #fbbf24;
+      stroke-width: 2;
+    }
+
+    /* ===== MAIN CONTENT ===== */
+    .main {
+      flex: 1;
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 32px 20px 48px;
+      width: 100%;
+    }
+
+    /* Page Title */
+    .page-title {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .page-title h1 {
+      font-size: 32px;
+      font-weight: 800;
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+
+    .page-title h1 span {
+      color: #0f172a;
+      -webkit-text-fill-color: #0f172a;
+    }
+
+    [data-theme="dark"] .page-title h1 span {
+      color: #f8fafc;
+      -webkit-text-fill-color: #f8fafc;
+    }
+
+    .page-title p {
+      font-size: 16px;
+      color: var(--text-muted);
+    }
+
+    /* Card */
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      transition: background var(--transition), border-color var(--transition), box-shadow var(--transition);
+    }
+
+    /* Two-column layout */
+    .tool-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .panel {
+      padding: 24px;
+    }
+
+    .panel-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .panel-title svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    /* ===== DROP ZONE ===== */
+    .drop-zone {
+      border: 2px dashed var(--drop-border);
+      border-radius: var(--radius);
+      background: var(--drop-bg);
+      padding: 40px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      position: relative;
+    }
+
+    .drop-zone:hover,
+    .drop-zone.dragover {
+      border-color: var(--drop-active-border);
+      background: var(--drop-active-bg);
+      transform: scale(1.01);
+    }
+
+    .drop-zone.dragover {
+      box-shadow: 0 0 0 4px rgba(59,130,246,0.15);
+    }
+
+    .drop-zone input[type="file"] {
+      display: none;
+    }
+
+    .drop-icon {
+      width: 56px;
+      height: 56px;
+      margin: 0 auto 16px;
+      background: var(--btn-primary-bg);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .drop-icon svg {
+      width: 28px;
+      height: 28px;
+      stroke: #fff;
+      fill: none;
+    }
+
+    .drop-text-main {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .drop-text-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* Image Preview */
+    .preview-container {
+      display: none;
+      margin-top: 16px;
+    }
+
+    .preview-container.active {
+      display: block;
+    }
+
+    .preview-img-wrapper {
+      position: relative;
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--input-bg);
+      margin-bottom: 12px;
+    }
+
+    .preview-img-wrapper img {
+      width: 100%;
+      height: auto;
+      max-height: 340px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .preview-info {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .info-badge {
+      font-size: 12px;
+      font-weight: 500;
+      padding: 4px 10px;
+      background: var(--input-bg);
+      border-radius: 6px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .remove-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.6);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+
+    .remove-btn:hover {
+      background: #ef4444;
+    }
+
+    .remove-btn svg {
+      width: 16px;
+      height: 16px;
+      stroke: #fff;
+    }
+
+    /* ===== CONTROLS PANEL ===== */
+    .control-group {
+      margin-bottom: 20px;
+    }
+
+    .control-group label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    .select-wrapper {
+      position: relative;
+    }
+
+    .select-wrapper select {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--input-bg);
+      color: var(--text);
+      font-size: 14px;
+      font-family: var(--font-family);
+      appearance: none;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+
+    .select-wrapper select:focus {
+      outline: none;
+      border-color: #a855f7;
+      box-shadow: 0 0 0 3px rgba(168,85,247,0.15);
+    }
+
+    .select-wrapper::after {
+      content: '';
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 6px solid var(--text-muted);
+      pointer-events: none;
+    }
+
+    /* Enhancement Toggles */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .toggle-row:last-child {
+      border-bottom: none;
+    }
+
+    .toggle-label {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .toggle-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      flex-shrink: 0;
+      margin-left: 12px;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background: var(--border);
+      border-radius: 24px;
+      transition: background 0.25s;
+    }
+
+    .toggle-slider::before {
+      content: '';
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      left: 3px;
+      bottom: 3px;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform 0.25s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+
+    .toggle-switch input:checked + .toggle-slider {
+      background: linear-gradient(135deg, #ef4444, #a855f7);
+    }
+
+    .toggle-switch input:checked + .toggle-slider::before {
+      transform: translateX(20px);
+    }
+
+    /* Extract Button */
+    .btn-extract {
+      width: 100%;
+      padding: 14px 24px;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #2563eb, #3b82f6);
+      color: #ffffff;
+      font-size: 16px;
+      font-weight: 700;
+      font-family: var(--font-family);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.25s ease;
+      margin-top: 8px;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn-extract:hover:not(:disabled) {
+      background: linear-gradient(135deg, #1d4ed8, #2563eb);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+    }
+
+    .btn-extract:active:not(:disabled) {
+      transform: translateY(0);
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn-extract:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .btn-extract svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    /* ===== PROGRESS SECTION ===== */
+    .progress-section {
+      display: none;
+      margin-top: 20px;
+    }
+
+    .progress-section.active {
+      display: block;
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .progress-status {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .progress-percent {
+      font-size: 14px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #ef4444, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 8px;
+      background: var(--progress-track);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--btn-primary-bg);
+      border-radius: 8px;
+      transition: width 0.3s ease;
+    }
+
+    /* Pulsing animation for status */
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .progress-status.pulsing {
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    /* ===== OUTPUT SECTION ===== */
+    .output-section {
+      margin-bottom: 24px;
+    }
+
+    .output-section .card {
+      padding: 24px;
+    }
+
+    .output-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .output-title {
+      font-size: 16px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .output-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn-action {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: var(--font-family);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+      border: 1px solid var(--btn-secondary-border);
+      background: var(--btn-secondary-bg);
+      color: var(--btn-secondary-text);
+    }
+
+    .btn-action:hover {
+      border-color: #a855f7;
+      color: #a855f7;
+    }
+
+    .btn-action svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .btn-action.btn-copy.copied {
+      background: #22c55e;
+      color: #fff;
+      border-color: #22c55e;
+    }
+
+    .btn-action.btn-download {
+      background: linear-gradient(135deg, #16a34a, #22c55e);
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 3px 10px rgba(22, 163, 74, 0.25);
+    }
+
+    .btn-action.btn-download:hover {
+      background: linear-gradient(135deg, #15803d, #16a34a);
+      color: #fff;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(22, 163, 74, 0.35);
+    }
+
+    #outputText {
+      width: 100%;
+      min-height: 220px;
+      max-height: 400px;
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid var(--textarea-border);
+      background: var(--textarea-bg);
+      color: var(--text);
+      font-size: 14px;
+      font-family: var(--font-family);
+      line-height: 1.7;
+      resize: vertical;
+      transition: border-color 0.2s, background var(--transition);
+    }
+
+    #outputText:focus {
+      outline: none;
+      border-color: #a855f7;
+      box-shadow: 0 0 0 3px rgba(168,85,247,0.12);
+    }
+
+    #outputText::placeholder {
+      color: var(--text-muted);
+      opacity: 0.6;
+    }
+
+    .word-count {
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* ===== PRIVACY NOTICE ===== */
+    .privacy-notice {
+      text-align: center;
+      padding: 20px;
+      font-size: 13px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .privacy-notice svg {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
+
+    /* ===== ERROR / TOAST ===== */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      z-index: 9999;
+      opacity: 0;
+      transition: all 0.35s ease;
+      max-width: 90%;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .toast.error { background: #ef4444; }
+    .toast.success { background: #22c55e; }
+    .toast.warning { background: #f59e0b; color: #0f172a; }
+
+    /* ===== FOOTER ===== */
+    .footer {
+      background: var(--footer-bg);
+      text-align: center;
+      padding: 20px;
+      font-size: 14px;
+      color: var(--footer-text);
+      transition: background var(--transition);
+    }
+
+    /* ===== EMPTY STATE ===== */
+    .output-empty {
+      text-align: center;
+      padding: 40px 16px;
+      color: var(--text-muted);
+    }
+
+    .output-empty svg {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 12px;
+      opacity: 0.4;
+    }
+
+    .output-empty p {
+      font-size: 14px;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      .tool-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .page-title h1 {
+        font-size: 26px;
+      }
+
+      .header-inner {
+        padding: 0 14px;
+      }
+
+      .back-link span {
+        display: none;
+      }
+
+      .panel {
+        padding: 20px 16px;
+      }
+
+      .output-section .card {
+        padding: 20px 16px;
+      }
+
+      .output-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .output-actions {
+        width: 100%;
+      }
+
+      .btn-action {
+        flex: 1;
+        justify-content: center;
+      }
+
+      .drop-zone {
+        padding: 32px 16px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .logo {
+        font-size: 20px;
+      }
+
+      .header-actions {
+        gap: 10px;
+      }
+
+      .main {
+        padding: 20px 12px 36px;
+      }
+    }
+
+    /* ===== HIDDEN CANVAS ===== */
+    #preprocessCanvas {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header class="header">
+    <div class="header-inner">
+      <!-- Logo -->
+      <a href="index.html" class="logo" aria-label="PassionTools Home">
+        <span class="logo-passion">Passion</span><span class="logo-tools">Tools</span>
+      </a>
+
+      <!-- Right Actions -->
+      <div class="header-actions">
+        <!-- Back Link -->
+        <a href="index.html" class="back-link" aria-label="Back to Tools">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+          <span>Back to Tools</span>
+        </a>
+
+        <!-- Divider -->
+        <div class="divider"></div>
+
+        <!-- Theme Toggle (Bulb) -->
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+          <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21h6"></path>
+            <path d="M12 3a6 6 0 0 0-4 10.5V17h8v-3.5A6 6 0 0 0 12 3z"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== MAIN ===== -->
+  <main class="main">
+
+    <!-- Page Title -->
+    <div class="page-title">
+      <h1>📝 Image to <span>Text (OCR)</span></h1>
+      <p>Extract text from images with high accuracy directly in your browser</p>
+    </div>
+
+    <!-- Tool Grid: Two Columns -->
+    <div class="tool-grid">
+
+      <!-- LEFT: Image Upload & Preview -->
+      <div class="card panel">
+        <div class="panel-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          Upload Image
+        </div>
+
+        <!-- Drop Zone -->
+        <div class="drop-zone" id="dropZone">
+          <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.webp,.bmp,.tiff,.tif">
+          <div class="drop-icon">
+            <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="16 16 12 12 8 16"></polyline>
+              <line x1="12" y1="12" x2="12" y2="21"></line>
+              <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"></path>
+            </svg>
+          </div>
+          <p class="drop-text-main">Drag & drop your image here</p>
+          <p class="drop-text-sub">or click to browse · JPG, PNG, WEBP, BMP, TIFF · Max 10MB</p>
+        </div>
+
+        <!-- Image Preview -->
+        <div class="preview-container" id="previewContainer">
+          <div class="preview-img-wrapper">
+            <img id="previewImg" src="" alt="Uploaded image preview">
+            <button class="remove-btn" id="removeBtn" aria-label="Remove image">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+          <div class="preview-info" id="previewInfo"></div>
+        </div>
+      </div>
+
+      <!-- RIGHT: OCR Controls -->
+      <div class="card panel">
+        <div class="panel-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          OCR Settings
+        </div>
+
+        <!-- Language Selector -->
+        <div class="control-group">
+          <label for="langSelect">Recognition Language</label>
+          <div class="select-wrapper">
+            <select id="langSelect">
+              <option value="eng" selected>English</option>
+              <option value="spa">Spanish</option>
+              <option value="fra">French</option>
+              <option value="deu">German</option>
+              <option value="hin">Hindi</option>
+              <option value="por">Portuguese</option>
+              <option value="ita">Italian</option>
+              <option value="rus">Russian</option>
+              <option value="jpn">Japanese</option>
+              <option value="kor">Korean</option>
+              <option value="chi_sim">Chinese (Simplified)</option>
+              <option value="chi_tra">Chinese (Traditional)</option>
+              <option value="ara">Arabic</option>
+              <option value="tur">Turkish</option>
+              <option value="nld">Dutch</option>
+              <option value="pol">Polish</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Image Enhancements -->
+        <div class="control-group">
+          <label>Image Enhancements</label>
+
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-label">Grayscale</div>
+              <div class="toggle-desc">Convert to grayscale for better accuracy</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="toggleGrayscale" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-label">Contrast Boost</div>
+              <div class="toggle-desc">Enhance contrast to improve readability</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="toggleContrast" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-label">Scale Up (2x)</div>
+              <div class="toggle-desc">Upscale image for small text recognition</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="toggleScale">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Extract Button -->
+        <button class="btn-extract" id="extractBtn" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="4 7 4 4 20 4 20 7"></polyline>
+            <line x1="9" y1="20" x2="15" y2="20"></line>
+            <line x1="12" y1="4" x2="12" y2="20"></line>
+          </svg>
+          Extract Text
+        </button>
+
+        <!-- Progress Section -->
+        <div class="progress-section" id="progressSection">
+          <div class="progress-header">
+            <span class="progress-status pulsing" id="progressStatus">Initializing...</span>
+            <span class="progress-percent" id="progressPercent">0%</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- OUTPUT SECTION -->
+    <div class="output-section" id="outputSection">
+      <div class="card">
+        <div class="output-header">
+          <div class="output-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            Extracted Text
+          </div>
+          <div class="output-actions" id="outputActions" style="display:none;">
+            <button class="btn-action btn-copy" id="copyBtn" aria-label="Copy to clipboard">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span id="copyLabel">Copy</span>
+            </button>
+            <button class="btn-action btn-download" id="downloadBtn" aria-label="Download as text file">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Download .txt
+            </button>
+            <button class="btn-action btn-clear" id="clearBtn" aria-label="Clear text">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14H7L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+              Clear
+            </button>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div id="outputEmpty" class="output-empty">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <p>Upload an image and click "Extract Text" to see results here</p>
+        </div>
+
+        <!-- Textarea (hidden until results) -->
+        <textarea id="outputText" style="display:none;" placeholder="Extracted text will appear here..."></textarea>
+        <div class="word-count" id="wordCount" style="display:none;"></div>
+      </div>
+    </div>
+
+    <!-- Privacy Notice -->
+    <div class="privacy-notice">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      This tool processes images entirely in your browser. Your files are never uploaded or stored.
+    </div>
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    &copy; 2026 Passion Tools. Secure client-side processing.
+  </footer>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Hidden Canvas for preprocessing -->
+  <canvas id="preprocessCanvas"></canvas>
+
+  <!-- ===== JAVASCRIPT ===== -->
+  <script>
+    // ===== THEME SYSTEM =====
+    const themeToggle = document.getElementById('themeToggle');
+    const html = document.documentElement;
+
+    function setTheme(theme) {
+      html.setAttribute('data-theme', theme);
+      localStorage.setItem('pt-theme', theme);
+    }
+
+    // Load saved theme
+    (function initTheme() {
+      const saved = localStorage.getItem('pt-theme');
+      if (saved) {
+        setTheme(saved);
+      } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        setTheme('dark');
+      }
+    })();
+
+    themeToggle.addEventListener('click', () => {
+      const current = html.getAttribute('data-theme');
+      setTheme(current === 'dark' ? 'light' : 'dark');
+    });
+
+    // ===== TOAST SYSTEM =====
+    function showToast(message, type = 'error', duration = 3000) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = 'toast ' + type;
+      requestAnimationFrame(() => {
+        toast.classList.add('show');
+      });
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, duration);
+    }
+
+    // ===== DOM REFERENCES =====
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const previewContainer = document.getElementById('previewContainer');
+    const previewImg = document.getElementById('previewImg');
+    const previewInfo = document.getElementById('previewInfo');
+    const removeBtn = document.getElementById('removeBtn');
+    const extractBtn = document.getElementById('extractBtn');
+    const langSelect = document.getElementById('langSelect');
+    const progressSection = document.getElementById('progressSection');
+    const progressStatus = document.getElementById('progressStatus');
+    const progressPercent = document.getElementById('progressPercent');
+    const progressFill = document.getElementById('progressFill');
+    const outputText = document.getElementById('outputText');
+    const outputEmpty = document.getElementById('outputEmpty');
+    const outputActions = document.getElementById('outputActions');
+    const copyBtn = document.getElementById('copyBtn');
+    const copyLabel = document.getElementById('copyLabel');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const wordCount = document.getElementById('wordCount');
+
+    const toggleGrayscale = document.getElementById('toggleGrayscale');
+    const toggleContrast = document.getElementById('toggleContrast');
+    const toggleScale = document.getElementById('toggleScale');
+
+    const canvas = document.getElementById('preprocessCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let currentFile = null;
+    let isProcessing = false;
+
+    // ===== ACCEPTED FORMATS =====
+    const ACCEPTED_TYPES = [
+      'image/jpeg', 'image/jpg', 'image/png',
+      'image/webp', 'image/bmp', 'image/tiff'
+    ];
+    const ACCEPTED_EXT = ['.jpg', '.jpeg', '.png', '.webp', '.bmp', '.tiff', '.tif'];
+    const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+
+    // ===== FILE VALIDATION =====
+    function validateFile(file) {
+      if (!file) return false;
+
+      const ext = '.' + file.name.split('.').pop().toLowerCase();
+      const typeOk = ACCEPTED_TYPES.includes(file.type) || ACCEPTED_EXT.includes(ext);
+
+      if (!typeOk) {
+        showToast('Unsupported format. Please use JPG, PNG, WEBP, BMP, or TIFF.', 'error');
+        return false;
+      }
+
+      if (file.size > MAX_SIZE) {
+        showToast('File is too large. Please use an image under 10MB.', 'warning');
+        return false;
+      }
+
+      return true;
+    }
+
+    // ===== FORMAT FILE SIZE =====
+    function formatSize(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+    }
+
+    // ===== HANDLE FILE SELECT =====
+    function handleFile(file) {
+      if (!validateFile(file)) return;
+      currentFile = file;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        previewImg.src = e.target.result;
+
+        // Get dimensions
+        const img = new Image();
+        img.onload = () => {
+          previewInfo.innerHTML = `
+            <span class="info-badge">📄 ${file.name}</span>
+            <span class="info-badge">📦 ${formatSize(file.size)}</span>
+            <span class="info-badge">📐 ${img.naturalWidth} × ${img.naturalHeight}px</span>
+          `;
+        };
+        img.src = e.target.result;
+
+        dropZone.style.display = 'none';
+        previewContainer.classList.add('active');
+        extractBtn.disabled = false;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // ===== DRAG & DROP =====
+    dropZone.addEventListener('click', () => fileInput.click());
+
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('dragover');
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.classList.remove('dragover');
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+      const file = e.dataTransfer.files[0];
+      if (file) handleFile(file);
+    });
+
+    fileInput.addEventListener('change', () => {
+      const file = fileInput.files[0];
+      if (file) handleFile(file);
+    });
+
+    // ===== REMOVE IMAGE =====
+    removeBtn.addEventListener('click', () => {
+      currentFile = null;
+      fileInput.value = '';
+      previewImg.src = '';
+      previewContainer.classList.remove('active');
+      dropZone.style.display = '';
+      extractBtn.disabled = true;
+      hideOutput();
+    });
+
+    // ===== IMAGE PREPROCESSING =====
+    function preprocessImage(imgSrc) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+          const doGray = toggleGrayscale.checked;
+          const doContrast = toggleContrast.checked;
+          const doScale = toggleScale.checked;
+
+          // If no preprocessing, return original
+          if (!doGray && !doContrast && !doScale) {
+            resolve(imgSrc);
+            return;
+          }
+
+          const scale = doScale ? 2 : 1;
+          canvas.width = img.naturalWidth * scale;
+          canvas.height = img.naturalHeight * scale;
+
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+          if (doGray || doContrast) {
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+
+            for (let i = 0; i < data.length; i += 4) {
+              let r = data[i], g = data[i + 1], b = data[i + 2];
+
+              // Grayscale
+              if (doGray) {
+                const gray = 0.299 * r + 0.587 * g + 0.114 * b;
+                r = g = b = gray;
+              }
+
+              // Contrast enhancement (factor ~1.5)
+              if (doContrast) {
+                const factor = 1.5;
+                r = Math.min(255, Math.max(0, factor * (r - 128) + 128));
+                g = Math.min(255, Math.max(0, factor * (g - 128) + 128));
+                b = Math.min(255, Math.max(0, factor * (b - 128) + 128));
+              }
+
+              data[i] = r;
+              data[i + 1] = g;
+              data[i + 2] = b;
+            }
+
+            ctx.putImageData(imageData, 0, 0);
+          }
+
+          resolve(canvas.toDataURL('image/png'));
+        };
+        img.src = imgSrc;
+      });
+    }
+
+    // ===== OCR EXTRACTION =====
+    extractBtn.addEventListener('click', async () => {
+      if (!currentFile || isProcessing) return;
+
+      isProcessing = true;
+      extractBtn.disabled = true;
+      extractBtn.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin 1s linear infinite;width:20px;height:20px"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+        Processing...
+      `;
+
+      // Show progress
+      progressSection.classList.add('active');
+      updateProgress(0, 'Loading OCR engine...');
+      hideOutput();
+
+      try {
+        // Preprocess image
+        updateProgress(5, 'Preprocessing image...');
+        const processedSrc = await preprocessImage(previewImg.src);
+
+        const lang = langSelect.value;
+
+        // Run Tesseract OCR
+        const result = await Tesseract.recognize(processedSrc, lang, {
+          logger: (m) => {
+            if (m.status === 'loading tesseract core') {
+              updateProgress(10, 'Loading Tesseract core...');
+            } else if (m.status === 'initializing tesseract') {
+              updateProgress(15, 'Initializing engine...');
+            } else if (m.status === 'loading language traineddata') {
+              updateProgress(20, `Loading ${lang} language data...`);
+            } else if (m.status === 'initializing api') {
+              updateProgress(35, 'Initializing API...');
+            } else if (m.status === 'recognizing text') {
+              const pct = Math.round(35 + m.progress * 60);
+              updateProgress(pct, 'Recognizing text...');
+            }
+          }
+        });
+
+        updateProgress(100, 'Complete!');
+        progressStatus.classList.remove('pulsing');
+
+        const text = result.data.text.trim();
+
+        if (text.length === 0) {
+          showToast('No text detected in the image. Try different settings or a clearer image.', 'warning', 4000);
+          showOutputText('');
+        } else {
+          showToast('Text extracted successfully!', 'success');
+          showOutputText(text);
+        }
+
+      } catch (err) {
+        console.error('OCR Error:', err);
+        showToast('OCR processing failed. Please try again.', 'error');
+        updateProgress(0, 'Error occurred');
+      } finally {
+        isProcessing = false;
+        extractBtn.disabled = false;
+        extractBtn.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px">
+            <polyline points="4 7 4 4 20 4 20 7"></polyline>
+            <line x1="9" y1="20" x2="15" y2="20"></line>
+            <line x1="12" y1="4" x2="12" y2="20"></line>
+          </svg>
+          Extract Text
+        `;
+
+        // Hide progress after a moment
+        setTimeout(() => {
+          progressSection.classList.remove('active');
+          progressFill.style.width = '0%';
+        }, 2000);
+      }
+    });
+
+    // ===== PROGRESS UPDATE =====
+    function updateProgress(percent, status) {
+      progressFill.style.width = percent + '%';
+      progressPercent.textContent = percent + '%';
+      progressStatus.textContent = status;
+      if (percent < 100) {
+        progressStatus.classList.add('pulsing');
+      } else {
+        progressStatus.classList.remove('pulsing');
+      }
+    }
+
+    // ===== SHOW / HIDE OUTPUT =====
+    function showOutputText(text) {
+      outputEmpty.style.display = 'none';
+      outputText.style.display = 'block';
+      outputText.value = text;
+      outputActions.style.display = 'flex';
+      wordCount.style.display = 'block';
+      updateWordCount();
+    }
+
+    function hideOutput() {
+      outputEmpty.style.display = '';
+      outputText.style.display = 'none';
+      outputText.value = '';
+      outputActions.style.display = 'none';
+      wordCount.style.display = 'none';
+    }
+
+    function updateWordCount() {
+      const text = outputText.value.trim();
+      const chars = text.length;
+      const words = text ? text.split(/\s+/).length : 0;
+      const lines = text ? text.split(/\n/).length : 0;
+      wordCount.textContent = `${words} words · ${chars} characters · ${lines} lines`;
+    }
+
+    outputText.addEventListener('input', updateWordCount);
+
+    // ===== COPY TO CLIPBOARD =====
+    copyBtn.addEventListener('click', async () => {
+      const text = outputText.value;
+      if (!text) return;
+
+      try {
+        await navigator.clipboard.writeText(text);
+        copyBtn.classList.add('copied');
+        copyLabel.textContent = 'Copied!';
+
+        setTimeout(() => {
+          copyBtn.classList.remove('copied');
+          copyLabel.textContent = 'Copy';
+        }, 2000);
+      } catch {
+        // Fallback
+        outputText.select();
+        document.execCommand('copy');
+        copyBtn.classList.add('copied');
+        copyLabel.textContent = 'Copied!';
+        setTimeout(() => {
+          copyBtn.classList.remove('copied');
+          copyLabel.textContent = 'Copy';
+        }, 2000);
+      }
+    });
+
+    // ===== DOWNLOAD AS .TXT =====
+    downloadBtn.addEventListener('click', () => {
+      const text = outputText.value;
+      if (!text) return;
+
+      const blob = new Blob([text], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const baseName = currentFile ? currentFile.name.replace(/\.[^/.]+$/, '') : 'extracted-text';
+      a.download = baseName + '.txt';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      showToast('Downloaded successfully!', 'success');
+    });
+
+    // ===== CLEAR TEXT =====
+    clearBtn.addEventListener('click', () => {
+      hideOutput();
+    });
+
+    // ===== SPINNER KEYFRAME =====
+    const style = document.createElement('style');
+    style.textContent = `@keyframes spin { to { transform: rotate(360deg); } }`;
+    document.head.appendChild(style);
+  </script>
+</body>
+</html>
