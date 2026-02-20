@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add Watermark – PassionTools</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--bg:#f8fafc;--card:#ffffff;--text:#0f172a;--muted:#64748b;--border:#e2e8f0;
+--header-bg:#ffffff;--footer-bg:#111827;--footer-text:#94a3b8;
+--drop-bg:#f1f5f9;--drop-border:#cbd5e1;--primary:#ef4444;
+--logo-text:#0f172a;--shadow:0 1px 3px rgba(0,0,0,0.08),0 1px 2px rgba(0,0,0,0.06);
+--shadow-lg:0 4px 14px rgba(0,0,0,0.08);
+}
+[data-theme="dark"]{
+--bg:#020617;--card:#111827;--text:#f8fafc;--muted:#94a3b8;--border:#1e293b;
+--header-bg:#0f172a;--footer-bg:#020617;--footer-text:#94a3b8;
+--drop-bg:#1e293b;--drop-border:#334155;--primary:#ef4444;
+--logo-text:#f8fafc;--shadow:0 1px 3px rgba(0,0,0,0.3);
+--shadow-lg:0 4px 14px rgba(0,0,0,0.3);
+}
+body{
+font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;
+transition:background 0.25s ease,color 0.25s ease;line-height:1.6;
+}
+/* HEADER */
+.header{
+position:sticky;top:0;z-index:100;height:70px;background:var(--header-bg);
+border-bottom:1px solid var(--border);display:flex;align-items:center;
+justify-content:space-between;padding:0 24px;transition:background 0.25s ease,border 0.25s ease;
+}
+.logo{font-size:22px;font-weight:800;letter-spacing:-0.5px;text-decoration:none;display:flex;align-items:center;gap:1px;}
+.logo-passion{color:var(--logo-text);transition:color 0.25s ease;}
+.logo-tools{background:linear-gradient(135deg,#ef4444,#a855f7);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.header-right{display:flex;align-items:center;gap:16px;}
+.back-link{
+font-size:14px;font-weight:500;color:var(--muted);text-decoration:none;
+white-space:nowrap;transition:color 0.25s ease;
+}
+.back-link:hover{color:var(--primary);}
+.divider{width:1px;height:20px;background:var(--border);transition:background 0.25s ease;}
+.theme-toggle{
+background:none;border:1px solid var(--border);border-radius:8px;
+width:40px;height:40px;cursor:pointer;font-size:18px;display:flex;
+align-items:center;justify-content:center;transition:border 0.25s ease,background 0.25s ease;
+color:var(--text);
+}
+.theme-toggle:hover{background:var(--drop-bg);}
+
+/* MAIN */
+main{flex:1;width:100%;max-width:1100px;margin:0 auto;padding:24px 20px 40px;}
+
+/* TOOL LOGO */
+.tool-logo{text-align:center;margin-bottom:8px;animation:fadeInUp 0.6s ease;}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+.tool-logo svg{filter:drop-shadow(0 2px 8px rgba(239,68,68,0.18));}
+
+/* CARD */
+.main-card{
+background:var(--card);border-radius:12px;box-shadow:var(--shadow-lg);
+border:1px solid var(--border);padding:36px 32px;transition:background 0.25s ease,border 0.25s ease;
+}
+.tool-title{font-size:26px;font-weight:700;text-align:center;margin-bottom:4px;}
+.tool-subtitle{font-size:15px;color:var(--muted);text-align:center;margin-bottom:28px;}
+
+/* UPLOAD AREA */
+.upload-zone{
+background:var(--drop-bg);border:2px dashed var(--drop-border);border-radius:12px;
+padding:44px 20px;text-align:center;cursor:pointer;transition:border-color 0.25s ease,background 0.25s ease;
+position:relative;
+}
+.upload-zone.dragover{border-color:var(--primary);background:rgba(239,68,68,0.05);}
+.upload-zone.has-file{border-style:solid;border-color:var(--primary);cursor:default;}
+.upload-icon{margin-bottom:12px;color:var(--muted);}
+.upload-label{font-size:16px;font-weight:600;margin-bottom:4px;}
+.upload-hint{font-size:13px;color:var(--muted);}
+.file-info{margin-top:14px;display:none;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;}
+.file-info.visible{display:flex;}
+.file-name{font-weight:600;font-size:14px;word-break:break-all;}
+.file-size{font-size:13px;color:var(--muted);}
+.remove-file{
+background:#ef4444;color:#fff;border:none;border-radius:6px;
+padding:4px 12px;font-size:12px;font-weight:600;cursor:pointer;transition:background 0.2s;
+}
+.remove-file:hover{background:#dc2626;}
+#fileInput{display:none;}
+
+/* SETTINGS PANEL */
+.settings-panel{margin-top:28px;display:none;}
+.settings-panel.visible{display:block;}
+.section-title{font-size:17px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.type-toggle{display:flex;gap:0;border-radius:8px;overflow:hidden;border:1px solid var(--border);margin-bottom:20px;}
+.type-btn{
+flex:1;padding:10px 16px;font-size:14px;font-weight:600;border:none;
+cursor:pointer;background:var(--drop-bg);color:var(--muted);
+transition:background 0.2s,color 0.2s;text-align:center;
+}
+.type-btn.active{background:var(--primary);color:#fff;}
+.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.setting-group{display:flex;flex-direction:column;gap:6px;}
+.setting-group.full{grid-column:1/-1;}
+.setting-label{font-size:13px;font-weight:600;color:var(--muted);display:flex;justify-content:space-between;align-items:center;}
+.setting-label span{font-weight:400;color:var(--text);font-size:12px;}
+.setting-input{
+width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;
+font-size:14px;background:var(--drop-bg);color:var(--text);outline:none;
+transition:border 0.2s;font-family:inherit;
+}
+.setting-input:focus{border-color:var(--primary);}
+input[type="range"]{
+-webkit-appearance:none;width:100%;height:6px;border-radius:3px;
+background:var(--drop-border);outline:none;cursor:pointer;
+}
+input[type="range"]::-webkit-slider-thumb{
+-webkit-appearance:none;width:18px;height:18px;border-radius:50%;
+background:var(--primary);cursor:pointer;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.2);
+}
+input[type="range"]::-moz-range-thumb{
+width:18px;height:18px;border-radius:50%;background:var(--primary);
+cursor:pointer;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.2);
+}
+input[type="color"]{
+width:50px;height:36px;padding:2px;border:1px solid var(--border);
+border-radius:6px;cursor:pointer;background:var(--drop-bg);
+}
+.position-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
+.pos-btn{
+padding:8px 4px;border:1px solid var(--border);border-radius:6px;
+background:var(--drop-bg);color:var(--text);font-size:11px;font-weight:600;
+cursor:pointer;text-align:center;transition:all 0.2s;
+}
+.pos-btn.active{background:var(--primary);color:#fff;border-color:var(--primary);}
+.pos-btn:hover:not(.active){border-color:var(--primary);}
+.toggle-switch{display:flex;align-items:center;gap:10px;}
+.switch{
+position:relative;width:44px;height:24px;background:var(--drop-border);
+border-radius:12px;cursor:pointer;transition:background 0.2s;flex-shrink:0;
+}
+.switch.active{background:var(--primary);}
+.switch::after{
+content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;
+border-radius:50%;background:#fff;transition:transform 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2);
+}
+.switch.active::after{transform:translateX(20px);}
+.switch-label{font-size:13px;font-weight:500;}
+.image-upload-zone{
+border:2px dashed var(--drop-border);border-radius:8px;padding:20px;
+text-align:center;cursor:pointer;transition:border 0.2s;background:var(--drop-bg);
+}
+.image-upload-zone:hover{border-color:var(--primary);}
+.image-upload-zone.has-image{border-style:solid;border-color:var(--primary);}
+.wm-image-preview{max-width:100px;max-height:60px;margin-top:8px;border-radius:4px;}
+#wmImageInput{display:none;}
+
+/* PAGE RANGE */
+.page-range-section{margin-top:20px;}
+.page-range-toggle{display:flex;gap:0;border-radius:8px;overflow:hidden;border:1px solid var(--border);margin-bottom:12px;}
+.range-btn{
+flex:1;padding:8px 12px;font-size:13px;font-weight:600;border:none;
+cursor:pointer;background:var(--drop-bg);color:var(--muted);transition:all 0.2s;text-align:center;
+}
+.range-btn.active{background:var(--primary);color:#fff;}
+.page-range-input{display:none;}
+.page-range-input.visible{display:block;}
+
+/* PREVIEW */
+.preview-section{margin-top:28px;display:none;}
+.preview-section.visible{display:block;}
+.preview-container{
+max-height:500px;overflow-y:auto;background:var(--drop-bg);border-radius:10px;
+border:1px solid var(--border);padding:16px;display:flex;flex-direction:column;
+align-items:center;gap:16px;
+}
+.preview-page{
+position:relative;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,0.1);
+border-radius:4px;overflow:hidden;display:inline-block;
+}
+.preview-page canvas{display:block;max-width:100%;height:auto;}
+.page-label{
+text-align:center;font-size:12px;color:var(--muted);margin-top:6px;font-weight:500;
+}
+.watermark-overlay{
+position:absolute;top:0;left:0;width:100%;height:100%;
+pointer-events:none;display:flex;align-items:center;justify-content:center;
+overflow:hidden;
+}
+.watermark-overlay.pos-top-left{align-items:flex-start;justify-content:flex-start;padding:8%;}
+.watermark-overlay.pos-top-right{align-items:flex-start;justify-content:flex-end;padding:8%;}
+.watermark-overlay.pos-bottom-left{align-items:flex-end;justify-content:flex-start;padding:8%;}
+.watermark-overlay.pos-bottom-right{align-items:flex-end;justify-content:flex-end;padding:8%;}
+.watermark-overlay.pos-center{align-items:center;justify-content:center;}
+.wm-text-preview{
+font-weight:700;white-space:nowrap;user-select:none;
+}
+.wm-img-preview{user-select:none;pointer-events:none;}
+
+/* ACTIONS */
+.actions{margin-top:24px;display:flex;gap:12px;flex-wrap:wrap;justify-content:center;}
+.btn-primary{
+background:#ef4444;color:#fff;border:none;border-radius:10px;
+padding:14px 28px;font-size:15px;font-weight:700;cursor:pointer;
+transition:background 0.2s,transform 0.1s;display:flex;align-items:center;
+gap:8px;box-shadow:0 2px 8px rgba(239,68,68,0.25);font-family:inherit;
+}
+.btn-primary:hover{background:#dc2626;transform:translateY(-1px);}
+.btn-primary:active{transform:translateY(0);}
+.btn-primary:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
+.btn-secondary{
+background:var(--drop-bg);color:var(--text);border:1px solid var(--border);
+border-radius:10px;padding:14px 28px;font-size:15px;font-weight:600;
+cursor:pointer;transition:all 0.2s;font-family:inherit;
+}
+.btn-secondary:hover{border-color:var(--primary);color:var(--primary);}
+
+/* PRIVACY */
+.privacy{
+margin-top:24px;text-align:center;font-size:13px;color:var(--muted);
+display:flex;align-items:center;justify-content:center;gap:6px;
+}
+
+/* TOAST */
+.toast{
+position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(80px);
+background:#10b981;color:#fff;padding:14px 28px;border-radius:10px;
+font-size:14px;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,0.18);
+z-index:999;transition:transform 0.35s ease;pointer-events:none;
+}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.toast.error{background:#ef4444;}
+
+/* PROGRESS */
+.progress-bar{
+width:100%;height:4px;background:var(--drop-bg);border-radius:2px;
+margin-top:12px;overflow:hidden;display:none;
+}
+.progress-bar.visible{display:block;}
+.progress-fill{height:100%;background:var(--primary);border-radius:2px;width:0;transition:width 0.3s ease;}
+
+/* FOOTER */
+.footer{
+background:var(--footer-bg);text-align:center;padding:20px;
+font-size:14px;color:var(--footer-text);margin-top:auto;
+transition:background 0.25s ease;
+}
+
+/* LOADING SPINNER */
+.spinner{display:inline-block;width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.6s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+.main-card{padding:24px 18px;}
+.settings-grid{grid-template-columns:1fr;}
+.back-link{font-size:13px;}
+.tool-title{font-size:22px;}
+.actions{flex-direction:column;}
+.btn-primary,.btn-secondary{width:100%;justify-content:center;}
+.preview-container{max-height:400px;}
+}
+@media(max-width:480px){
+.header{padding:0 14px;}
+.header-right{gap:10px;}
+.divider{display:none;}
+.main-card{padding:20px 14px;}
+.upload-zone{padding:30px 14px;}
+.position-grid{grid-template-columns:repeat(3,1fr);gap:4px;}
+.pos-btn{padding:6px 2px;font-size:10px;}
+}
+</style>
+<script>
+(function(){
+const t=localStorage.getItem('pt-theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+document.documentElement.setAttribute('data-theme',t);
+})();
+</script>
+</head>
+<body>
+<!-- HEADER -->
+<header class="header">
+<a href="index.html" class="logo">
+<span class="logo-passion">Passion</span><span class="logo-tools">Tools</span>
+</a>
+<div class="header-right">
+<a href="index.html" class="back-link">← Back to Tools</a>
+<div class="divider"></div>
+<button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"></button>
+</div>
+</header>
+
+<!-- MAIN -->
+<main>
+<!-- TOOL LOGO -->
+<div class="tool-logo">
+<svg width="90" height="90" viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="15" y="8" width="50" height="64" rx="6" fill="#ef4444" opacity="0.12"/>
+<rect x="20" y="13" width="50" height="64" rx="6" fill="#ef4444" opacity="0.25"/>
+<rect x="25" y="18" width="50" height="64" rx="6" fill="#ef4444" opacity="0.9" stroke="#fff" stroke-width="1"/>
+<text x="50" y="48" text-anchor="middle" font-size="11" font-weight="800" fill="#fff" font-family="system-ui,sans-serif">PDF</text>
+<path d="M50 56 C50 56, 42 68, 42 72 C42 76.4, 45.6 80, 50 80 C54.4 80, 58 76.4, 58 72 C58 68, 50 56, 50 56Z" fill="#3b82f6" opacity="0.85" stroke="#fff" stroke-width="1"/>
+<circle cx="50" cy="70" r="2" fill="#fff" opacity="0.5"/>
+</svg>
+</div>
+
+<!-- MAIN CARD -->
+<div class="main-card">
+<h1 class="tool-title">Add Watermark</h1>
+<p class="tool-subtitle">Add text or image watermarks to PDF files directly in your browser.</p>
+
+<!-- UPLOAD -->
+<div class="upload-zone" id="uploadZone">
+<div class="upload-icon">
+<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 12 15 15"/>
+</svg>
+</div>
+<p class="upload-label">Drop PDF here or Click to Upload</p>
+<p class="upload-hint">Maximum file size: 20MB</p>
+<div class="file-info" id="fileInfo">
+<span class="file-name" id="fileName"></span>
+<span class="file-size" id="fileSize"></span>
+<button class="remove-file" id="removeFile">✕ Remove</button>
+</div>
+</div>
+<input type="file" id="fileInput" accept=".pdf,application/pdf">
+
+<!-- SETTINGS -->
+<div class="settings-panel" id="settingsPanel">
+<h3 class="section-title">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+Watermark Settings
+</h3>
+
+<!-- TYPE TOGGLE -->
+<div class="type-toggle">
+<button class="type-btn active" data-type="text" id="typeText">📝 Text</button>
+<button class="type-btn" data-type="image" id="typeImage">🖼️ Image</button>
+</div>
+
+<!-- TEXT SETTINGS -->
+<div id="textSettings">
+<div class="settings-grid">
+<div class="setting-group full">
+<label class="setting-label">Watermark Text</label>
+<input type="text" class="setting-input" id="wmText" value="CONFIDENTIAL" placeholder="Enter watermark text" maxlength="60">
+</div>
+<div class="setting-group">
+<label class="setting-label">Font Size <span id="fontSizeVal">48</span>px</label>
+<input type="range" id="wmFontSize" min="12" max="120" value="48">
+</div>
+<div class="setting-group">
+<label class="setting-label">Color</label>
+<input type="color" id="wmColor" value="#ef4444">
+</div>
+<div class="setting-group">
+<label class="setting-label">Opacity <span id="opacityVal">0.3</span></label>
+<input type="range" id="wmOpacity" min="0" max="100" value="30">
+</div>
+<div class="setting-group">
+<label class="setting-label">Rotation <span id="rotationVal">-45</span>°</label>
+<input type="range" id="wmRotation" min="-180" max="180" value="-45">
+</div>
+<div class="setting-group full">
+<label class="setting-label">Position</label>
+<div class="position-grid">
+<button class="pos-btn" data-pos="top-left">Top Left</button>
+<button class="pos-btn" data-pos="top-center">Top Center</button>
+<button class="pos-btn" data-pos="top-right">Top Right</button>
+<button class="pos-btn" data-pos="center-left">Center Left</button>
+<button class="pos-btn active" data-pos="center">Center</button>
+<button class="pos-btn" data-pos="center-right">Center Right</button>
+<button class="pos-btn" data-pos="bottom-left">Bottom Left</button>
+<button class="pos-btn" data-pos="bottom-center">Bottom Center</button>
+<button class="pos-btn" data-pos="bottom-right">Bottom Right</button>
+</div>
+</div>
+<div class="setting-group full">
+<div class="toggle-switch">
+<div class="switch" id="repeatToggle"></div>
+<span class="switch-label">Repeat watermark across page</span>
+</div>
+</div>
+</div>
+</div>
+
+<!-- IMAGE SETTINGS -->
+<div id="imageSettings" style="display:none;">
+<div class="settings-grid">
+<div class="setting-group full">
+<label class="setting-label">Watermark Image</label>
+<div class="image-upload-zone" id="wmImageZone">
+<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--muted)"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+<p style="font-size:13px;color:var(--muted);margin-top:6px;">Click or drop an image (PNG, JPG)</p>
+<img class="wm-image-preview" id="wmImagePreview" style="display:none;">
+</div>
+<input type="file" id="wmImageInput" accept="image/png,image/jpeg,image/jpg">
+</div>
+<div class="setting-group">
+<label class="setting-label">Scale <span id="imgScaleVal">30</span>%</label>
+<input type="range" id="wmImgScale" min="5" max="100" value="30">
+</div>
+<div class="setting-group">
+<label class="setting-label">Opacity <span id="imgOpacityVal">0.3</span></label>
+<input type="range" id="wmImgOpacity" min="0" max="100" value="30">
+</div>
+<div class="setting-group">
+<label class="setting-label">Rotation <span id="imgRotationVal">0</span>°</label>
+<input type="range" id="wmImgRotation" min="-180" max="180" value="0">
+</div>
+<div class="setting-group full">
+<label class="setting-label">Position</label>
+<div class="position-grid" id="imgPosGrid">
+<button class="pos-btn" data-pos="top-left">Top Left</button>
+<button class="pos-btn" data-pos="top-center">Top Center</button>
+<button class="pos-btn" data-pos="top-right">Top Right</button>
+<button class="pos-btn" data-pos="center-left">Center Left</button>
+<button class="pos-btn active" data-pos="center">Center</button>
+<button class="pos-btn" data-pos="center-right">Center Right</button>
+<button class="pos-btn" data-pos="bottom-left">Bottom Left</button>
+<button class="pos-btn" data-pos="bottom-center">Bottom Center</button>
+<button class="pos-btn" data-pos="bottom-right">Bottom Right</button>
+</div>
+</div>
+</div>
+</div>
+
+<!-- PAGE RANGE -->
+<div class="page-range-section">
+<h3 class="section-title" style="margin-top:20px;">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+Page Range
+</h3>
+<div class="page-range-toggle">
+<button class="range-btn active" data-range="all">All Pages</button>
+<button class="range-btn" data-range="custom">Custom Range</button>
+</div>
+<div class="page-range-input" id="pageRangeInput">
+<input type="text" class="setting-input" id="pageRange" placeholder="e.g. 1-3, 5, 7-10">
+<p style="font-size:11px;color:var(--muted);margin-top:4px;">Total pages: <span id="totalPages">0</span></p>
+</div>
+</div>
+</div>
+
+<!-- PREVIEW -->
+<div class="preview-section" id="previewSection">
+<h3 class="section-title">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+Preview
+</h3>
+<div class="preview-container" id="previewContainer"></div>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-bar" id="progressBar">
+<div class="progress-fill" id="progressFill"></div>
+</div>
+
+<!-- ACTIONS -->
+<div class="actions" id="actionsSection" style="display:none;">
+<button class="btn-primary" id="applyBtn">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+Apply Watermark & Download
+</button>
+<button class="btn-secondary" id="resetBtn">Reset</button>
+</div>
+
+<!-- PRIVACY -->
+<div class="privacy">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+This tool processes your PDF entirely in your browser. No files are uploaded or stored.
+</div>
+</div>
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">© 2026 Passion Tools. Secure client-side processing.</footer>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== THEME =====
+const themeToggle = document.getElementById('themeToggle');
+function getTheme() { return document.documentElement.getAttribute('data-theme'); }
+function setTheme(t) {
+  document.documentElement.setAttribute('data-theme', t);
+  localStorage.setItem('pt-theme', t);
+  themeToggle.textContent = t === 'dark' ? '☀️' : '🌙';
+}
+setTheme(getTheme());
+themeToggle.addEventListener('click', () => setTheme(getTheme() === 'dark' ? 'light' : 'dark'));
+
+// ===== TOAST =====
+function showToast(msg, isError = false) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.className = 'toast' + (isError ? ' error' : '');
+  requestAnimationFrame(() => toast.classList.add('show'));
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+// ===== PDF.js CONFIG =====
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+// ===== STATE =====
+const MAX_FILE_SIZE = 20 * 1024 * 1024;
+let pdfFile = null;
+let pdfBytes = null;
+let pdfDoc = null;
+let totalPageCount = 0;
+let wmType = 'text';
+let wmPosition = 'center';
+let wmImgPosition = 'center';
+let wmRepeat = false;
+let wmImageBytes = null;
+let wmImageType = null;
+let pageRangeMode = 'all';
+
+// ===== ELEMENTS =====
+const uploadZone = document.getElementById('uploadZone');
+const fileInput = document.getElementById('fileInput');
+const fileInfo = document.getElementById('fileInfo');
+const fileName = document.getElementById('fileName');
+const fileSize = document.getElementById('fileSize');
+const removeFile = document.getElementById('removeFile');
+const settingsPanel = document.getElementById('settingsPanel');
+const previewSection = document.getElementById('previewSection');
+const previewContainer = document.getElementById('previewContainer');
+const actionsSection = document.getElementById('actionsSection');
+const applyBtn = document.getElementById('applyBtn');
+const resetBtn = document.getElementById('resetBtn');
+const progressBar = document.getElementById('progressBar');
+const progressFill = document.getElementById('progressFill');
+
+// ===== FILE UPLOAD =====
+uploadZone.addEventListener('click', (e) => {
+  if (!uploadZone.classList.contains('has-file')) fileInput.click();
+});
+uploadZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadZone.classList.add('dragover'); });
+uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+uploadZone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  uploadZone.classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file) handleFile(file);
+});
+fileInput.addEventListener('change', (e) => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+removeFile.addEventListener('click', (e) => { e.stopPropagation(); resetAll(); });
+
+function formatSize(b) {
+  if (b < 1024) return b + ' B';
+  if (b < 1048576) return (b / 1024).toFixed(1) + ' KB';
+  return (b / 1048576).toFixed(2) + ' MB';
+}
+
+async function handleFile(file) {
+  if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+    showToast('Please upload a valid PDF file.', true);
+    return;
+  }
+  if (file.size > MAX_FILE_SIZE) {
+    showToast('File size exceeds 20MB limit.', true);
+    return;
+  }
+  pdfFile = file;
+  fileName.textContent = file.name;
+  fileSize.textContent = formatSize(file.size);
+  fileInfo.classList.add('visible');
+  uploadZone.classList.add('has-file');
+
+  try {
+    pdfBytes = await file.arrayBuffer();
+    pdfDoc = await pdfjsLib.getDocument({ data: pdfBytes.slice(0) }).promise;
+    totalPageCount = pdfDoc.numPages;
+    document.getElementById('totalPages').textContent = totalPageCount;
+    settingsPanel.classList.add('visible');
+    actionsSection.style.display = 'flex';
+    await renderPreview();
+  } catch (err) {
+    console.error(err);
+    showToast('Unable to read this PDF. It may be encrypted or corrupted.', true);
+    resetAll();
+  }
+}
+
+// ===== PREVIEW RENDERING =====
+let previewDebounceTimer = null;
+function schedulePreview() {
+  clearTimeout(previewDebounceTimer);
+  previewDebounceTimer = setTimeout(() => renderPreview(), 200);
+}
+
+async function renderPreview() {
+  if (!pdfDoc) return;
+  previewContainer.innerHTML = '';
+  previewSection.classList.add('visible');
+  const maxPreview = Math.min(totalPageCount, 4);
+  for (let i = 1; i <= maxPreview; i++) {
+    const page = await pdfDoc.getPage(i);
+    const viewport = page.getViewport({ scale: 1 });
+    const desiredWidth = Math.min(480, previewContainer.clientWidth - 32);
+    const scale = desiredWidth / viewport.width;
+    const scaledVP = page.getViewport({ scale });
+
+    const wrapper = document.createElement('div');
+    const pageDiv = document.createElement('div');
+    pageDiv.className = 'preview-page';
+    pageDiv.style.width = scaledVP.width + 'px';
+    pageDiv.style.height = scaledVP.height + 'px';
+
+    const canvas = document.createElement('canvas');
+    canvas.width = scaledVP.width;
+    canvas.height = scaledVP.height;
+    const ctx = canvas.getContext('2d');
+    await page.render({ canvasContext: ctx, viewport: scaledVP }).promise;
+    pageDiv.appendChild(canvas);
+
+    // Watermark overlay
+    const overlay = createWatermarkOverlay();
+    pageDiv.appendChild(overlay);
+
+    wrapper.appendChild(pageDiv);
+    const label = document.createElement('div');
+    label.className = 'page-label';
+    label.textContent = 'Page ' + i + (totalPageCount > maxPreview && i === maxPreview ? ' (showing first ' + maxPreview + ')' : '');
+    wrapper.appendChild(label);
+    previewContainer.appendChild(wrapper);
+  }
+}
+
+function createWatermarkOverlay() {
+  const overlay = document.createElement('div');
+  overlay.className = 'watermark-overlay';
+  const pos = wmType === 'text' ? wmPosition : wmImgPosition;
+
+  // Position class
+  if (pos === 'top-left') overlay.classList.add('pos-top-left');
+  else if (pos === 'top-right') overlay.classList.add('pos-top-right');
+  else if (pos === 'bottom-left') overlay.classList.add('pos-bottom-left');
+  else if (pos === 'bottom-right') overlay.classList.add('pos-bottom-right');
+  else if (pos === 'top-center') { overlay.style.alignItems = 'flex-start'; overlay.style.padding = '8%'; }
+  else if (pos === 'bottom-center') { overlay.style.alignItems = 'flex-end'; overlay.style.padding = '8%'; }
+  else if (pos === 'center-left') { overlay.style.justifyContent = 'flex-start'; overlay.style.padding = '8%'; }
+  else if (pos === 'center-right') { overlay.style.justifyContent = 'flex-end'; overlay.style.padding = '8%'; }
+  else overlay.classList.add('pos-center');
+
+  if (wmType === 'text') {
+    const text = document.getElementById('wmText').value || 'WATERMARK';
+    const fontSize = document.getElementById('wmFontSize').value;
+    const color = document.getElementById('wmColor').value;
+    const opacity = document.getElementById('wmOpacity').value / 100;
+    const rotation = document.getElementById('wmRotation').value;
+
+    if (wmRepeat) {
+      overlay.style.display = 'block';
+      overlay.style.padding = '0';
+      for (let r = 0; r < 5; r++) {
+        for (let c = 0; c < 3; c++) {
+          const span = document.createElement('span');
+          span.className = 'wm-text-preview';
+          span.textContent = text;
+          span.style.cssText = `
+            position:absolute;
+            font-size:${Math.max(8, fontSize * 0.25)}px;
+            color:${color};
+            opacity:${opacity};
+            transform:rotate(${rotation}deg);
+            top:${10 + r * 22}%;
+            left:${5 + c * 35}%;
+            white-space:nowrap;
+            font-weight:700;
+          `;
+          overlay.appendChild(span);
+        }
+      }
+    } else {
+      const span = document.createElement('span');
+      span.className = 'wm-text-preview';
+      span.textContent = text;
+      span.style.cssText = `
+        font-size:${Math.max(10, fontSize * 0.3)}px;
+        color:${color};
+        opacity:${opacity};
+        transform:rotate(${rotation}deg);
+        font-weight:700;
+      `;
+      overlay.appendChild(span);
+    }
+  } else {
+    // Image watermark preview
+    const preview = document.getElementById('wmImagePreview');
+    if (preview.src && preview.style.display !== 'none') {
+      const imgScale = document.getElementById('wmImgScale').value;
+      const imgOpacity = document.getElementById('wmImgOpacity').value / 100;
+      const imgRotation = document.getElementById('wmImgRotation').value;
+      const img = document.createElement('img');
+      img.src = preview.src;
+      img.className = 'wm-img-preview';
+      img.style.cssText = `
+        max-width:${imgScale}%;
+        opacity:${imgOpacity};
+        transform:rotate(${imgRotation}deg);
+      `;
+      overlay.appendChild(img);
+    }
+  }
+  return overlay;
+}
+
+// ===== WATERMARK TYPE TOGGLE =====
+document.getElementById('typeText').addEventListener('click', () => {
+  wmType = 'text';
+  document.getElementById('typeText').classList.add('active');
+  document.getElementById('typeImage').classList.remove('active');
+  document.getElementById('textSettings').style.display = '';
+  document.getElementById('imageSettings').style.display = 'none';
+  schedulePreview();
+});
+document.getElementById('typeImage').addEventListener('click', () => {
+  wmType = 'image';
+  document.getElementById('typeImage').classList.add('active');
+  document.getElementById('typeText').classList.remove('active');
+  document.getElementById('textSettings').style.display = 'none';
+  document.getElementById('imageSettings').style.display = '';
+  schedulePreview();
+});
+
+// ===== TEXT SETTINGS LISTENERS =====
+['wmText', 'wmFontSize', 'wmColor', 'wmOpacity', 'wmRotation'].forEach(id => {
+  document.getElementById(id).addEventListener('input', (e) => {
+    if (id === 'wmFontSize') document.getElementById('fontSizeVal').textContent = e.target.value;
+    if (id === 'wmOpacity') document.getElementById('opacityVal').textContent = (e.target.value / 100).toFixed(2);
+    if (id === 'wmRotation') document.getElementById('rotationVal').textContent = e.target.value;
+    schedulePreview();
+  });
+});
+
+// Position buttons (text)
+document.querySelectorAll('#textSettings .pos-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#textSettings .pos-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    wmPosition = btn.dataset.pos;
+    schedulePreview();
+  });
+});
+
+// Position buttons (image)
+document.querySelectorAll('#imgPosGrid .pos-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#imgPosGrid .pos-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    wmImgPosition = btn.dataset.pos;
+    schedulePreview();
+  });
+});
+
+// Repeat toggle
+document.getElementById('repeatToggle').addEventListener('click', function() {
+  wmRepeat = !wmRepeat;
+  this.classList.toggle('active', wmRepeat);
+  schedulePreview();
+});
+
+// ===== IMAGE WATERMARK UPLOAD =====
+const wmImageZone = document.getElementById('wmImageZone');
+const wmImageInput = document.getElementById('wmImageInput');
+const wmImagePreview = document.getElementById('wmImagePreview');
+
+wmImageZone.addEventListener('click', () => wmImageInput.click());
+wmImageZone.addEventListener('dragover', (e) => e.preventDefault());
+wmImageZone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  if (e.dataTransfer.files[0]) handleWmImage(e.dataTransfer.files[0]);
+});
+wmImageInput.addEventListener('change', (e) => { if (e.target.files[0]) handleWmImage(e.target.files[0]); });
+
+async function handleWmImage(file) {
+  if (!file.type.startsWith('image/')) {
+    showToast('Please upload a valid image file.', true);
+    return;
+  }
+  try {
+    wmImageBytes = await file.arrayBuffer();
+    wmImageType = file.type.includes('png') ? 'png' : 'jpg';
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      wmImagePreview.src = e.target.result;
+      wmImagePreview.style.display = 'block';
+      wmImageZone.classList.add('has-image');
+      schedulePreview();
+    };
+    reader.readAsDataURL(file);
+  } catch (err) {
+    showToast('Unable to read image file.', true);
+  }
+}
+
+// Image settings listeners
+['wmImgScale', 'wmImgOpacity', 'wmImgRotation'].forEach(id => {
+  document.getElementById(id).addEventListener('input', (e) => {
+    if (id === 'wmImgScale') document.getElementById('imgScaleVal').textContent = e.target.value;
+    if (id === 'wmImgOpacity') document.getElementById('imgOpacityVal').textContent = (e.target.value / 100).toFixed(2);
+    if (id === 'wmImgRotation') document.getElementById('imgRotationVal').textContent = e.target.value;
+    schedulePreview();
+  });
+});
+
+// ===== PAGE RANGE =====
+document.querySelectorAll('.range-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.range-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    pageRangeMode = btn.dataset.range;
+    document.getElementById('pageRangeInput').classList.toggle('visible', pageRangeMode === 'custom');
+  });
+});
+
+function getSelectedPages() {
+  if (pageRangeMode === 'all') {
+    return Array.from({ length: totalPageCount }, (_, i) => i);
+  }
+  const input = document.getElementById('pageRange').value.trim();
+  if (!input) return Array.from({ length: totalPageCount }, (_, i) => i);
+  const pages = new Set();
+  const parts = input.split(',');
+  for (const part of parts) {
+    const trimmed = part.trim();
+    if (trimmed.includes('-')) {
+      const [start, end] = trimmed.split('-').map(Number);
+      if (isNaN(start) || isNaN(end) || start < 1 || end > totalPageCount || start > end) {
+        showToast('Invalid page range: ' + trimmed, true);
+        return null;
+      }
+      for (let i = start; i <= end; i++) pages.add(i - 1);
+    } else {
+      const num = parseInt(trimmed);
+      if (isNaN(num) || num < 1 || num > totalPageCount) {
+        showToast('Invalid page number: ' + trimmed, true);
+        return null;
+      }
+      pages.add(num - 1);
+    }
+  }
+  return Array.from(pages).sort((a, b) => a - b);
+}
+
+// ===== APPLY WATERMARK =====
+applyBtn.addEventListener('click', async () => {
+  if (!pdfBytes) return;
+
+  const pages = getSelectedPages();
+  if (pages === null) return;
+
+  if (wmType === 'image' && !wmImageBytes) {
+    showToast('Please upload a watermark image first.', true);
+    return;
+  }
+
+  const textVal = document.getElementById('wmText').value.trim();
+  if (wmType === 'text' && !textVal) {
+    showToast('Please enter watermark text.', true);
+    return;
+  }
+
+  applyBtn.disabled = true;
+  const origContent = applyBtn.innerHTML;
+  applyBtn.innerHTML = '<span class="spinner"></span> Processing...';
+  progressBar.classList.add('visible');
+  progressFill.style.width = '0%';
+
+  try {
+    const { PDFDocument, rgb, degrees, StandardFonts } = PDFLib;
+    const pdfDocLib = await PDFDocument.load(pdfBytes, { ignoreEncryption: true });
+    const allPages = pdfDocLib.getPages();
+
+    if (wmType === 'text') {
+      const font = await pdfDocLib.embedFont(StandardFonts.Helvetica);
+      const fontSize = parseInt(document.getElementById('wmFontSize').value);
+      const hexColor = document.getElementById('wmColor').value;
+      const r = parseInt(hexColor.slice(1, 3), 16) / 255;
+      const g = parseInt(hexColor.slice(3, 5), 16) / 255;
+      const b = parseInt(hexColor.slice(5, 7), 16) / 255;
+      const opacity = parseInt(document.getElementById('wmOpacity').value) / 100;
+      const rotation = parseInt(document.getElementById('wmRotation').value);
+
+      for (let idx = 0; idx < pages.length; idx++) {
+        const pageIndex = pages[idx];
+        if (pageIndex >= allPages.length) continue;
+        const page = allPages[pageIndex];
+        const { width, height } = page.getSize();
+        const textWidth = font.widthOfTextAtSize(textVal, fontSize);
+
+        if (wmRepeat) {
+          const cols = 3;
+          const rows = 5;
+          for (let row = 0; row < rows; row++) {
+            for (let col = 0; col < cols; col++) {
+              const x = (width * (0.1 + col * 0.35)) - textWidth / 2;
+              const y = height * (0.1 + row * 0.2);
+              page.drawText(textVal, {
+                x, y, size: fontSize, font, color: rgb(r, g, b),
+                opacity, rotate: degrees(rotation),
+              });
+            }
+          }
+        } else {
+          const { x, y } = getPosition(wmPosition, width, height, textWidth, fontSize);
+          page.drawText(textVal, {
+            x, y, size: fontSize, font, color: rgb(r, g, b),
+            opacity, rotate: degrees(rotation),
+          });
+        }
+        progressFill.style.width = ((idx + 1) / pages.length * 90) + '%';
+      }
+    } else {
+      // Image watermark
+      let embeddedImg;
+      if (wmImageType === 'png') {
+        embeddedImg = await pdfDocLib.embedPng(wmImageBytes);
+      } else {
+        embeddedImg = await pdfDocLib.embedJpg(wmImageBytes);
+      }
+      const imgScale = parseInt(document.getElementById('wmImgScale').value) / 100;
+      const imgOpacity = parseInt(document.getElementById('wmImgOpacity').value) / 100;
+      const imgRotation = parseInt(document.getElementById('wmImgRotation').value);
+
+      for (let idx = 0; idx < pages.length; idx++) {
+        const pageIndex = pages[idx];
+        if (pageIndex >= allPages.length) continue;
+        const page = allPages[pageIndex];
+        const { width, height } = page.getSize();
+
+        const imgW = embeddedImg.width * imgScale;
+        const imgH = embeddedImg.height * imgScale;
+        // Ensure image fits within page
+        const maxW = width * 0.9;
+        const maxH = height * 0.9;
+        let finalW = imgW;
+        let finalH = imgH;
+        if (finalW > maxW) { const ratio = maxW / finalW; finalW *= ratio; finalH *= ratio; }
+        if (finalH > maxH) { const ratio = maxH / finalH; finalW *= ratio; finalH *= ratio; }
+
+        const { x, y } = getPosition(wmImgPosition, width, height, finalW, finalH);
+
+        page.drawImage(embeddedImg, {
+          x, y, width: finalW, height: finalH,
+          opacity: imgOpacity, rotate: degrees(imgRotation),
+        });
+        progressFill.style.width = ((idx + 1) / pages.length * 90) + '%';
+      }
+    }
+
+    progressFill.style.width = '95%';
+    const newPdfBytes = await pdfDocLib.save();
+    progressFill.style.width = '100%';
+
+    const blob = new Blob([newPdfBytes], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'watermarked-document.pdf';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    showToast('Watermark applied successfully! Downloading...');
+  } catch (err) {
+    console.error(err);
+    showToast('Unable to apply watermark. Please try another file.', true);
+  } finally {
+    applyBtn.disabled = false;
+    applyBtn.innerHTML = origContent;
+    setTimeout(() => {
+      progressBar.classList.remove('visible');
+      progressFill.style.width = '0%';
+    }, 1500);
+  }
+});
+
+function getPosition(pos, pageW, pageH, objW, objH) {
+  const margin = Math.min(pageW, pageH) * 0.08;
+  let x, y;
+  switch (pos) {
+    case 'top-left': x = margin; y = pageH - margin - objH; break;
+    case 'top-center': x = (pageW - objW) / 2; y = pageH - margin - objH; break;
+    case 'top-right': x = pageW - margin - objW; y = pageH - margin - objH; break;
+    case 'center-left': x = margin; y = (pageH - objH) / 2; break;
+    case 'center': x = (pageW - objW) / 2; y = (pageH - objH) / 2; break;
+    case 'center-right': x = pageW - margin - objW; y = (pageH - objH) / 2; break;
+    case 'bottom-left': x = margin; y = margin; break;
+    case 'bottom-center': x = (pageW - objW) / 2; y = margin; break;
+    case 'bottom-right': x = pageW - margin - objW; y = margin; break;
+    default: x = (pageW - objW) / 2; y = (pageH - objH) / 2;
+  }
+  return { x, y };
+}
+
+// ===== RESET =====
+resetBtn.addEventListener('click', resetAll);
+
+function resetAll() {
+  pdfFile = null;
+  pdfBytes = null;
+  pdfDoc = null;
+  totalPageCount = 0;
+  wmImageBytes = null;
+  wmImageType = null;
+  wmRepeat = false;
+  wmPosition = 'center';
+  wmImgPosition = 'center';
+  pageRangeMode = 'all';
+
+  fileInput.value = '';
+  fileInfo.classList.remove('visible');
+  uploadZone.classList.remove('has-file');
+  settingsPanel.classList.remove('visible');
+  previewSection.classList.remove('visible');
+  actionsSection.style.display = 'none';
+  previewContainer.innerHTML = '';
+  progressBar.classList.remove('visible');
+  progressFill.style.width = '0%';
+
+  // Reset settings
+  document.getElementById('wmText').value = 'CONFIDENTIAL';
+  document.getElementById('wmFontSize').value = 48;
+  document.getElementById('fontSizeVal').textContent = '48';
+  document.getElementById('wmColor').value = '#ef4444';
+  document.getElementById('wmOpacity').value = 30;
+  document.getElementById('opacityVal').textContent = '0.30';
+  document.getElementById('wmRotation').value = -45;
+  document.getElementById('rotationVal').textContent = '-45';
+
+  document.getElementById('wmImgScale').value = 30;
+  document.getElementById('imgScaleVal').textContent = '30';
+  document.getElementById('wmImgOpacity').value = 30;
+  document.getElementById('imgOpacityVal').textContent = '0.30';
+  document.getElementById('wmImgRotation').value = 0;
+  document.getElementById('imgRotationVal').textContent = '0';
+
+  document.getElementById('repeatToggle').classList.remove('active');
+  wmImagePreview.style.display = 'none';
+  wmImagePreview.src = '';
+  wmImageZone.classList.remove('has-image');
+  wmImageInput.value = '';
+
+  // Reset position buttons
+  document.querySelectorAll('.pos-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.pos-btn[data-pos="center"]').forEach(b => b.classList.add('active'));
+
+  // Reset type toggle
+  wmType = 'text';
+  document.getElementById('typeText').classList.add('active');
+  document.getElementById('typeImage').classList.remove('active');
+  document.getElementById('textSettings').style.display = '';
+  document.getElementById('imageSettings').style.display = 'none';
+
+  // Reset range
+  document.querySelectorAll('.range-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector('.range-btn[data-range="all"]').classList.add('active');
+  document.getElementById('pageRangeInput').classList.remove('visible');
+  document.getElementById('pageRange').value = '';
+  document.getElementById('totalPages').textContent = '0';
+}
+</script>
+</body>
+</html>
