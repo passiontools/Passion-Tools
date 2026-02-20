@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Word to PDF – PassionTools</title>
+<meta name="description" content="Convert Word documents (.docx) to PDF files directly in your browser. No uploads, no servers, fully private.">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+/* ========== THEME VARIABLES ========== */
+:root {
+  --bg: #f8fafc;
+  --card: #ffffff;
+  --text: #0f172a;
+  --muted: #64748b;
+  --border: #e2e8f0;
+  --header-bg: #ffffff;
+  --footer-bg: #111827;
+  --footer-text: #94a3b8;
+  --drop-bg: #f1f5f9;
+  --drop-border: #cbd5e1;
+  --primary: #ef4444;
+  --primary-hover: #dc2626;
+}
+
+[data-theme="dark"] {
+  --bg: #020617;
+  --card: #111827;
+  --text: #f8fafc;
+  --muted: #94a3b8;
+  --border: #1e293b;
+  --header-bg: #0f172a;
+  --footer-bg: #020617;
+  --footer-text: #94a3b8;
+  --drop-bg: #1e293b;
+  --drop-border: #334155;
+  --primary: #ef4444;
+  --primary-hover: #dc2626;
+}
+
+/* ========== RESET & BASE ========== */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  transition: background 0.25s ease, color 0.25s ease;
+  line-height: 1.6;
+}
+
+/* ========== HEADER ========== */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  height: 70px;
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  transition: background 0.25s ease, border-color 0.25s ease;
+}
+
+.logo {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  text-decoration: none;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.logo-passion {
+  color: var(--text);
+  transition: color 0.25s ease;
+}
+
+.logo-tools {
+  background: linear-gradient(135deg, #ef4444, #a855f7);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.back-link {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--muted);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.25s ease;
+}
+
+.back-link:hover {
+  color: var(--primary);
+}
+
+.divider {
+  width: 1px;
+  height: 24px;
+  background: var(--border);
+  transition: background 0.25s ease;
+}
+
+.theme-toggle {
+  background: none;
+  border: 2px solid var(--border);
+  color: var(--text);
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  transition: border-color 0.25s ease, color 0.25s ease, background 0.25s ease;
+}
+
+.theme-toggle:hover {
+  border-color: var(--primary);
+  background: var(--drop-bg);
+}
+
+/* ========== MAIN CONTAINER ========== */
+.main-container {
+  flex: 1;
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+/* ========== MAIN CARD ========== */
+.main-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
+  padding: 48px 40px;
+  transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* ========== TOOL LOGO ========== */
+.tool-logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+  animation: fadeInLogo 0.8s ease;
+}
+
+@keyframes fadeInLogo {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.tool-logo svg {
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.10));
+}
+
+/* ========== TITLE ========== */
+.tool-title {
+  text-align: center;
+  font-size: 28px;
+  font-weight: 800;
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
+}
+
+.tool-subtitle {
+  text-align: center;
+  color: var(--muted);
+  font-size: 15px;
+  margin-bottom: 36px;
+}
+
+/* ========== UPLOAD AREA ========== */
+.upload-zone {
+  background: var(--drop-bg);
+  border: 2px dashed var(--drop-border);
+  border-radius: 12px;
+  padding: 48px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.25s ease, background 0.25s ease, transform 0.15s ease;
+  position: relative;
+}
+
+.upload-zone:hover {
+  border-color: var(--primary);
+}
+
+.upload-zone.drag-over {
+  border-color: var(--primary);
+  background: rgba(239, 68, 68, 0.05);
+  transform: scale(1.01);
+}
+
+.upload-zone.has-file {
+  border-style: solid;
+  border-color: #22c55e;
+  cursor: default;
+}
+
+.upload-icon {
+  margin-bottom: 16px;
+}
+
+.upload-icon svg {
+  color: var(--muted);
+  transition: color 0.25s ease;
+}
+
+.upload-zone:hover .upload-icon svg {
+  color: var(--primary);
+}
+
+.upload-text {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.upload-hint {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.file-input {
+  display: none;
+}
+
+/* ========== FILE INFO ========== */
+.file-info {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.file-info.visible {
+  display: flex;
+}
+
+.file-icon-wrapper {
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.file-details {
+  text-align: left;
+}
+
+.file-name {
+  font-size: 14px;
+  font-weight: 600;
+  word-break: break-all;
+}
+
+.file-size {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.remove-file {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  transition: color 0.2s, background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.remove-file:hover {
+  color: var(--primary);
+  background: var(--drop-bg);
+}
+
+/* ========== PROCESSING STATE ========== */
+.processing-state {
+  display: none;
+  text-align: center;
+  padding: 40px 0;
+}
+
+.processing-state.visible {
+  display: block;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 16px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.processing-text {
+  font-size: 15px;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+/* ========== PREVIEW ========== */
+.preview-section {
+  display: none;
+  margin-top: 32px;
+}
+
+.preview-section.visible {
+  display: block;
+}
+
+.preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.preview-label {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--muted);
+}
+
+.preview-container {
+  background: var(--drop-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 32px;
+  max-height: 500px;
+  overflow-y: auto;
+  transition: background 0.25s ease, border-color 0.25s ease;
+  line-height: 1.7;
+  font-size: 14px;
+}
+
+.preview-container h1 {
+  font-size: 24px;
+  font-weight: 800;
+  margin: 20px 0 10px;
+  line-height: 1.3;
+}
+
+.preview-container h2 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 18px 0 8px;
+  line-height: 1.3;
+}
+
+.preview-container h3 {
+  font-size: 17px;
+  font-weight: 700;
+  margin: 14px 0 6px;
+  line-height: 1.4;
+}
+
+.preview-container p {
+  margin: 8px 0;
+}
+
+.preview-container ul, .preview-container ol {
+  margin: 8px 0;
+  padding-left: 24px;
+}
+
+.preview-container li {
+  margin: 4px 0;
+}
+
+.preview-container table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 12px 0;
+}
+
+.preview-container th,
+.preview-container td {
+  border: 1px solid var(--border);
+  padding: 8px 12px;
+  text-align: left;
+  font-size: 13px;
+}
+
+.preview-container th {
+  background: var(--card);
+  font-weight: 600;
+}
+
+.preview-container img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+  margin: 8px 0;
+}
+
+.preview-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.preview-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.preview-container::-webkit-scrollbar-thumb {
+  background: var(--drop-border);
+  border-radius: 3px;
+}
+
+/* ========== BUTTONS ========== */
+.button-group {
+  display: none;
+  gap: 12px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+
+.button-group.visible {
+  display: flex;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 28px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn-export {
+  background: #ef4444;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+  flex: 1;
+  min-width: 200px;
+}
+
+.btn-export:hover:not(:disabled) {
+  background: #dc2626;
+  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4);
+}
+
+.btn-export:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-reset {
+  background: var(--drop-bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  min-width: 140px;
+}
+
+.btn-reset:hover {
+  background: var(--border);
+}
+
+/* ========== TOAST ========== */
+.toast {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: #111827;
+  color: #f8fafc;
+  padding: 14px 28px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+  z-index: 9999;
+  opacity: 0;
+  transition: transform 0.35s ease, opacity 0.35s ease;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toast.visible {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+.toast.error {
+  background: #dc2626;
+}
+
+/* ========== PRIVACY ========== */
+.privacy-notice {
+  margin-top: 32px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.privacy-notice svg {
+  flex-shrink: 0;
+}
+
+/* ========== ERROR ========== */
+.error-message {
+  display: none;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  padding: 14px 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  margin-top: 16px;
+  text-align: center;
+}
+
+[data-theme="dark"] .error-message {
+  background: rgba(220, 38, 38, 0.1);
+  border-color: rgba(220, 38, 38, 0.3);
+  color: #fca5a5;
+}
+
+.error-message.visible {
+  display: block;
+}
+
+/* ========== FOOTER ========== */
+.footer {
+  background: var(--footer-bg);
+  padding: 24px;
+  text-align: center;
+  transition: background 0.25s ease;
+}
+
+.footer-text {
+  color: var(--footer-text);
+  font-size: 14px;
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 768px) {
+  .main-card {
+    padding: 32px 20px;
+  }
+
+  .back-link {
+    font-size: 13px;
+  }
+
+  .tool-title {
+    font-size: 24px;
+  }
+
+  .upload-zone {
+    padding: 36px 16px;
+  }
+
+  .preview-container {
+    padding: 20px;
+    max-height: 400px;
+  }
+
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .button-group {
+    flex-direction: column;
+  }
+
+  .btn-export, .btn-reset {
+    min-width: unset;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    padding: 0 16px;
+  }
+
+  .header-right {
+    gap: 10px;
+  }
+
+  .divider {
+    display: none;
+  }
+
+  .main-container {
+    padding: 24px 12px;
+  }
+
+  .main-card {
+    padding: 24px 16px;
+  }
+
+  .tool-title {
+    font-size: 20px;
+  }
+
+  .preview-container {
+    padding: 16px;
+    max-height: 350px;
+  }
+}
+</style>
+<script>
+  /* Prevent flash of wrong theme */
+  (function() {
+    var t = localStorage.getItem('pt-theme');
+    if (!t) t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', t);
+  })();
+</script>
+</head>
+<body>
+
+<!-- ========== HEADER ========== -->
+<header class="header">
+  <a href="index.html" class="logo" aria-label="PassionTools Home">
+    <span class="logo-passion">Passion</span><span class="logo-tools">Tools</span>
+  </a>
+  <div class="header-right">
+    <a href="index.html" class="back-link">← Back to Tools</a>
+    <div class="divider"></div>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+      <span id="themeIcon">🌙</span>
+    </button>
+  </div>
+</header>
+
+<!-- ========== MAIN ========== -->
+<main class="main-container">
+  <div class="main-card">
+
+    <!-- Tool Logo -->
+    <div class="tool-logo">
+      <svg width="96" height="80" viewBox="0 0 96 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Word Document -->
+        <rect x="2" y="8" width="32" height="40" rx="4" fill="#2563eb" opacity="0.12"/>
+        <rect x="4" y="10" width="28" height="36" rx="3" fill="#2563eb"/>
+        <text x="18" y="33" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="800" font-family="system-ui, sans-serif">W</text>
+        <!-- Arrow -->
+        <path d="M40 28 L54 28" stroke="#64748b" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M50 22 L56 28 L50 34" stroke="#64748b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- PDF Document -->
+        <rect x="60" y="8" width="32" height="40" rx="4" fill="#ef4444" opacity="0.12"/>
+        <rect x="62" y="10" width="28" height="36" rx="3" fill="#ef4444"/>
+        <!-- Folded corner -->
+        <path d="M82 10 L90 10 L90 18 Z" fill="#dc2626" opacity="0.5"/>
+        <path d="M82 10 L82 18 L90 18" fill="#b91c1c" opacity="0.3"/>
+        <text x="76" y="35" text-anchor="middle" fill="#ffffff" font-size="9" font-weight="700" font-family="system-ui, sans-serif">PDF</text>
+      </svg>
+    </div>
+
+    <!-- Title -->
+    <h1 class="tool-title">Word to PDF</h1>
+    <p class="tool-subtitle">Convert .docx documents to high-quality PDF files — entirely in your browser.</p>
+
+    <!-- Upload Zone -->
+    <div class="upload-zone" id="uploadZone">
+      <div class="upload-content" id="uploadContent">
+        <div class="upload-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="12" y1="18" x2="12" y2="12"/>
+            <polyline points="9 15 12 12 15 15"/>
+          </svg>
+        </div>
+        <p class="upload-text">Drop Word file here or Click to Upload</p>
+        <p class="upload-hint">Supports .docx files up to 20MB</p>
+      </div>
+      <div class="file-info" id="fileInfo">
+        <div class="file-icon-wrapper">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+        </div>
+        <div class="file-details">
+          <div class="file-name" id="fileName"></div>
+          <div class="file-size" id="fileSize"></div>
+        </div>
+        <button class="remove-file" id="removeFile" aria-label="Remove file" title="Remove file">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <input type="file" class="file-input" id="fileInput" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+    </div>
+
+    <!-- Error Message -->
+    <div class="error-message" id="errorMessage"></div>
+
+    <!-- Processing State -->
+    <div class="processing-state" id="processingState">
+      <div class="spinner"></div>
+      <p class="processing-text">Converting document…</p>
+    </div>
+
+    <!-- Preview Section -->
+    <div class="preview-section" id="previewSection">
+      <div class="preview-header">
+        <span class="preview-label">📄 Document Preview</span>
+      </div>
+      <div class="preview-container" id="previewContainer"></div>
+    </div>
+
+    <!-- Button Group -->
+    <div class="button-group" id="buttonGroup">
+      <button class="btn btn-export" id="exportBtn" disabled>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="12" y1="18" x2="12" y2="12"/>
+          <polyline points="9 15 12 18 15 15"/>
+        </svg>
+        Export as PDF
+      </button>
+      <button class="btn btn-reset" id="resetBtn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="1 4 1 10 7 10"/>
+          <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+        </svg>
+        Reset
+      </button>
+    </div>
+
+    <!-- Privacy -->
+    <div class="privacy-notice">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+      This tool processes your Word file entirely in your browser. No files are uploaded or stored.
+    </div>
+  </div>
+</main>
+
+<!-- ========== FOOTER ========== -->
+<footer class="footer">
+  <p class="footer-text">© 2026 PassionTools. Secure client-side processing.</p>
+</footer>
+
+<!-- ========== TOAST ========== -->
+<div class="toast" id="toast"></div>
+
+<script>
+(function() {
+  'use strict';
+
+  /* ========== CONFIG ========== */
+  const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB
+
+  /* ========== DOM REFS ========== */
+  const $ = id => document.getElementById(id);
+  const themeToggle = $('themeToggle');
+  const themeIcon = $('themeIcon');
+  const uploadZone = $('uploadZone');
+  const uploadContent = $('uploadContent');
+  const fileInfo = $('fileInfo');
+  const fileInput = $('fileInput');
+  const fileName = $('fileName');
+  const fileSize = $('fileSize');
+  const removeFile = $('removeFile');
+  const errorMessage = $('errorMessage');
+  const processingState = $('processingState');
+  const previewSection = $('previewSection');
+  const previewContainer = $('previewContainer');
+  const buttonGroup = $('buttonGroup');
+  const exportBtn = $('exportBtn');
+  const resetBtn = $('resetBtn');
+  const toast = $('toast');
+
+  let currentFile = null;
+  let extractedHTML = '';
+
+  /* ========== THEME ========== */
+  function getTheme() {
+    return document.documentElement.getAttribute('data-theme') || 'light';
+  }
+
+  function applyThemeIcon() {
+    themeIcon.textContent = getTheme() === 'dark' ? '☀️' : '🌙';
+  }
+
+  function toggleTheme() {
+    const next = getTheme() === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('pt-theme', next);
+    applyThemeIcon();
+  }
+
+  themeToggle.addEventListener('click', toggleTheme);
+  applyThemeIcon();
+
+  /* ========== TOAST ========== */
+  let toastTimer;
+  function showToast(msg, isError) {
+    clearTimeout(toastTimer);
+    toast.textContent = msg;
+    toast.className = 'toast' + (isError ? ' error' : '');
+    requestAnimationFrame(() => { toast.classList.add('visible'); });
+    toastTimer = setTimeout(() => { toast.classList.remove('visible'); }, 3500);
+  }
+
+  /* ========== UTILITY ========== */
+  function formatSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / 1048576).toFixed(2) + ' MB';
+  }
+
+  function showError(msg) {
+    errorMessage.textContent = msg;
+    errorMessage.classList.add('visible');
+  }
+
+  function hideError() {
+    errorMessage.classList.remove('visible');
+  }
+
+  /* ========== RESET UI ========== */
+  function resetUI() {
+    currentFile = null;
+    extractedHTML = '';
+    fileInput.value = '';
+    uploadZone.classList.remove('has-file');
+    uploadContent.style.display = '';
+    fileInfo.classList.remove('visible');
+    processingState.classList.remove('visible');
+    previewSection.classList.remove('visible');
+    buttonGroup.classList.remove('visible');
+    exportBtn.disabled = true;
+    previewContainer.innerHTML = '';
+    hideError();
+  }
+
+  /* ========== VALIDATE & PROCESS ========== */
+  function validateFile(file) {
+    hideError();
+
+    if (!file) return false;
+
+    const name = file.name.toLowerCase();
+
+    if (name.endsWith('.doc') && !name.endsWith('.docx')) {
+      showError('Unsupported format: .doc files are not supported. Please convert to .docx first.');
+      return false;
+    }
+
+    if (!name.endsWith('.docx')) {
+      showError('Invalid file type. Please upload a .docx file.');
+      return false;
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+      showError('File exceeds the 20MB limit. Please choose a smaller file.');
+      return false;
+    }
+
+    if (file.size === 0) {
+      showError('This file appears to be empty.');
+      return false;
+    }
+
+    return true;
+  }
+
+  function showFileInfo(file) {
+    fileName.textContent = file.name;
+    fileSize.textContent = formatSize(file.size);
+    uploadContent.style.display = 'none';
+    fileInfo.classList.add('visible');
+    uploadZone.classList.add('has-file');
+  }
+
+  async function processFile(file) {
+    if (!validateFile(file)) return;
+
+    currentFile = file;
+    showFileInfo(file);
+
+    // Show processing
+    processingState.classList.add('visible');
+    previewSection.classList.remove('visible');
+    buttonGroup.classList.remove('visible');
+    exportBtn.disabled = true;
+
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+
+      const result = await mammoth.convertToHtml(
+        { arrayBuffer: arrayBuffer },
+        {
+          styleMap: [
+            "p[style-name='Heading 1'] => h1:fresh",
+            "p[style-name='Heading 2'] => h2:fresh",
+            "p[style-name='Heading 3'] => h3:fresh"
+          ],
+          convertImage: mammoth.images.imgElement(function(image) {
+            return image.read("base64").then(function(imageBuffer) {
+              return { src: "data:" + image.contentType + ";base64," + imageBuffer };
+            });
+          })
+        }
+      );
+
+      extractedHTML = result.value;
+
+      if (!extractedHTML || extractedHTML.trim().length === 0) {
+        throw new Error('empty');
+      }
+
+      // Show preview
+      previewContainer.innerHTML = extractedHTML;
+      previewSection.classList.add('visible');
+      buttonGroup.classList.add('visible');
+      exportBtn.disabled = false;
+
+      if (result.messages && result.messages.length > 0) {
+        const warnings = result.messages.filter(m => m.type === 'warning');
+        if (warnings.length > 0) {
+          console.info('Mammoth warnings:', warnings);
+        }
+      }
+
+      showToast('✓ Document converted successfully!');
+
+    } catch (err) {
+      console.error('Conversion error:', err);
+      if (err.message === 'empty') {
+        showError('The document appears to be empty. No content was found.');
+      } else {
+        showError('Unable to extract content from this Word document.');
+      }
+      extractedHTML = '';
+    } finally {
+      processingState.classList.remove('visible');
+    }
+  }
+
+  /* ========== UPLOAD EVENTS ========== */
+  uploadZone.addEventListener('click', (e) => {
+    if (currentFile) return;
+    if (e.target === removeFile || removeFile.contains(e.target)) return;
+    fileInput.click();
+  });
+
+  fileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) processFile(file);
+  });
+
+  // Drag & Drop
+  uploadZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    if (!currentFile) uploadZone.classList.add('drag-over');
+  });
+
+  uploadZone.addEventListener('dragleave', (e) => {
+    e.preventDefault();
+    uploadZone.classList.remove('drag-over');
+  });
+
+  uploadZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    uploadZone.classList.remove('drag-over');
+    if (currentFile) return;
+    const file = e.dataTransfer.files[0];
+    if (file) processFile(file);
+  });
+
+  // Prevent default drag on body
+  document.addEventListener('dragover', (e) => e.preventDefault());
+  document.addEventListener('drop', (e) => e.preventDefault());
+
+  // Remove file
+  removeFile.addEventListener('click', (e) => {
+    e.stopPropagation();
+    resetUI();
+  });
+
+  // Reset button
+  resetBtn.addEventListener('click', resetUI);
+
+  /* ========== PDF EXPORT ========== */
+  exportBtn.addEventListener('click', async () => {
+    if (!extractedHTML) return;
+
+    exportBtn.disabled = true;
+    exportBtn.innerHTML = '<span class="spinner" style="width:18px;height:18px;border-width:2px;margin:0;display:inline-block;vertical-align:middle;"></span> Generating PDF…';
+
+    try {
+      // Create a hidden render container
+      const renderDiv = document.createElement('div');
+      renderDiv.style.cssText = `
+        position: fixed;
+        top: -99999px;
+        left: 0;
+        width: 794px;
+        padding: 48px 56px;
+        background: #ffffff;
+        color: #0f172a;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        font-size: 14px;
+        line-height: 1.7;
+        z-index: -1;
+      `;
+
+      // Add styles for rendered content
+      const style = document.createElement('style');
+      style.textContent = `
+        .pdf-render h1 { font-size: 22px; font-weight: 800; margin: 18px 0 10px; color: #0f172a; }
+        .pdf-render h2 { font-size: 18px; font-weight: 700; margin: 16px 0 8px; color: #0f172a; }
+        .pdf-render h3 { font-size: 15px; font-weight: 700; margin: 12px 0 6px; color: #0f172a; }
+        .pdf-render p { margin: 8px 0; color: #1e293b; }
+        .pdf-render ul, .pdf-render ol { margin: 8px 0; padding-left: 24px; }
+        .pdf-render li { margin: 4px 0; color: #1e293b; }
+        .pdf-render table { border-collapse: collapse; width: 100%; margin: 12px 0; }
+        .pdf-render th, .pdf-render td { border: 1px solid #e2e8f0; padding: 6px 10px; font-size: 12px; }
+        .pdf-render th { background: #f1f5f9; font-weight: 600; }
+        .pdf-render img { max-width: 100%; height: auto; margin: 8px 0; }
+        .pdf-render strong, .pdf-render b { font-weight: 700; }
+        .pdf-render em, .pdf-render i { font-style: italic; }
+      `;
+      renderDiv.appendChild(style);
+
+      const contentDiv = document.createElement('div');
+      contentDiv.className = 'pdf-render';
+      contentDiv.innerHTML = extractedHTML;
+      renderDiv.appendChild(contentDiv);
+      document.body.appendChild(renderDiv);
+
+      // Wait for images to load
+      const images = renderDiv.querySelectorAll('img');
+      if (images.length > 0) {
+        await Promise.all(Array.from(images).map(img => {
+          if (img.complete) return Promise.resolve();
+          return new Promise(resolve => {
+            img.onload = resolve;
+            img.onerror = resolve;
+          });
+        }));
+      }
+
+      // Render to canvas
+      const canvas = await html2canvas(renderDiv, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#ffffff',
+        logging: false,
+        windowWidth: 794
+      });
+
+      document.body.removeChild(renderDiv);
+
+      // Generate PDF
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 0;
+
+      const imgWidth = pageWidth - (margin * 2);
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      // Multi-page support
+      const totalPages = Math.ceil(imgHeight / pageHeight);
+
+      if (totalPages <= 1) {
+        const imgData = canvas.toDataURL('image/jpeg', 0.95);
+        pdf.addImage(imgData, 'JPEG', margin, margin, imgWidth, imgHeight);
+      } else {
+        // Split canvas into pages
+        const pageCanvasHeight = (canvas.width * pageHeight) / imgWidth;
+
+        for (let i = 0; i < totalPages; i++) {
+          if (i > 0) pdf.addPage();
+
+          const srcY = i * pageCanvasHeight;
+          const srcH = Math.min(pageCanvasHeight, canvas.height - srcY);
+          const destH = (srcH * imgWidth) / canvas.width;
+
+          const pageCanvas = document.createElement('canvas');
+          pageCanvas.width = canvas.width;
+          pageCanvas.height = srcH;
+          const ctx = pageCanvas.getContext('2d');
+          ctx.drawImage(canvas, 0, srcY, canvas.width, srcH, 0, 0, canvas.width, srcH);
+
+          const pageImgData = pageCanvas.toDataURL('image/jpeg', 0.95);
+          pdf.addImage(pageImgData, 'JPEG', margin, 0, imgWidth, destH);
+        }
+      }
+
+      // Generate filename from original file
+      let pdfName = 'converted-document.pdf';
+      if (currentFile && currentFile.name) {
+        const baseName = currentFile.name.replace(/\.docx$/i, '');
+        pdfName = baseName + '.pdf';
+      }
+
+      pdf.save(pdfName);
+      showToast('✓ PDF downloaded successfully!');
+
+    } catch (err) {
+      console.error('PDF generation error:', err);
+      showToast('Failed to generate PDF. Please try again.', true);
+    } finally {
+      exportBtn.disabled = false;
+      exportBtn.innerHTML = `
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="12" y1="18" x2="12" y2="12"/>
+          <polyline points="9 15 12 18 15 15"/>
+        </svg>
+        Export as PDF
+      `;
+    }
+  });
+
+})();
+</script>
+</body>
+</html>
