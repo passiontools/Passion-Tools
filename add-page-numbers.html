@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add Page Numbers – PassionTools</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #f8fafc;
+  --card: #ffffff;
+  --text: #0f172a;
+  --muted: #64748b;
+  --border: #e2e8f0;
+  --header-bg: #ffffff;
+  --footer-bg: #111827;
+  --footer-text: #94a3b8;
+  --drop-bg: #f1f5f9;
+  --drop-border: #cbd5e1;
+  --primary: #ef4444;
+  --primary-hover: #dc2626;
+  --input-bg: #f8fafc;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-lg: 0 10px 25px rgba(0,0,0,0.08);
+}
+[data-theme="dark"] {
+  --bg: #020617;
+  --card: #111827;
+  --text: #f8fafc;
+  --muted: #94a3b8;
+  --border: #1e293b;
+  --header-bg: #0f172a;
+  --footer-bg: #020617;
+  --footer-text: #94a3b8;
+  --drop-bg: #1e293b;
+  --drop-border: #334155;
+  --primary: #ef4444;
+  --primary-hover: #dc2626;
+  --input-bg: #1e293b;
+  --shadow: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
+  --shadow-lg: 0 10px 25px rgba(0,0,0,0.3);
+}
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  transition: background 0.25s ease, color 0.25s ease;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+/* ========== HEADER ========== */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: 70px;
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  transition: background 0.25s ease, border-color 0.25s ease;
+}
+.logo {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  user-select: none;
+}
+.logo-passion {
+  color: var(--text);
+  transition: color 0.25s ease;
+}
+.logo-tools {
+  background: linear-gradient(135deg, #ef4444, #a855f7);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.back-link {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--muted);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.25s ease;
+}
+.back-link:hover {
+  color: var(--primary);
+}
+.divider {
+  width: 1px;
+  height: 24px;
+  background: var(--border);
+  transition: background 0.25s ease;
+}
+.theme-toggle {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: var(--text);
+  transition: all 0.25s ease;
+}
+.theme-toggle:hover {
+  border-color: var(--primary);
+  background: var(--drop-bg);
+}
+/* ========== MAIN CONTAINER ========== */
+.main-container {
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 32px 20px;
+  flex: 1;
+}
+.main-card {
+  background: var(--card);
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border);
+  padding: 40px;
+  transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+/* ========== TOOL LOGO ========== */
+.tool-logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+  animation: fadeInLogo 0.8s ease;
+}
+@keyframes fadeInLogo {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.tool-logo svg {
+  filter: drop-shadow(0 2px 8px rgba(239, 68, 68, 0.2));
+}
+.tool-title {
+  text-align: center;
+  font-size: 28px;
+  font-weight: 800;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+.tool-subtitle {
+  text-align: center;
+  font-size: 15px;
+  color: var(--muted);
+  margin-bottom: 32px;
+}
+/* ========== UPLOAD AREA ========== */
+.upload-zone {
+  background: var(--drop-bg);
+  border: 2px dashed var(--drop-border);
+  border-radius: 12px;
+  padding: 48px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  position: relative;
+}
+.upload-zone:hover,
+.upload-zone.drag-over {
+  border-color: var(--primary);
+  background: rgba(239, 68, 68, 0.04);
+}
+.upload-zone.drag-over {
+  transform: scale(1.01);
+}
+.upload-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  display: block;
+  color: var(--muted);
+}
+.upload-text {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.upload-hint {
+  font-size: 13px;
+  color: var(--muted);
+}
+.upload-input {
+  display: none;
+}
+.file-info {
+  display: none;
+  margin-top: 24px;
+  padding: 16px 20px;
+  background: var(--drop-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  transition: all 0.25s ease;
+}
+.file-info.visible {
+  display: flex;
+}
+.file-details {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.file-icon-wrap {
+  width: 42px;
+  height: 42px;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.file-icon-wrap svg {
+  width: 22px;
+  height: 22px;
+  color: #fff;
+}
+.file-meta {
+  min-width: 0;
+}
+.file-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.file-size {
+  font-size: 12px;
+  color: var(--muted);
+}
+.remove-file {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  font-size: 20px;
+  line-height: 1;
+}
+.remove-file:hover {
+  color: var(--primary);
+  background: rgba(239, 68, 68, 0.1);
+}
+/* ========== SETTINGS PANEL ========== */
+.settings-panel {
+  display: none;
+  margin-top: 28px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: border-color 0.25s ease;
+}
+.settings-panel.visible {
+  display: block;
+}
+.settings-header {
+  padding: 16px 20px;
+  background: var(--drop-bg);
+  border-bottom: 1px solid var(--border);
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.25s ease;
+}
+.settings-body {
+  padding: 24px 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.setting-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.setting-group.full-width {
+  grid-column: 1 / -1;
+}
+.setting-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.setting-label .label-hint {
+  font-weight: 400;
+  color: var(--muted);
+  font-size: 12px;
+}
+select, input[type="number"], input[type="text"] {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--input-bg);
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  outline: none;
+}
+select:focus, input[type="number"]:focus, input[type="text"]:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+input[type="range"] {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  appearance: none;
+  background: var(--drop-border);
+  outline: none;
+  cursor: pointer;
+}
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--primary);
+  cursor: pointer;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--primary);
+  cursor: pointer;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+input[type="color"] {
+  width: 44px;
+  height: 38px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  padding: 2px;
+  background: var(--input-bg);
+}
+.color-input-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.color-input-row span {
+  font-size: 13px;
+  color: var(--muted);
+}
+.range-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.range-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary);
+  min-width: 36px;
+  text-align: right;
+}
+.position-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+.position-btn {
+  padding: 8px 4px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--input-bg);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  white-space: nowrap;
+}
+.position-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.position-btn.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+.page-range-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.page-range-row label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--text);
+  cursor: pointer;
+  font-weight: 500;
+}
+.page-range-row input[type="radio"] {
+  accent-color: var(--primary);
+  width: 16px;
+  height: 16px;
+}
+.custom-range-input {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--input-bg);
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+  width: 160px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+.custom-range-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+.custom-range-input:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+/* ========== PREVIEW AREA ========== */
+.preview-section {
+  display: none;
+  margin-top: 28px;
+}
+.preview-section.visible {
+  display: block;
+}
+.preview-header {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--text);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.preview-container {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--drop-bg);
+  padding: 20px;
+  max-height: 600px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  transition: all 0.25s ease;
+}
+.preview-page-wrap {
+  position: relative;
+  display: inline-block;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+  border-radius: 4px;
+  overflow: hidden;
+  background: #fff;
+}
+.preview-page-wrap canvas {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+.page-number-overlay {
+  position: absolute;
+  font-family: system-ui, sans-serif;
+  pointer-events: none;
+  z-index: 5;
+  white-space: nowrap;
+}
+.preview-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 12px;
+}
+.preview-nav button {
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--input-bg);
+  color: var(--text);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+.preview-nav button:hover:not(:disabled) {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.preview-nav button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.preview-nav span {
+  font-size: 14px;
+  color: var(--muted);
+  font-weight: 600;
+}
+/* ========== ACTIONS ========== */
+.actions {
+  display: none;
+  margin-top: 28px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.actions.visible {
+  display: flex;
+}
+.btn-primary {
+  flex: 1;
+  min-width: 220px;
+  padding: 14px 24px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--primary-hover);
+  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4);
+  transform: translateY(-1px);
+}
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+.btn-secondary {
+  padding: 14px 24px;
+  background: var(--drop-bg);
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.btn-secondary:hover {
+  color: var(--text);
+  border-color: var(--text);
+}
+/* ========== PRIVACY NOTICE ========== */
+.privacy-notice {
+  margin-top: 28px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 14px;
+  background: var(--drop-bg);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  transition: all 0.25s ease;
+}
+/* ========== TOAST ========== */
+.toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: #10b981;
+  color: #fff;
+  padding: 14px 28px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  box-shadow: 0 8px 30px rgba(16, 185, 129, 0.3);
+  z-index: 999;
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.toast.error {
+  background: #ef4444;
+  box-shadow: 0 8px 30px rgba(239, 68, 68, 0.3);
+}
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+/* ========== FOOTER ========== */
+.footer {
+  background: var(--footer-bg);
+  padding: 24px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--footer-text);
+  border-top: 1px solid var(--border);
+  transition: background 0.25s ease;
+  margin-top: auto;
+}
+/* ========== LOADING SPINNER ========== */
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+/* ========== RESPONSIVE ========== */
+@media (max-width: 768px) {
+  .main-card {
+    padding: 24px 16px;
+  }
+  .settings-body {
+    grid-template-columns: 1fr;
+  }
+  .tool-title {
+    font-size: 22px;
+  }
+  .back-link {
+    font-size: 13px;
+  }
+  .upload-zone {
+    padding: 36px 16px;
+  }
+  .btn-primary {
+    min-width: unset;
+    width: 100%;
+  }
+  .actions {
+    flex-direction: column;
+  }
+  .btn-secondary {
+    width: 100%;
+    text-align: center;
+  }
+  .preview-container {
+    max-height: 400px;
+  }
+}
+@media (max-width: 480px) {
+  .header {
+    padding: 0 14px;
+  }
+  .header-right {
+    gap: 10px;
+  }
+  .divider {
+    display: none;
+  }
+  .logo {
+    font-size: 19px;
+  }
+  .page-range-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .custom-range-input {
+    width: 100%;
+  }
+}
+</style>
+</head>
+<body>
+<!-- HEADER -->
+<header class="header">
+  <a href="index.html" class="logo">
+    <span class="logo-passion">Passion</span><span class="logo-tools">Tools</span>
+  </a>
+  <div class="header-right">
+    <a href="index.html" class="back-link">← Back to Tools</a>
+    <div class="divider"></div>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
+  </div>
+</header>
+<!-- MAIN -->
+<main class="main-container">
+  <div class="main-card">
+    <!-- TOOL LOGO -->
+    <div class="tool-logo">
+      <svg width="90" height="90" viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="15" y="8" width="50" height="64" rx="6" fill="#ef4444" opacity="0.12"/>
+        <rect x="20" y="12" width="50" height="64" rx="6" fill="#fff" stroke="#ef4444" stroke-width="2"/>
+        <path d="M30 30h30M30 38h24M30 46h28" stroke="#e2e8f0" stroke-width="2" stroke-linecap="round"/>
+        <rect x="42" y="56" width="34" height="24" rx="6" fill="#ef4444"/>
+        <text x="48" y="72" font-family="system-ui,sans-serif" font-size="12" font-weight="800" fill="#fff">1 2 3</text>
+        <circle cx="35" cy="60" r="3" fill="#ef4444" opacity="0.5"/>
+        <line x1="35" y1="63" x2="35" y2="70" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="2 2" opacity="0.5"/>
+      </svg>
+    </div>
+    <!-- TITLE -->
+    <h1 class="tool-title">Add Page Numbers</h1>
+    <p class="tool-subtitle">Add customizable page numbers to your PDF documents — entirely in your browser.</p>
+    <!-- UPLOAD AREA -->
+    <div class="upload-zone" id="uploadZone">
+      <span class="upload-icon">📄</span>
+      <p class="upload-text">Drop PDF here or Click to Upload</p>
+      <p class="upload-hint">Maximum file size: 20MB</p>
+      <input type="file" accept=".pdf,application/pdf" class="upload-input" id="fileInput">
+    </div>
+    <!-- FILE INFO -->
+    <div class="file-info" id="fileInfo">
+      <div class="file-details">
+        <div class="file-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </div>
+        <div class="file-meta">
+          <div class="file-name" id="fileName">—</div>
+          <div class="file-size" id="fileSize">—</div>
+        </div>
+      </div>
+      <button class="remove-file" id="removeFile" aria-label="Remove file">✕</button>
+    </div>
+    <!-- SETTINGS PANEL -->
+    <div class="settings-panel" id="settingsPanel">
+      <div class="settings-header">⚙️ Page Number Settings</div>
+      <div class="settings-body">
+        <!-- Number Format -->
+        <div class="setting-group">
+          <label class="setting-label">Number Format</label>
+          <select id="numberFormat">
+            <option value="plain">1, 2, 3</option>
+            <option value="page">Page 1</option>
+            <option value="of" selected>1 / Total</option>
+            <option value="page-of">Page 1 of Total</option>
+          </select>
+        </div>
+        <!-- Starting Number -->
+        <div class="setting-group">
+          <label class="setting-label">Starting Number</label>
+          <input type="number" id="startNumber" value="1" min="1" max="9999">
+        </div>
+        <!-- Position -->
+        <div class="setting-group">
+          <label class="setting-label">Position</label>
+          <div class="position-grid" id="positionGrid">
+            <button class="position-btn" data-pos="top-left">Top Left</button>
+            <button class="position-btn" data-pos="top-center">Top Center</button>
+            <button class="position-btn" data-pos="top-right">Top Right</button>
+            <button class="position-btn" data-pos="bottom-left">Btm Left</button>
+            <button class="position-btn active" data-pos="bottom-center">Btm Center</button>
+            <button class="position-btn" data-pos="bottom-right">Btm Right</button>
+          </div>
+        </div>
+        <!-- Font Size -->
+        <div class="setting-group">
+          <label class="setting-label">Font Size</label>
+          <div class="range-row">
+            <input type="range" id="fontSize" min="8" max="36" value="12">
+            <span class="range-value" id="fontSizeVal">12px</span>
+          </div>
+        </div>
+        <!-- Color -->
+        <div class="setting-group">
+          <label class="setting-label">Color</label>
+          <div class="color-input-row">
+            <input type="color" id="fontColor" value="#000000">
+            <span id="colorHex">#000000</span>
+          </div>
+        </div>
+        <!-- Opacity -->
+        <div class="setting-group">
+          <label class="setting-label">Opacity</label>
+          <div class="range-row">
+            <input type="range" id="opacity" min="10" max="100" value="100">
+            <span class="range-value" id="opacityVal">100%</span>
+          </div>
+        </div>
+        <!-- Horizontal Margin -->
+        <div class="setting-group">
+          <label class="setting-label">Horizontal Margin <span class="label-hint">(px)</span></label>
+          <input type="number" id="marginH" value="40" min="0" max="200">
+        </div>
+        <!-- Vertical Margin -->
+        <div class="setting-group">
+          <label class="setting-label">Vertical Margin <span class="label-hint">(px)</span></label>
+          <input type="number" id="marginV" value="30" min="0" max="200">
+        </div>
+        <!-- Page Range -->
+        <div class="setting-group full-width">
+          <label class="setting-label">Page Range</label>
+          <div class="page-range-row">
+            <label><input type="radio" name="pageRange" value="all" checked> All pages</label>
+            <label><input type="radio" name="pageRange" value="custom"> Custom range</label>
+            <input type="text" class="custom-range-input" id="customRange" placeholder="e.g. 2-10, 3, 5-8" disabled>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- PREVIEW -->
+    <div class="preview-section" id="previewSection">
+      <div class="preview-header">👁️ Preview</div>
+      <div class="preview-container" id="previewContainer"></div>
+      <div class="preview-nav">
+        <button id="prevPage">← Prev</button>
+        <span id="pageIndicator">1 / 1</span>
+        <button id="nextPage">Next →</button>
+      </div>
+    </div>
+    <!-- ACTIONS -->
+    <div class="actions" id="actions">
+      <button class="btn-primary" id="applyBtn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Add Page Numbers & Download
+      </button>
+      <button class="btn-secondary" id="resetBtn">Reset</button>
+    </div>
+    <!-- PRIVACY -->
+    <div class="privacy-notice">
+      🔒 This tool processes your PDF entirely in your browser. No files are uploaded or stored.
+    </div>
+  </div>
+</main>
+<!-- FOOTER -->
+<footer class="footer">
+  © 2026 Passion Tools. Secure client-side processing.
+</footer>
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+<script>
+/* ===== THEME SYSTEM ===== */
+(function initTheme() {
+  const saved = localStorage.getItem('pt-theme');
+  const prefer = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  const theme = saved || prefer;
+  document.documentElement.setAttribute('data-theme', theme);
+  updateToggleIcon(theme);
+})();
+function updateToggleIcon(t) {
+  document.getElementById('themeToggle').textContent = t === 'dark' ? '☀️' : '🌙';
+}
+document.getElementById('themeToggle').addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('pt-theme', next);
+  updateToggleIcon(next);
+});
+/* ===== PDF.js SETUP ===== */
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+/* ===== STATE ===== */
+const MAX_FILE_SIZE = 20 * 1024 * 1024;
+let pdfArrayBuffer = null;
+let pdfDoc = null;
+let totalPages = 0;
+let currentPreviewPage = 1;
+/* ===== DOM REFS ===== */
+const uploadZone = document.getElementById('uploadZone');
+const fileInput = document.getElementById('fileInput');
+const fileInfo = document.getElementById('fileInfo');
+const fileName = document.getElementById('fileName');
+const fileSize = document.getElementById('fileSize');
+const removeFile = document.getElementById('removeFile');
+const settingsPanel = document.getElementById('settingsPanel');
+const previewSection = document.getElementById('previewSection');
+const previewContainer = document.getElementById('previewContainer');
+const actions = document.getElementById('actions');
+const applyBtn = document.getElementById('applyBtn');
+const resetBtn = document.getElementById('resetBtn');
+const prevPageBtn = document.getElementById('prevPage');
+const nextPageBtn = document.getElementById('nextPage');
+const pageIndicator = document.getElementById('pageIndicator');
+/* ===== TOAST ===== */
+function showToast(msg, isError = false) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.className = 'toast' + (isError ? ' error' : '');
+  requestAnimationFrame(() => toast.classList.add('show'));
+  setTimeout(() => toast.classList.remove('show'), 3200);
+}
+/* ===== FORMAT FILE SIZE ===== */
+function formatSize(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / 1048576).toFixed(2) + ' MB';
+}
+/* ===== UPLOAD HANDLERS ===== */
+uploadZone.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
+uploadZone.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  uploadZone.classList.add('drag-over');
+});
+uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
+uploadZone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  uploadZone.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file) handleFile(file);
+});
+removeFile.addEventListener('click', resetAll);
+async function handleFile(file) {
+  if (!file) return;
+  if (!file.type && !file.name.toLowerCase().endsWith('.pdf')) {
+    return showToast('Please upload a valid PDF file.', true);
+  }
+  if (file.type && file.type !== 'application/pdf') {
+    return showToast('Please upload a valid PDF file.', true);
+  }
+  if (file.size > MAX_FILE_SIZE) {
+    return showToast('File exceeds 20MB limit.', true);
+  }
+  fileName.textContent = file.name;
+  fileSize.textContent = formatSize(file.size);
+  fileInfo.classList.add('visible');
+  uploadZone.style.display = 'none';
+  try {
+    pdfArrayBuffer = await file.arrayBuffer();
+    pdfDoc = await pdfjsLib.getDocument({ data: pdfArrayBuffer.slice(0) }).promise;
+    totalPages = pdfDoc.numPages;
+    settingsPanel.classList.add('visible');
+    previewSection.classList.add('visible');
+    actions.classList.add('visible');
+    currentPreviewPage = 1;
+    renderPreview(currentPreviewPage);
+  } catch (err) {
+    console.error(err);
+    showToast('Unable to process this PDF. It may be encrypted or corrupted.', true);
+    resetAll();
+  }
+}
+/* ===== SETTINGS CONTROLS ===== */
+// Position grid
+document.getElementById('positionGrid').addEventListener('click', (e) => {
+  if (!e.target.classList.contains('position-btn')) return;
+  document.querySelectorAll('.position-btn').forEach(b => b.classList.remove('active'));
+  e.target.classList.add('active');
+  renderPreview(currentPreviewPage);
+});
+// Font size
+document.getElementById('fontSize').addEventListener('input', (e) => {
+  document.getElementById('fontSizeVal').textContent = e.target.value + 'px';
+  renderPreview(currentPreviewPage);
+});
+// Color
+document.getElementById('fontColor').addEventListener('input', (e) => {
+  document.getElementById('colorHex').textContent = e.target.value;
+  renderPreview(currentPreviewPage);
+});
+// Opacity
+document.getElementById('opacity').addEventListener('input', (e) => {
+  document.getElementById('opacityVal').textContent = e.target.value + '%';
+  renderPreview(currentPreviewPage);
+});
+// Other settings trigger re-render
+['numberFormat', 'startNumber', 'marginH', 'marginV'].forEach(id => {
+  document.getElementById(id).addEventListener('change', () => renderPreview(currentPreviewPage));
+  document.getElementById(id).addEventListener('input', () => renderPreview(currentPreviewPage));
+});
+// Page range
+document.querySelectorAll('input[name="pageRange"]').forEach(r => {
+  r.addEventListener('change', () => {
+    const custom = document.getElementById('customRange');
+    custom.disabled = r.value !== 'custom';
+    if (r.value === 'custom') custom.focus();
+  });
+});
+/* ===== GET SETTINGS ===== */
+function getSettings() {
+  const position = document.querySelector('.position-btn.active').dataset.pos;
+  return {
+    format: document.getElementById('numberFormat').value,
+    startNumber: parseInt(document.getElementById('startNumber').value) || 1,
+    position,
+    fontSize: parseInt(document.getElementById('fontSize').value),
+    color: document.getElementById('fontColor').value,
+    opacity: parseInt(document.getElementById('opacity').value) / 100,
+    marginH: parseInt(document.getElementById('marginH').value) || 40,
+    marginV: parseInt(document.getElementById('marginV').value) || 30,
+    pageRange: document.querySelector('input[name="pageRange"]:checked').value,
+    customRange: document.getElementById('customRange').value
+  };
+}
+/* ===== PARSE PAGE RANGE ===== */
+function parsePageRange(rangeStr, total) {
+  const pages = new Set();
+  const parts = rangeStr.split(',');
+  for (let part of parts) {
+    part = part.trim().replace(/\u2013|\u2014/g, '-');
+    if (part.includes('-')) {
+      const [a, b] = part.split('-').map(s => parseInt(s.trim()));
+      if (isNaN(a) || isNaN(b)) continue;
+      for (let i = Math.max(1, a); i <= Math.min(total, b); i++) pages.add(i);
+    } else {
+      const n = parseInt(part);
+      if (!isNaN(n) && n >= 1 && n <= total) pages.add(n);
+    }
+  }
+  return pages;
+}
+/* ===== FORMAT PAGE NUMBER TEXT ===== */
+function formatPageNumber(pageNum, total, format) {
+  switch (format) {
+    case 'plain': return String(pageNum);
+    case 'page': return 'Page ' + pageNum;
+    case 'of': return pageNum + ' / ' + total;
+    case 'page-of': return 'Page ' + pageNum + ' of ' + total;
+    default: return String(pageNum);
+  }
+}
+/* ===== SHOULD NUMBER PAGE ===== */
+function shouldNumberPage(pageIndex, settings) {
+  const pageNum = pageIndex + 1;
+  if (settings.pageRange === 'all') return true;
+  if (!settings.customRange.trim()) return false;
+  const pages = parsePageRange(settings.customRange, totalPages);
+  return pages.has(pageNum);
+}
+/* ===== RENDER PREVIEW ===== */
+async function renderPreview(pageNum) {
+  if (!pdfDoc) return;
+  previewContainer.innerHTML = '';
+  const settings = getSettings();
+  try {
+    const page = await pdfDoc.getPage(pageNum);
+    const viewport = page.getViewport({ scale: 1 });
+    const maxWidth = Math.min(previewContainer.clientWidth - 40, 600);
+    const scale = maxWidth / viewport.width;
+    const scaledViewport = page.getViewport({ scale });
+    const wrap = document.createElement('div');
+    wrap.className = 'preview-page-wrap';
+    wrap.style.width = scaledViewport.width + 'px';
+    wrap.style.height = scaledViewport.height + 'px';
+    const canvas = document.createElement('canvas');
+    canvas.width = scaledViewport.width;
+    canvas.height = scaledViewport.height;
+    const ctx = canvas.getContext('2d');
+    await page.render({ canvasContext: ctx, viewport: scaledViewport }).promise;
+    wrap.appendChild(canvas);
+    // Overlay page number
+    const pageIndex = pageNum - 1;
+    if (shouldNumberPage(pageIndex, settings)) {
+      const displayNum = settings.startNumber + countNumberedPagesBefore(pageIndex, settings);
+      const text = formatPageNumber(displayNum, calcTotal(settings), settings.format);
+      const overlay = document.createElement('div');
+      overlay.className = 'page-number-overlay';
+      overlay.textContent = text;
+      overlay.style.fontSize = (settings.fontSize * scale) + 'px';
+      overlay.style.color = settings.color;
+      overlay.style.opacity = settings.opacity;
+      overlay.style.fontWeight = '600';
+      const mH = settings.marginH * scale;
+      const mV = settings.marginV * scale;
+      const pos = settings.position;
+      if (pos.includes('top')) overlay.style.top = mV + 'px';
+      if (pos.includes('bottom')) overlay.style.bottom = mV + 'px';
+      if (pos.includes('left')) overlay.style.left = mH + 'px';
+      if (pos.includes('right')) overlay.style.right = mH + 'px';
+      if (pos.includes('center')) {
+        overlay.style.left = '50%';
+        overlay.style.transform = 'translateX(-50%)';
+      }
+      wrap.appendChild(overlay);
+    }
+    previewContainer.appendChild(wrap);
+    pageIndicator.textContent = pageNum + ' / ' + totalPages;
+    prevPageBtn.disabled = pageNum <= 1;
+    nextPageBtn.disabled = pageNum >= totalPages;
+  } catch (err) {
+    console.error(err);
+  }
+}
+function countNumberedPagesBefore(pageIndex, settings) {
+  let count = 0;
+  for (let i = 0; i < pageIndex; i++) {
+    if (shouldNumberPage(i, settings)) count++;
+  }
+  return count;
+}
+function calcTotal(settings) {
+  if (settings.pageRange === 'all') return totalPages;
+  if (!settings.customRange.trim()) return totalPages;
+  return parsePageRange(settings.customRange, totalPages).size;
+}
+/* ===== PREVIEW NAVIGATION ===== */
+prevPageBtn.addEventListener('click', () => {
+  if (currentPreviewPage > 1) {
+    currentPreviewPage--;
+    renderPreview(currentPreviewPage);
+  }
+});
+nextPageBtn.addEventListener('click', () => {
+  if (currentPreviewPage < totalPages) {
+    currentPreviewPage++;
+    renderPreview(currentPreviewPage);
+  }
+});
+/* ===== APPLY & DOWNLOAD ===== */
+applyBtn.addEventListener('click', async () => {
+  if (!pdfArrayBuffer) return;
+  const settings = getSettings();
+  if (settings.pageRange === 'custom' && !settings.customRange.trim()) {
+    return showToast('Please enter a valid page range.', true);
+  }
+  applyBtn.disabled = true;
+  const origHTML = applyBtn.innerHTML;
+  applyBtn.innerHTML = '<div class="spinner"></div> Processing...';
+  try {
+    const pdfLibDoc = await PDFLib.PDFDocument.load(pdfArrayBuffer, { ignoreEncryption: true });
+    const pages = pdfLibDoc.getPages();
+    const font = await pdfLibDoc.embedFont(PDFLib.StandardFonts.Helvetica);
+    const hexToRgb = (hex) => {
+      const r = parseInt(hex.slice(1, 3), 16) / 255;
+      const g = parseInt(hex.slice(3, 5), 16) / 255;
+      const b = parseInt(hex.slice(5, 7), 16) / 255;
+      return PDFLib.rgb(r, g, b);
+    };
+    const color = hexToRgb(settings.color);
+    let numberedCount = 0;
+    const totalNumbered = calcTotalForPdfLib(settings, pages.length);
+    for (let i = 0; i < pages.length; i++) {
+      if (!shouldNumberPageForPdfLib(i, settings, pages.length)) continue;
+      numberedCount++;
+      const displayNum = settings.startNumber + numberedCount - 1;
+      const text = formatPageNumberForPdfLib(displayNum, totalNumbered + settings.startNumber - 1, settings.format);
+      const pg = pages[i];
+      const { width, height } = pg.getSize();
+      const textWidth = font.widthOfTextAtSize(text, settings.fontSize);
+      let x, y;
+      const pos = settings.position;
+      if (pos.includes('left')) x = settings.marginH;
+      else if (pos.includes('right')) x = width - textWidth - settings.marginH;
+      else x = (width - textWidth) / 2;
+      if (pos.includes('top')) y = height - settings.marginV - settings.fontSize;
+      else y = settings.marginV;
+      pg.drawText(text, {
+        x,
+        y,
+        size: settings.fontSize,
+        font,
+        color,
+        opacity: settings.opacity,
+      });
+    }
+    const pdfBytes = await pdfLibDoc.save();
+    const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'numbered-document.pdf';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('✅ Page numbers added successfully!');
+  } catch (err) {
+    console.error(err);
+    showToast('Unable to add page numbers. Please try another file.', true);
+  } finally {
+    applyBtn.disabled = false;
+    applyBtn.innerHTML = origHTML;
+  }
+});
+function shouldNumberPageForPdfLib(pageIndex, settings, total) {
+  const pageNum = pageIndex + 1;
+  if (settings.pageRange === 'all') return true;
+  if (!settings.customRange.trim()) return false;
+  const pages = parsePageRange(settings.customRange, total);
+  return pages.has(pageNum);
+}
+function calcTotalForPdfLib(settings, totalPgs) {
+  if (settings.pageRange === 'all') return totalPgs;
+  if (!settings.customRange.trim()) return totalPgs;
+  return parsePageRange(settings.customRange, totalPgs).size;
+}
+function formatPageNumberForPdfLib(pageNum, total, format) {
+  switch (format) {
+    case 'plain': return String(pageNum);
+    case 'page': return 'Page ' + pageNum;
+    case 'of': return pageNum + ' / ' + total;
+    case 'page-of': return 'Page ' + pageNum + ' of ' + total;
+    default: return String(pageNum);
+  }
+}
+/* ===== RESET ===== */
+resetBtn.addEventListener('click', resetAll);
+function resetAll() {
+  pdfArrayBuffer = null;
+  pdfDoc = null;
+  totalPages = 0;
+  currentPreviewPage = 1;
+  fileInput.value = '';
+  uploadZone.style.display = '';
+  fileInfo.classList.remove('visible');
+  settingsPanel.classList.remove('visible');
+  previewSection.classList.remove('visible');
+  actions.classList.remove('visible');
+  previewContainer.innerHTML = '';
+  // Reset settings to defaults
+  document.getElementById('numberFormat').value = 'of';
+  document.getElementById('startNumber').value = 1;
+  document.getElementById('fontSize').value = 12;
+  document.getElementById('fontSizeVal').textContent = '12px';
+  document.getElementById('fontColor').value = '#000000';
+  document.getElementById('colorHex').textContent = '#000000';
+  document.getElementById('opacity').value = 100;
+  document.getElementById('opacityVal').textContent = '100%';
+  document.getElementById('marginH').value = 40;
+  document.getElementById('marginV').value = 30;
+  document.getElementById('customRange').value = '';
+  document.getElementById('customRange').disabled = true;
+  document.querySelector('input[name="pageRange"][value="all"]').checked = true;
+  document.querySelectorAll('.position-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector('.position-btn[data-pos="bottom-center"]').classList.add('active');
+}
+</script>
+</body>
+</html>
