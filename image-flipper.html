@@ -17,17 +17,41 @@
             --blue-dark: #2563eb;
             --green: #22c55e;
             
-            /* UI Colors */
+            /* Light Mode UI Colors */
             --bg-color: #f9fafb;
             --card-bg: #ffffff;
             --text-primary: #1f2937;
             --text-secondary: #6b7280;
             --border-color: #e5e7eb;
             --hover-gray: #f3f4f6;
+            --header-bg: rgba(255, 255, 255, 0.95);
+            --footer-bg: #111827;
+            --upload-bg: #fafafa;
+            --preview-bg: #f3f4f6;
+            --logo-passion: #1f2937;
             
             --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
             --radius: 16px;
             --transition: all 0.3s ease;
+        }
+
+        /* Dark Mode Override */
+        [data-theme="dark"] {
+            --bg-color: #020617;
+            --card-bg: #111827;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border-color: #1e293b;
+            --hover-gray: #1e293b;
+            --header-bg: rgba(15, 23, 42, 0.95);
+            --footer-bg: #020617;
+            --upload-bg: #0f172a;
+            --preview-bg: #1e293b;
+            --logo-passion: #f8fafc;
+            
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -40,17 +64,19 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            transition: var(--transition);
         }
 
         /* --- Header --- */
         header {
-            background-color: rgba(255, 255, 255, 0.95);
+            background-color: var(--header-bg);
             backdrop-filter: blur(10px);
             border-bottom: 1px solid var(--border-color);
             padding: 16px 0;
             position: sticky;
             top: 0;
             z-index: 100;
+            transition: var(--transition);
         }
 
         .container {
@@ -67,58 +93,81 @@
         }
 
         .logo { text-decoration: none; display: flex; align-items: center; gap: 10px; }
-        .logo-text { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
-        .logo-passion { color: #1f2937; }
+        .logo-text { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; display: block; }
+        .logo-passion { color: var(--logo-passion); transition: color var(--transition); }
         .logo-tools {
             background: linear-gradient(to right, var(--red), var(--purple));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
         
-        .back-link {
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .nav-link {
             text-decoration: none;
             color: var(--text-secondary);
             font-weight: 500;
+            transition: var(--transition);
             display: flex;
             align-items: center;
             gap: 8px;
-            transition: var(--transition);
-            font-size: 15px;
         }
-        .back-link:hover { color: var(--red); }
+        .nav-link:hover { color: var(--red); }
 
-        /* --- Tool Layout --- */
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: var(--transition);
+        }
+        .theme-toggle:hover { background: var(--hover-gray); }
+
+        /* --- Main Content --- */
         .tool-container {
-            max-width: 900px;
-            margin: 60px auto;
+            max-width: 800px;
+            width: 100%;
+            margin: 40px auto;
             padding: 0 20px;
             flex: 1;
         }
 
-        .tool-header { text-align: center; margin-bottom: 40px; }
-        .tool-title { font-size: 36px; font-weight: 800; margin-bottom: 12px; }
-        .tool-subtitle { color: var(--text-secondary); font-size: 18px; }
+        .tool-header { text-align: center; margin-bottom: 30px; }
+        .tool-title { font-size: 32px; font-weight: 800; margin-bottom: 12px; }
+        .tool-subtitle { color: var(--text-secondary); font-size: 16px; transition: color var(--transition); }
 
         .tool-card {
             background: var(--card-bg);
             border-radius: 24px;
-            box-shadow: var(--shadow-md);
+            box-shadow: var(--shadow-lg);
             padding: 40px;
             border: 1px solid var(--border-color);
+            transition: var(--transition);
         }
 
         /* --- Upload Area --- */
         .upload-area {
             border: 2px dashed var(--border-color);
             border-radius: 16px;
-            padding: 80px 20px;
+            padding: 60px 20px;
             text-align: center;
             cursor: pointer;
             transition: var(--transition);
-            background-color: #fafafa;
+            background-color: var(--upload-bg);
         }
 
-        .upload-area:hover { border-color: var(--blue); background-color: rgba(59, 130, 246, 0.05); }
+        .upload-area:hover, .upload-area.dragover { border-color: var(--blue); background-color: rgba(59, 130, 246, 0.05); }
         .upload-icon { font-size: 48px; color: var(--blue); margin-bottom: 16px; }
         .upload-text { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
         .upload-subtext { color: var(--text-secondary); font-size: 14px; }
@@ -128,39 +177,47 @@
         .workspace { display: none; animation: fadeIn 0.5s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Preview Stage */
+        /* Canvas Stage */
         .stage-container {
-            background: #f3f4f6;
+            background: var(--preview-bg);
             border-radius: 12px;
             padding: 20px;
-            min-height: 400px;
+            height: 400px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin-bottom: 30px;
             overflow: hidden;
             border: 1px solid var(--border-color);
-            position: relative;
+            transition: var(--transition);
         }
 
-        /* Visual Image (CSS Transformed) */
+        /* The visual image (CSS Scaled for smoothness) */
         .preview-img {
-            max-width: 100%;
-            max-height: 500px;
+            max-width: 80%;
+            max-height: 80%;
+            object-fit: contain;
             transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            box-shadow: var(--shadow-md);
+            border-radius: 4px;
         }
 
         /* Controls */
         .controls-wrapper {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+            display: flex;
+            flex-direction: column;
             gap: 24px;
-            margin-bottom: 24px;
         }
 
-        .btn-control {
-            background: white;
+        /* Quick Actions Grid */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .btn-quick {
+            background: var(--card-bg);
             border: 1px solid var(--border-color);
             padding: 16px;
             border-radius: 12px;
@@ -170,26 +227,19 @@
             cursor: pointer;
             transition: var(--transition);
             display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 8px;
+            justify-content: center;
+            gap: 10px;
+        }
+        .btn-quick:hover, .btn-quick:active { 
+            border-color: var(--blue); 
+            color: var(--blue); 
+            background-color: rgba(59, 130, 246, 0.05); 
+            transform: translateY(-2px); 
         }
 
-        .btn-control i { font-size: 24px; color: var(--text-secondary); transition: var(--transition); }
-        
-        .btn-control:hover { border-color: var(--blue); background-color: rgba(59, 130, 246, 0.05); }
-        .btn-control:hover i { color: var(--blue); }
-        
-        /* Active State for Buttons */
-        .btn-control.active {
-            background-color: rgba(59, 130, 246, 0.1);
-            border-color: var(--blue);
-            color: var(--blue);
-        }
-        .btn-control.active i { color: var(--blue); }
-
-        /* Action Buttons */
-        .action-buttons {
+        /* Main Actions */
+        .main-actions {
             display: flex;
             gap: 16px;
             margin-top: 10px;
@@ -211,32 +261,58 @@
             text-decoration: none;
         }
 
-        .btn-download {
-            background-color: var(--green);
-            color: white;
-            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
-        }
+        .btn-apply { background-color: var(--blue); color: white; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
+        .btn-apply:hover { background-color: var(--blue-dark); transform: translateY(-2px); }
+
+        .btn-download { background-color: var(--green); color: white; box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3); display: none; }
         .btn-download:hover { background-color: #16a34a; transform: translateY(-2px); }
 
         .btn-reset {
-            background: white;
+            width: 100%;
+            background: none;
             border: 1px solid var(--border-color);
-            color: var(--red);
+            color: var(--text-primary);
+            padding: 14px;
+            border-radius: 12px;
+            margin-top: 16px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
-        .btn-reset:hover { background: #fee2e2; border-color: #fecaca; }
+        .btn-reset:hover { background-color: var(--hover-gray); border-color: var(--text-secondary); }
+
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
 
         /* Footer */
         footer {
-            background-color: #111827;
-            color: white;
+            background-color: var(--footer-bg);
+            color: #94a3b8;
             padding: 40px 0;
             margin-top: auto;
             text-align: center;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            transition: var(--transition);
         }
 
         @media (max-width: 600px) {
-            .controls-wrapper { grid-template-columns: 1fr; }
-            .action-buttons { flex-direction: column; }
+            .tool-card { padding: 24px 20px; }
+            .tool-title { font-size: 26px; }
+            .upload-area { padding: 40px 16px; }
+            .quick-actions { grid-template-columns: 1fr; }
+            .main-actions { flex-direction: column; }
+            .nav-link span { display: none; }
         }
     </style>
 </head>
@@ -246,13 +322,16 @@
         <div class="container">
             <div class="header-content">
                 <a href="index.html" class="logo">
-                    <div class="logo-text">
+                    <span class="logo-text">
                         <span class="logo-passion">Passion</span><span class="logo-tools">Tools</span>
-                    </div>
+                    </span>
                 </a>
-                <a href="index.html" class="back-link">
-                    <i class="fas fa-arrow-left"></i> Back to Tools
-                </a>
+                <div class="header-actions">
+                    <a href="index.html" class="nav-link" title="Back to Tools">
+                        <i class="fas fa-arrow-left"></i> <span>Back to Tools</span>
+                    </a>
+                    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle theme">🌙</button>
+                </div>
             </div>
         </div>
     </header>
@@ -260,42 +339,48 @@
     <main class="tool-container">
         <div class="tool-header">
             <h1 class="tool-title">Image Flipper</h1>
-            <p class="tool-subtitle">Mirror your images horizontally or vertically instantly.</p>
+            <p class="tool-subtitle">Flip your images horizontally or vertically in seconds. Free and secure.</p>
         </div>
 
         <div class="tool-card">
             
             <div class="upload-area" id="dropZone">
-                <i class="fas fa-right-left upload-icon"></i> <div class="upload-text">Click or Drag & Drop Image</div>
-                <div class="upload-subtext">Supports JPG, PNG, WEBP</div>
-                <input type="file" id="fileInput" accept="image/*">
+                <i class="fas fa-arrows-alt-h upload-icon"></i>
+                <div class="upload-text">Click or Drag & Drop to Upload</div>
+                <div class="upload-subtext">Supports JPG, PNG, WEBP (Max 20MB)</div>
+                <input type="file" id="fileInput" accept="image/png, image/jpeg, image/webp">
             </div>
 
             <div class="workspace" id="workspace">
                 
                 <div class="stage-container">
-                    <img src="" id="previewImg" class="preview-img">
+                    <img src="" id="previewImg" class="preview-img" alt="Preview">
                 </div>
 
                 <div class="controls-wrapper">
-                    <button class="btn-control" id="btnFlipH" onclick="toggleFlip('h')">
-                        <i class="fas fa-arrows-left-right"></i>
-                        Flip Horizontally
-                    </button>
-                    <button class="btn-control" id="btnFlipV" onclick="toggleFlip('v')">
-                        <i class="fas fa-arrows-up-down"></i>
-                        Flip Vertically
-                    </button>
+                    
+                    <div class="quick-actions">
+                        <button class="btn-quick" id="btnFlipH">
+                            <i class="fas fa-arrows-alt-h"></i> Flip Horizontal
+                        </button>
+                        <button class="btn-quick" id="btnFlipV">
+                            <i class="fas fa-arrows-alt-v"></i> Flip Vertical
+                        </button>
+                    </div>
+
+                    <div class="main-actions">
+                        <button class="btn-main btn-apply" id="btnProcess">
+                            <i class="fas fa-cog"></i> Apply Flip
+                        </button>
+                        <a href="#" class="btn-main btn-download" id="btnDownload" download="flipped-image.jpg">
+                            <i class="fas fa-download"></i> Download Image
+                        </a>
+                    </div>
                 </div>
 
-                <div class="action-buttons">
-                    <button class="btn-main btn-reset" id="btnReset">
-                        <i class="fas fa-undo"></i> Reset / Remove
-                    </button>
-                    <a href="#" class="btn-main btn-download" id="btnDownload">
-                        <i class="fas fa-download"></i> Download Image
-                    </a>
-                </div>
+                <button class="btn-reset" id="btnReset">
+                    <i class="fas fa-trash-alt"></i> Start Over
+                </button>
             </div>
 
         </div>
@@ -308,121 +393,157 @@
     </footer>
 
     <script>
-        // DOM Elements
+        // --- 1. THEME TOGGLE LOGIC ---
+        (function initTheme() {
+            const saved = localStorage.getItem('pt-theme');
+            if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+            updateToggleIcon();
+        })();
+
+        function updateToggleIcon() {
+            const btn = document.getElementById('themeToggle');
+            if (btn) btn.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
+        }
+
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+            localStorage.setItem('pt-theme', isDark ? 'light' : 'dark');
+            updateToggleIcon();
+        });
+
+        // --- 2. IMAGE FLIPPER LOGIC ---
         const dropZone = document.getElementById('dropZone');
         const fileInput = document.getElementById('fileInput');
         const workspace = document.getElementById('workspace');
         const previewImg = document.getElementById('previewImg');
-        const btnDownload = document.getElementById('btnDownload');
-        const btnReset = document.getElementById('btnReset');
+        
         const btnFlipH = document.getElementById('btnFlipH');
         const btnFlipV = document.getElementById('btnFlipV');
+        
+        const btnProcess = document.getElementById('btnProcess');
+        const btnDownload = document.getElementById('btnDownload');
+        const btnReset = document.getElementById('btnReset');
 
-        // State
         let originalFile = null;
-        let scaleX = 1; // 1 = Normal, -1 = Flipped
-        let scaleY = 1; // 1 = Normal, -1 = Flipped
+        let scaleX = 1;
+        let scaleY = 1;
 
-        // 1. Upload Logic
+        // Upload Logic
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(e => {
+            dropZone.addEventListener(e, ev => { ev.preventDefault(); ev.stopPropagation(); });
+        });
+        
         dropZone.addEventListener('click', () => fileInput.click());
         fileInput.addEventListener('change', (e) => loadFile(e.target.files[0]));
-        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.style.borderColor = 'var(--blue)'; });
-        dropZone.addEventListener('dragleave', () => dropZone.style.borderColor = 'var(--border-color)');
-        dropZone.addEventListener('drop', (e) => { e.preventDefault(); loadFile(e.dataTransfer.files[0]); });
+        dropZone.addEventListener('dragover', () => dropZone.classList.add('dragover'));
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+        dropZone.addEventListener('drop', (e) => { 
+            dropZone.classList.remove('dragover'); 
+            loadFile(e.dataTransfer.files[0]); 
+        });
 
         function loadFile(file) {
-            if (!file || !file.type.match('image.*')) return;
+            if (!file || !file.type.match('image.*')) {
+                alert("Please upload a valid image file.");
+                return;
+            }
             originalFile = file;
             const reader = new FileReader();
             reader.onload = (e) => {
                 previewImg.src = e.target.result;
                 dropZone.style.display = 'none';
                 workspace.style.display = 'block';
-                // Reset State
-                scaleX = 1; 
-                scaleY = 1;
-                updateUI();
+                resetFlipState();
             };
             reader.readAsDataURL(file);
         }
 
-        // 2. Flip Logic
-        function toggleFlip(direction) {
-            if (direction === 'h') {
-                scaleX = scaleX * -1;
-            } else {
-                scaleY = scaleY * -1;
-            }
-            updateUI();
-        }
-
+        // Flipping Logic (Visual)
         function updateUI() {
-            // Visual update via CSS
+            // Visual flip using CSS transforms
             previewImg.style.transform = `scale(${scaleX}, ${scaleY})`;
-
-            // Toggle button active states
-            scaleX === -1 ? btnFlipH.classList.add('active') : btnFlipH.classList.remove('active');
-            scaleY === -1 ? btnFlipV.classList.add('active') : btnFlipV.classList.remove('active');
+            
+            // Reset download state if changed so user is forced to apply again
+            btnProcess.style.display = 'flex';
+            btnDownload.style.display = 'none';
         }
 
-        // 3. Process & Download (Canvas API)
-        btnDownload.addEventListener('click', (e) => {
-            e.preventDefault(); // Prevent default link behavior to handle logic first
-            
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            const img = new Image();
-            
-            img.onload = () => {
-                canvas.width = img.width;
-                canvas.height = img.height;
-
-                // Handle transparency for JPEGs
-                if(originalFile.type === 'image/jpeg') {
-                    ctx.fillStyle = '#FFFFFF';
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-                }
-
-                // Coordinate Transformation Logic
-                // To flip, we translate to the far edge and scale negatively
-                
-                // Horizontal Flip
-                if (scaleX === -1) {
-                    ctx.translate(canvas.width, 0);
-                    ctx.scale(-1, 1);
-                }
-
-                // Vertical Flip
-                if (scaleY === -1) {
-                    ctx.translate(0, canvas.height);
-                    ctx.scale(1, -1);
-                }
-
-                // Draw image
-                ctx.drawImage(img, 0, 0);
-
-                // Create blob/url
-                const format = originalFile.type === 'image/png' ? 'image/png' : 'image/jpeg';
-                const url = canvas.toDataURL(format, 0.95);
-                
-                // Trigger download
-                const link = document.createElement('a');
-                link.download = `flipped-image.${format === 'image/png' ? 'png' : 'jpg'}`;
-                link.href = url;
-                link.click();
-            };
-
-            img.src = previewImg.src;
+        btnFlipH.addEventListener('click', () => {
+            scaleX = scaleX === 1 ? -1 : 1;
+            updateUI();
         });
 
-        // 4. Reset
-        btnReset.addEventListener('click', () => {
-            fileInput.value = '';
-            dropZone.style.display = 'block';
-            workspace.style.display = 'none';
+        btnFlipV.addEventListener('click', () => {
+            scaleY = scaleY === 1 ? -1 : 1;
+            updateUI();
+        });
+
+        function resetFlipState() {
             scaleX = 1;
             scaleY = 1;
             updateUI();
+        }
+
+        // Process & Download (Canvas API)
+        btnProcess.addEventListener('click', () => {
+            btnProcess.innerHTML = '<div class="spinner"></div> Processing...';
+            btnProcess.disabled = true;
+            
+            setTimeout(() => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const img = new Image();
+                
+                img.onload = () => {
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+
+                    // Fill white background for JPEGs (prevents transparent black background)
+                    if(originalFile.type === 'image/jpeg') {
+                        ctx.fillStyle = '#FFFFFF';
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    }
+
+                    // Move to center, apply scale (flip), draw offset by half image width/height
+                    ctx.translate(canvas.width / 2, canvas.height / 2);
+                    ctx.scale(scaleX, scaleY);
+                    ctx.drawImage(img, -img.width / 2, -img.height / 2);
+
+                    // Export
+                    let mimeType = originalFile.type === 'image/png' ? 'image/png' : 'image/jpeg';
+                    const dataUrl = canvas.toDataURL(mimeType, 0.95);
+
+                    btnDownload.href = dataUrl;
+                    
+                    // Naming logic
+                    const ext = mimeType === 'image/png' ? 'png' : 'jpg';
+                    const baseName = originalFile.name.split('.')[0];
+                    btnDownload.download = `${baseName}-flipped.${ext}`;
+
+                    // Switch buttons
+                    btnProcess.style.display = 'none';
+                    btnDownload.style.display = 'flex';
+                    
+                    btnProcess.innerHTML = '<i class="fas fa-cog"></i> Apply Flip'; 
+                    btnProcess.disabled = false;
+                };
+
+                img.src = previewImg.src;
+            }, 300); // UI Delay
+        });
+
+        // Reset App State
+        btnReset.addEventListener('click', () => {
+            fileInput.value = '';
+            originalFile = null;
+            dropZone.style.display = 'block';
+            workspace.style.display = 'none';
+            btnDownload.style.display = 'none';
+            btnProcess.style.display = 'flex';
+            resetFlipState();
         });
 
     </script>
