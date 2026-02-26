@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JPG to PDF - PassionTools</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <style>
+        :root {
+            --red: #ef4444;
+            --purple: #a855f7;
+            --blue: #3b82f6;
+            --blue-dark: #2563eb;
+            --green: #22c55e;
+            --bg-color: #f9fafb;
+            --card-bg: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --hover-gray: #f3f4f6;
+            --header-bg: rgba(255, 255, 255, 0.72);
+            --footer-bg: #111827;
+            --logo-passion: #000000;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #020617;
+            --card-bg: #111827;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border-color: #1e293b;
+            --hover-gray: #1e293b;
+            --header-bg: rgba(2, 6, 23, 0.72);
+            --footer-bg: #020617;
+            --logo-passion: #f8fafc;
+        }
+
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── Header ── */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--header-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 1.35rem;
+            font-weight: 800;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            letter-spacing: -0.5px;
+            user-select: none;
+        }
+
+        .logo-passion {
+            color: var(--logo-passion);
+            transition: color 0.3s ease;
+        }
+
+        .logo:hover .logo-passion {
+            color: var(--red);
+        }
+
+        .logo-tools {
+            background: linear-gradient(135deg, var(--red), var(--purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-link {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-weight: 500;
+            padding: 8px 4px;
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: var(--red);
+        }
+
+        .theme-toggle {
+            width: 40px;
+            height: 40px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            background: var(--card-bg);
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--blue);
+            background: var(--hover-gray);
+        }
+
+        /* ── Main ── */
+        .main {
+            flex: 1;
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 48px 24px 60px;
+        }
+
+        .tool-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .tool-header h1 {
+            font-size: 2.25rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        .tool-header p {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            font-weight: 400;
+            max-width: 560px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* ── Upload Area ── */
+        .upload-area {
+            border: 2.5px dashed var(--border-color);
+            border-radius: 16px;
+            padding: 56px 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: var(--card-bg);
+            position: relative;
+        }
+
+        .upload-area:hover,
+        .upload-area.drag-over {
+            border-color: var(--blue);
+            background: rgba(59, 130, 246, 0.04);
+        }
+
+        .upload-area.drag-over {
+            transform: scale(1.01);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: var(--blue);
+            margin-bottom: 16px;
+        }
+
+        .upload-area h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: var(--text-primary);
+        }
+
+        .upload-area p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .upload-area .browse-btn {
+            display: inline-block;
+            margin-top: 18px;
+            padding: 10px 28px;
+            background: var(--blue);
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .upload-area:hover .browse-btn {
+            background: var(--blue-dark);
+        }
+
+        .upload-area input[type="file"] {
+            display: none;
+        }
+
+        /* ── Workspace ── */
+        .workspace {
+            display: none;
+            margin-top: 36px;
+        }
+
+        .workspace.active {
+            display: block;
+            animation: fadeUp 0.4s ease;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Options Panel */
+        .options-panel {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: center;
+            padding: 18px 22px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            margin-bottom: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .option-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .option-group label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .option-group select {
+            padding: 8px 32px 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+        }
+
+        .option-group select:hover {
+            border-color: var(--blue);
+        }
+
+        .option-group select:focus {
+            outline: none;
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+        }
+
+        .images-count {
+            margin-left: auto;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .images-count .count-badge {
+            background: var(--blue);
+            color: #fff;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        /* Image Grid */
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .image-item {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            cursor: grab;
+            transition: all 0.3s ease;
+            aspect-ratio: 3 / 4;
+        }
+
+        .image-item:hover {
+            border-color: var(--blue);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transform: translateY(-2px);
+        }
+
+        .image-item:active {
+            cursor: grabbing;
+        }
+
+        .image-item.sortable-ghost {
+            opacity: 0.35;
+            transform: scale(0.96);
+        }
+
+        .image-item.sortable-chosen {
+            box-shadow: 0 8px 32px rgba(59, 130, 246, 0.2);
+            border-color: var(--blue);
+        }
+
+        .image-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .image-item .page-number {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(6px);
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 6px;
+        }
+
+        .image-item .remove-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 30px;
+            height: 30px;
+            background: rgba(239, 68, 68, 0.85);
+            backdrop-filter: blur(6px);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 0.75rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.25s ease;
+        }
+
+        .image-item:hover .remove-btn {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .image-item .remove-btn:hover {
+            background: var(--red);
+            transform: scale(1.1);
+        }
+
+        .image-item .file-name {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px 10px 8px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.65));
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Action Buttons */
+        .action-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 28px;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+        }
+
+        .btn-primary {
+            background: var(--blue);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: var(--blue-dark);
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.35);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1.5px solid var(--border-color);
+        }
+
+        .btn-ghost:hover {
+            border-color: var(--blue);
+            color: var(--blue);
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .btn-success {
+            background: var(--green);
+            color: #fff;
+        }
+
+        .btn-success:hover {
+            background: #16a34a;
+            box-shadow: 0 4px 16px rgba(34, 197, 94, 0.35);
+        }
+
+        .btn-danger {
+            background: transparent;
+            color: var(--red);
+            border: 1.5px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-danger:hover {
+            background: rgba(239, 68, 68, 0.08);
+            border-color: var(--red);
+        }
+
+        .btn .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2.5px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            display: none;
+        }
+
+        .btn.loading .spinner {
+            display: block;
+        }
+
+        .btn.loading .btn-text {
+            display: none;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .download-area {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+            animation: fadeUp 0.4s ease;
+        }
+
+        .download-area.active {
+            display: block;
+        }
+
+        .success-msg {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 14px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--green);
+        }
+
+        /* ── Footer ── */
+        .footer {
+            background: var(--footer-bg);
+            text-align: center;
+            padding: 30px 20px;
+            font-size: 14px;
+            color: #94a3b8;
+            transition: background-color 0.3s ease;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .image-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+
+            .tool-header h1 {
+                font-size: 1.75rem;
+            }
+
+            .tool-header p {
+                font-size: 0.95rem;
+            }
+
+            .main {
+                padding: 32px 16px 48px;
+            }
+
+            .options-panel {
+                gap: 12px;
+                padding: 14px 16px;
+            }
+
+            .images-count {
+                margin-left: 0;
+                width: 100%;
+                justify-content: flex-start;
+            }
+
+            .action-bar {
+                flex-direction: column;
+            }
+
+            .action-bar .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .image-item .remove-btn {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-inner {
+                padding: 0 16px;
+            }
+
+            .back-link span {
+                display: none;
+            }
+
+            .upload-area {
+                padding: 40px 16px;
+            }
+        }
+
+        /* ── Drag hint ── */
+        .drag-hint {
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-inner">
+            <a href="#" class="logo">
+                <span class="logo-passion">Passion</span><span class="logo-tools">Tools</span>
+            </a>
+            <div class="header-actions">
+                <a href="index.html" class="back-link">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Back to Tools</span>
+                </a>
+                <button class="theme-toggle" id="themeToggle" title="Toggle theme">
+                    <span id="themeIcon">☀️</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="tool-header">
+            <h1><i class="fas fa-file-pdf"></i> JPG to PDF</h1>
+            <p>Convert and combine multiple images into a single PDF document. 100% private and secure in your browser.</p>
+        </div>
+
+        <!-- Upload Area -->
+        <div class="upload-area" id="uploadArea">
+            <div class="upload-icon">
+                <i class="fas fa-cloud-arrow-up"></i>
+            </div>
+            <h3>Drag & drop your images here</h3>
+            <p>Supports JPG, PNG, WEBP — multiple files allowed</p>
+            <div class="browse-btn">Browse Files</div>
+            <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" multiple>
+        </div>
+
+        <!-- Workspace -->
+        <div class="workspace" id="workspace">
+            <!-- Options -->
+            <div class="options-panel">
+                <div class="option-group">
+                    <label>Page Size</label>
+                    <select id="pageSize">
+                        <option value="a4">A4</option>
+                        <option value="letter">Letter</option>
+                        <option value="fit">Fit to Image</option>
+                    </select>
+                </div>
+                <div class="option-group">
+                    <label>Margin</label>
+                    <select id="marginSize">
+                        <option value="none">None</option>
+                        <option value="small">Small</option>
+                        <option value="big">Big</option>
+                    </select>
+                </div>
+                <div class="images-count">
+                    <span>Images:</span>
+                    <span class="count-badge" id="imageCount">0</span>
+                </div>
+            </div>
+
+            <div class="drag-hint">
+                <i class="fas fa-grip-vertical"></i> Drag & drop thumbnails to reorder pages
+            </div>
+
+            <!-- Image Grid -->
+            <div class="image-grid" id="imageGrid"></div>
+
+            <!-- Actions -->
+            <div class="action-bar">
+                <button class="btn btn-ghost" id="addMoreBtn">
+                    <i class="fas fa-plus"></i>
+                    <span class="btn-text">Add More Images</span>
+                </button>
+                <button class="btn btn-danger" id="clearAllBtn">
+                    <i class="fas fa-trash-alt"></i>
+                    <span class="btn-text">Clear All</span>
+                </button>
+                <button class="btn btn-primary" id="generateBtn">
+                    <div class="spinner"></div>
+                    <i class="fas fa-file-pdf btn-text"></i>
+                    <span class="btn-text">Generate PDF</span>
+                </button>
+            </div>
+
+            <!-- Download -->
+            <div class="download-area" id="downloadArea">
+                <div class="success-msg">
+                    <i class="fas fa-circle-check"></i>
+                    PDF generated successfully!
+                </div>
+                <a class="btn btn-success" id="downloadBtn" download="passion-tools.pdf">
+                    <i class="fas fa-download"></i>
+                    Download PDF
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        &copy; 2026 Passion Tools. Secure client-side processing.
+    </footer>
+
+    <script>
+        // ── State ──
+        let imageFiles = []; // { id, file, dataUrl }
+        let sortableInstance = null;
+        let pdfBlobUrl = null;
+        let idCounter = 0;
+
+        // ── DOM ──
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const workspace = document.getElementById('workspace');
+        const imageGrid = document.getElementById('imageGrid');
+        const imageCountEl = document.getElementById('imageCount');
+        const generateBtn = document.getElementById('generateBtn');
+        const addMoreBtn = document.getElementById('addMoreBtn');
+        const clearAllBtn = document.getElementById('clearAllBtn');
+        const downloadArea = document.getElementById('downloadArea');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const pageSizeSelect = document.getElementById('pageSize');
+        const marginSelect = document.getElementById('marginSize');
+
+        // ── Theme Toggle ──
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            themeIcon.textContent = theme === 'dark' ? '🌙' : '☀️';
+            localStorage.setItem('pt-theme', theme);
+        }
+
+        (function initTheme() {
+            const saved = localStorage.getItem('pt-theme');
+            if (saved) {
+                setTheme(saved);
+            } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                setTheme('dark');
+            }
+        })();
+
+        themeToggle.addEventListener('click', () => {
+            const current = document.documentElement.getAttribute('data-theme');
+            setTheme(current === 'dark' ? 'light' : 'dark');
+        });
+
+        // ── Upload ──
+        uploadArea.addEventListener('click', () => fileInput.click());
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('drag-over');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('drag-over');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        fileInput.addEventListener('change', () => {
+            handleFiles(fileInput.files);
+            fileInput.value = '';
+        });
+
+        addMoreBtn.addEventListener('click', () => fileInput.click());
+
+        clearAllBtn.addEventListener('click', () => {
+            imageFiles = [];
+            renderGrid();
+            workspace.classList.remove('active');
+            uploadArea.style.display = '';
+            hideDownload();
+        });
+
+        function handleFiles(files) {
+            const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+            const newFiles = Array.from(files).filter(f => validTypes.includes(f.type));
+            if (!newFiles.length) return;
+
+            hideDownload();
+
+            let loaded = 0;
+            newFiles.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    imageFiles.push({
+                        id: ++idCounter,
+                        file: file,
+                        dataUrl: e.target.result,
+                        name: file.name
+                    });
+                    loaded++;
+                    if (loaded === newFiles.length) {
+                        showWorkspace();
+                        renderGrid();
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function showWorkspace() {
+            workspace.classList.add('active');
+            uploadArea.style.display = 'none';
+        }
+
+        function hideDownload() {
+            downloadArea.classList.remove('active');
+            if (pdfBlobUrl) {
+                URL.revokeObjectURL(pdfBlobUrl);
+                pdfBlobUrl = null;
+            }
+        }
+
+        // ── Render Grid ──
+        function renderGrid() {
+            imageGrid.innerHTML = '';
+            imageCountEl.textContent = imageFiles.length;
+
+            imageFiles.forEach((img, index) => {
+                const item = document.createElement('div');
+                item.className = 'image-item';
+                item.setAttribute('data-id', img.id);
+                item.innerHTML = `
+                    <img src="${img.dataUrl}" alt="${img.name}" loading="lazy">
+                    <span class="page-number">${index + 1}</span>
+                    <button class="remove-btn" data-id="${img.id}" title="Remove image">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    <div class="file-name">${img.name}</div>
+                `;
+                imageGrid.appendChild(item);
+            });
+
+            // Attach remove handlers
+            imageGrid.querySelectorAll('.remove-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const id = parseInt(btn.getAttribute('data-id'));
+                    imageFiles = imageFiles.filter(f => f.id !== id);
+                    hideDownload();
+                    if (imageFiles.length === 0) {
+                        workspace.classList.remove('active');
+                        uploadArea.style.display = '';
+                    }
+                    renderGrid();
+                });
+            });
+
+            initSortable();
+        }
+
+        // ── SortableJS ──
+        function initSortable() {
+            if (sortableInstance) sortableInstance.destroy();
+            sortableInstance = new Sortable(imageGrid, {
+                animation: 250,
+                ghostClass: 'sortable-ghost',
+                chosenClass: 'sortable-chosen',
+                easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+                delay: 80,
+                delayOnTouchOnly: true,
+                touchStartThreshold: 3,
+                onEnd: (evt) => {
+                    // Sync array order to DOM order
+                    const ids = Array.from(imageGrid.children).map(el => parseInt(el.getAttribute('data-id')));
+                    const reordered = ids.map(id => imageFiles.find(f => f.id === id));
+                    imageFiles = reordered;
+                    hideDownload();
+                    renderGrid();
+                }
+            });
+        }
+
+        // ── Generate PDF ──
+        generateBtn.addEventListener('click', async () => {
+            if (!imageFiles.length) return;
+            generateBtn.classList.add('loading');
+            generateBtn.disabled = true;
+            hideDownload();
+
+            await new Promise(r => setTimeout(r, 50)); // let UI repaint
+
+            try {
+                const { jsPDF } = window.jspdf;
+                const pageSize = pageSizeSelect.value;
+                const marginOpt = marginSelect.value;
+
+                let margins = { none: 0, small: 14, big: 40 };
+                let margin = margins[marginOpt] || 0;
+
+                // Determine initial orientation/size for first page (will add pages dynamically)
+                let firstDoc;
+                if (pageSize === 'a4') {
+                    firstDoc = { format: 'a4', unit: 'mm' };
+                } else if (pageSize === 'letter') {
+                    firstDoc = { format: 'letter', unit: 'mm' };
+                } else {
+                    firstDoc = { format: 'a4', unit: 'px' };
+                }
+
+                const doc = new jsPDF({ unit: 'px', hotfixes: ['px_scaling'] });
+
+                for (let i = 0; i < imageFiles.length; i++) {
+                    const img = imageFiles[i];
+                    const { width: imgW, height: imgH } = await getImageDimensions(img.dataUrl);
+
+                    let pageW, pageH, orientation;
+
+                    if (pageSize === 'a4') {
+                        // A4 in px at 72dpi: 595.28 x 841.89
+                        orientation = imgW > imgH ? 'landscape' : 'portrait';
+                        pageW = orientation === 'portrait' ? 595.28 : 841.89;
+                        pageH = orientation === 'portrait' ? 841.89 : 595.28;
+                    } else if (pageSize === 'letter') {
+                        orientation = imgW > imgH ? 'landscape' : 'portrait';
+                        pageW = orientation === 'portrait' ? 612 : 792;
+                        pageH = orientation === 'portrait' ? 792 : 612;
+                    } else {
+                        // Fit to image
+                        pageW = imgW + margin * 2;
+                        pageH = imgH + margin * 2;
+                    }
+
+                    if (i === 0) {
+                        // modify first page
+                        doc.internal.pageSize.setWidth(pageW);
+                        doc.internal.pageSize.setHeight(pageH);
+                    } else {
+                        doc.addPage([pageW, pageH]);
+                    }
+
+                    if (pageSize === 'fit') {
+                        doc.addImage(img.dataUrl, 'JPEG', margin, margin, imgW, imgH, undefined, 'FAST');
+                    } else {
+                        const availW = pageW - margin * 2;
+                        const availH = pageH - margin * 2;
+                        const scale = Math.min(availW / imgW, availH / imgH);
+                        const drawW = imgW * scale;
+                        const drawH = imgH * scale;
+                        const x = margin + (availW - drawW) / 2;
+                        const y = margin + (availH - drawH) / 2;
+                        doc.addImage(img.dataUrl, 'JPEG', x, y, drawW, drawH, undefined, 'FAST');
+                    }
+
+                    // Let the UI breathe between pages
+                    if (i % 3 === 0) await new Promise(r => setTimeout(r, 0));
+                }
+
+                const pdfBlob = doc.output('blob');
+                pdfBlobUrl = URL.createObjectURL(pdfBlob);
+                downloadBtn.href = pdfBlobUrl;
+
+                downloadArea.classList.add('active');
+            } catch (err) {
+                console.error('PDF generation failed:', err);
+                alert('Something went wrong generating the PDF. Please try again.');
+            } finally {
+                generateBtn.classList.remove('loading');
+                generateBtn.disabled = false;
+            }
+        });
+
+        function getImageDimensions(dataUrl) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => {
+                    // Limit to reasonable dimensions for PDF
+                    const MAX = 4000;
+                    let w = img.naturalWidth;
+                    let h = img.naturalHeight;
+                    if (w > MAX || h > MAX) {
+                        const scale = MAX / Math.max(w, h);
+                        w = Math.round(w * scale);
+                        h = Math.round(h * scale);
+                    }
+                    resolve({ width: w, height: h });
+                };
+                img.onerror = reject;
+                img.src = dataUrl;
+            });
+        }
+    </script>
+</body>
+</html>
