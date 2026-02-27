@@ -144,7 +144,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px; /* Increased slightly for emoji */
+            font-size: 18px;
             transition: all 0.3s ease;
         }
 
@@ -170,18 +170,6 @@
         .tool-header {
             text-align: center;
             animation: fadeIn 0.5s ease;
-        }
-
-        .tool-icon-wrapper {
-            width: 64px;
-            height: 64px;
-            border-radius: 16px;
-            background: linear-gradient(135deg, var(--blue), var(--purple));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.25);
         }
 
         .tool-title {
@@ -492,16 +480,6 @@
     <main class="main-container">
         
         <div class="tool-header">
-            <div class="tool-icon-wrapper">
-                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M20 21v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8"/>
-                    <path d="M4 16h16"/>
-                    <path d="M12 11V7"/>
-                    <path d="M8 11V8"/>
-                    <path d="M16 11V8"/>
-                    <path d="M12 3a1.5 1.5 0 0 1 0 3a1.5 1.5 0 0 1 0-3z"/>
-                </svg>
-            </div>
             <h1 class="tool-title">Age Calculator</h1>
             <p class="tool-subtitle">Calculate your exact age in years, months, days, and watch your life count up in real-time seconds.</p>
         </div>
@@ -664,11 +642,9 @@
             function setTheme(theme) {
                 document.documentElement.setAttribute('data-theme', theme);
                 localStorage.setItem('passion-tools-theme', theme);
-                // CHANGED: Use emoji ☀️/🌙 instead of FontAwesome icons
                 themeIcon.textContent = theme === 'dark' ? '🌙' : '☀️';
             }
 
-            // CHANGED: Load theme and persist state in localStorage
             const savedTheme = localStorage.getItem('passion-tools-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
             setTheme(savedTheme);
 
