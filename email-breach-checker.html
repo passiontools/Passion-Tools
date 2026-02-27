@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Breach Checker | PassionTools</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --red: #ef4444;
+            --purple: #a855f7;
+            --blue: #3b82f6;
+            --blue-dark: #2563eb;
+            --green: #22c55e;
+            --bg-color: #f9fafb;
+            --card-bg: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --hover-gray: #f3f4f6;
+            --btn-action-bg: #fef2f2;
+            --header-bg: rgba(255, 255, 255, 0.75);
+            --footer-bg: #111827;
+            --logo-passion: #000000;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.04);
+            --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.08), 0 8px 10px -6px rgba(0,0,0,0.04);
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #020617;
+            --card-bg: #111827;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border-color: #1e293b;
+            --hover-gray: #1e293b;
+            --btn-action-bg: #450a0a;
+            --header-bg: rgba(2, 6, 23, 0.75);
+            --footer-bg: #020617;
+            --logo-passion: #f8fafc;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.4), 0 2px 4px -2px rgba(0,0,0,0.3);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.5), 0 4px 6px -4px rgba(0,0,0,0.3);
+            --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.5), 0 8px 10px -6px rgba(0,0,0,0.3);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            line-height: 1.6;
+        }
+
+        /* ============ HEADER ============ */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: var(--header-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 24px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+        }
+
+        .logo-link {
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .logo-passion {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--logo-passion);
+            letter-spacing: -0.5px;
+            transition: color 0.3s ease;
+        }
+
+        .logo-tools {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--red), var(--purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: var(--red);
+        }
+
+        .theme-toggle {
+            width: 40px;
+            height: 40px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            background: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            color: var(--text-secondary);
+        }
+
+        .theme-toggle:hover {
+            background: var(--hover-gray);
+            border-color: var(--text-secondary);
+        }
+
+        /* ============ MAIN ============ */
+        .main-content {
+            flex: 1;
+            padding: 48px 24px;
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* ---- Tool Header ---- */
+        .tool-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .tool-icon-modern {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(168, 85, 247, 0.1));
+            color: var(--blue);
+            margin-bottom: 24px;
+            font-size: 38px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .tool-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+            transition: color 0.3s ease;
+        }
+
+        .tool-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+            max-width: 560px;
+            margin: 0 auto;
+            line-height: 1.7;
+            transition: color 0.3s ease;
+        }
+
+        /* ---- Search Area ---- */
+        .search-area {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 32px;
+            transition: all 0.3s ease;
+        }
+
+        .search-form {
+            display: flex;
+            gap: 12px;
+            align-items: stretch;
+        }
+
+        .email-input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        .email-input-wrapper i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 16px;
+            transition: color 0.3s ease;
+        }
+
+        .email-input {
+            width: 100%;
+            padding: 14px 16px 14px 46px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            color: var(--text-primary);
+            background: var(--bg-color);
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .email-input::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+
+        .email-input:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        .email-input.input-error {
+            border-color: var(--red);
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+        }
+
+        .check-btn {
+            padding: 14px 28px;
+            background: linear-gradient(135deg, var(--blue), var(--blue-dark));
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .check-btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .check-btn:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .check-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .spinner {
+            display: none;
+            width: 18px;
+            height: 18px;
+            border: 2.5px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+
+        .spinner.active {
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .validation-msg {
+            font-size: 13px;
+            color: var(--red);
+            margin-top: 8px;
+            display: none;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .validation-msg.show {
+            display: flex;
+        }
+
+        /* ---- Results ---- */
+        .results-section {
+            display: none;
+            animation: fadeSlideUp 0.5s ease;
+        }
+
+        .results-section.visible {
+            display: block;
+        }
+
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .alert-box {
+            padding: 24px 28px;
+            border-radius: 14px;
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 28px;
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .alert-box.safe {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.08), rgba(34, 197, 94, 0.04));
+            border-color: rgba(34, 197, 94, 0.3);
+        }
+
+        .alert-box.breached {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.08), rgba(239, 68, 68, 0.04));
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .alert-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 22px;
+        }
+
+        .alert-box.safe .alert-icon {
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--green);
+        }
+
+        .alert-box.breached .alert-icon {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--red);
+        }
+
+        .alert-content {
+            flex: 1;
+        }
+
+        .alert-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .alert-box.safe .alert-title { color: var(--green); }
+        .alert-box.breached .alert-title { color: var(--red); }
+
+        .alert-description {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .alert-email {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* ---- Breach Cards Grid ---- */
+        .breach-grid-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .breach-grid-title .count-badge {
+            background: var(--red);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 2px 10px;
+            border-radius: 20px;
+        }
+
+        .breach-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 16px;
+        }
+
+        .breach-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 24px;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+            animation: fadeSlideUp 0.5s ease backwards;
+        }
+
+        .breach-card:hover {
+            box-shadow: var(--shadow-lg);
+            border-color: rgba(239, 68, 68, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .breach-card-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .breach-card-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(168, 85, 247, 0.1));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--red);
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .breach-card-logo {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            object-fit: contain;
+            background: var(--hover-gray);
+        }
+
+        .breach-card-icon-fallback {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(168, 85, 247, 0.1));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--red);
+            font-size: 18px;
+        }
+
+        .breach-card-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .breach-card-domain {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .risk-badge {
+            margin-left: auto;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .risk-critical { background: rgba(239, 68, 68, 0.12); color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.25); }
+        .risk-high { background: rgba(245, 158, 11, 0.12); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.25); }
+        .risk-medium { background: rgba(59, 130, 246, 0.1); color: var(--blue); border: 1px solid rgba(59, 130, 246, 0.2); }
+        .risk-low { background: rgba(34, 197, 94, 0.1); color: var(--green); border: 1px solid rgba(34, 197, 94, 0.2); }
+
+        .breach-card-details {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .breach-detail-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 13px;
+        }
+
+        .breach-detail-label {
+            color: var(--text-secondary);
+            font-weight: 500;
+            min-width: 110px;
+            flex-shrink: 0;
+        }
+
+        .breach-detail-value {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .data-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .data-tag {
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            background: rgba(239, 68, 68, 0.08);
+            color: var(--red);
+            border: 1px solid rgba(239, 68, 68, 0.15);
+        }
+
+        .safe-tips {
+            margin-top: 20px;
+        }
+
+        .safe-tips-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 12px;
+        }
+
+        .tip-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .tip-card:hover { box-shadow: var(--shadow-md); }
+
+        .tip-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .tip-text {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .tip-text strong {
+            color: var(--text-primary);
+            display: block;
+            margin-bottom: 2px;
+            font-size: 13px;
+        }
+
+        /* ---- Toast ---- */
+        .toast-container {
+            position: fixed;
+            top: 80px;
+            right: 24px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: var(--shadow-xl);
+            animation: toastIn 0.4s ease;
+            max-width: 380px;
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        .toast.toast-out { animation: toastOut 0.3s ease forwards; }
+
+        .toast-icon {
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .toast.error .toast-icon { color: var(--red); }
+        .toast.warning .toast-icon { color: #f59e0b; }
+        .toast.info .toast-icon { color: var(--blue); }
+
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateX(40px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes toastOut {
+            from { opacity: 1; transform: translateX(0); }
+            to { opacity: 0; transform: translateX(40px); }
+        }
+
+        /* Why Use Section */
+        .why-section { margin-top: 56px; }
+
+        .why-section-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--text-primary);
+            text-align: center;
+            margin-bottom: 8px;
+            letter-spacing: -0.3px;
+            transition: color 0.3s ease;
+        }
+
+        .why-section-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .why-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 14px;
+        }
+
+        .why-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 24px 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+            opacity: 0;
+            transform: translateY(16px);
+        }
+
+        .why-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .why-card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-4px);
+            border-color: rgba(59, 130, 246, 0.25);
+        }
+
+        .why-card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-bottom: 14px;
+        }
+
+        .wci-detect { background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.05)); color: var(--red); }
+        .wci-prevent { background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05)); color: var(--blue); }
+        .wci-password { background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(34, 197, 94, 0.05)); color: var(--green); }
+        .wci-awareness { background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(168, 85, 247, 0.05)); color: var(--purple); }
+
+        .why-card-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+            transition: color 0.3s ease;
+        }
+
+        .why-card-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* ============ FOOTER ============ */
+        .footer {
+            background: var(--footer-bg);
+            text-align: center;
+            padding: 30px 20px;
+            font-size: 14px;
+            color: #94a3b8;
+            transition: background-color 0.3s ease;
+            margin-top: auto;
+        }
+
+        /* ============ RESPONSIVE ============ */
+        @media (max-width: 640px) {
+            .header { padding: 0 16px; }
+            .back-link span { display: none; }
+            .back-link { padding: 0; }
+            .main-content { padding: 32px 16px; }
+            .tool-title { font-size: 26px; }
+            .tool-subtitle { font-size: 14px; }
+            .search-area { padding: 20px; }
+            .search-form { flex-direction: column; }
+            .check-btn { justify-content: center; width: 100%; }
+            .breach-grid { grid-template-columns: 1fr; }
+            .tips-grid { grid-template-columns: 1fr; }
+            .alert-box { flex-direction: column; align-items: center; text-align: center; padding: 20px; }
+            .breach-detail-row { flex-direction: column; gap: 4px; }
+            .breach-detail-label { min-width: unset; }
+            .toast-container { right: 12px; left: 12px; }
+            .toast { max-width: unset; }
+            .why-grid { grid-template-columns: repeat(2, 1fr); }
+            .why-section-title { font-size: 19px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <a href="index.html" class="logo-link">
+            <span class="logo-passion">Passion</span><span class="logo-tools">Tools</span>
+        </a>
+        <div class="header-actions">
+            <a href="index.html" class="back-link">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to Tools</span>
+            </a>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                ☀️
+            </button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="tool-header">
+            <div class="tool-icon-modern">
+                <i class="fas fa-shield-virus"></i>
+            </div>
+            <h1 class="tool-title">Email Breach Checker</h1>
+            <p class="tool-subtitle">Enter your email address to instantly check if your personal data has been compromised in known data breaches.</p>
+        </div>
+
+        <div class="search-area">
+            <form class="search-form" id="searchForm" onsubmit="return false;">
+                <div class="email-input-wrapper">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" class="email-input" id="emailInput" placeholder="Enter your email address..." autocomplete="email" spellcheck="false">
+                    <div class="validation-msg" id="validationMsg">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span id="validationText">Please enter a valid email address.</span>
+                    </div>
+                </div>
+                <button type="button" class="check-btn" id="checkBtn" onclick="handleCheck()">
+                    <div class="spinner" id="spinner"></div>
+                    <i class="fas fa-shield-halved" id="btnIcon"></i>
+                    <span id="btnText">Check Security</span>
+                </button>
+            </form>
+        </div>
+
+        <div class="results-section" id="resultsSection"></div>
+
+        <div class="why-section">
+            <h3 class="why-section-title">Why Use an Email Breach Checker?</h3>
+            <p class="why-section-subtitle">Protect yourself and stay ahead of cyber threats with proactive breach monitoring.</p>
+            <div class="why-grid" id="whyGrid">
+                <div class="why-card">
+                    <div class="why-card-icon wci-detect">
+                        <i class="fas fa-shield-virus"></i>
+                    </div>
+                    <div class="why-card-title">Detect Compromises</div>
+                    <div class="why-card-desc">Find out if your email has been exposed in known data breaches across the web.</div>
+                </div>
+                <div class="why-card">
+                    <div class="why-card-icon wci-prevent">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <div class="why-card-title">Prevent Identity Theft</div>
+                    <div class="why-card-desc">Take action before attackers can use stolen credentials to hijack your accounts.</div>
+                </div>
+                <div class="why-card">
+                    <div class="why-card-icon wci-password">
+                        <i class="fas fa-key"></i>
+                    </div>
+                    <div class="why-card-title">Better Security Habits</div>
+                    <div class="why-card-desc">Encourages stronger passwords, 2FA adoption, and regular credential rotation.</div>
+                </div>
+                <div class="why-card">
+                    <div class="why-card-icon wci-awareness">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <div class="why-card-title">Safety Awareness</div>
+                    <div class="why-card-desc">Stay informed about your digital footprint and improve your overall online safety.</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        © 2026 Passion Tools. Secure client-side processing.
+    </footer>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        // ============ THEME ============
+        const themeToggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+
+        function setTheme(theme) {
+            html.setAttribute('data-theme', theme);
+            themeToggle.textContent = theme === 'dark' ? '🌙' : '☀️';
+            localStorage.setItem('pt-theme', theme);
+        }
+
+        (function initTheme() {
+            const saved = localStorage.getItem('pt-theme');
+            if (saved) {
+                setTheme(saved);
+            } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                setTheme('dark');
+            }
+        })();
+
+        themeToggle.addEventListener('click', () => {
+            const current = html.getAttribute('data-theme');
+            setTheme(current === 'dark' ? 'light' : 'dark');
+        });
+
+        // ============ TOAST ============
+        function showToast(message, type = 'error') {
+            const container = document.getElementById('toastContainer');
+            const icons = {
+                error: 'fas fa-circle-xmark',
+                warning: 'fas fa-triangle-exclamation',
+                info: 'fas fa-circle-info'
+            };
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<i class="toast-icon ${icons[type]}"></i><span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('toast-out');
+                toast.addEventListener('animationend', () => toast.remove());
+            }, 4000);
+        }
+
+        // ============ VALIDATION ============
+        function validateEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        // ============ CHECK HANDLER ============
+        const emailInput = document.getElementById('emailInput');
+        const checkBtn = document.getElementById('checkBtn');
+        const spinner = document.getElementById('spinner');
+        const btnIcon = document.getElementById('btnIcon');
+        const btnText = document.getElementById('btnText');
+        const validationMsg = document.getElementById('validationMsg');
+        const validationText = document.getElementById('validationText');
+        const resultsSection = document.getElementById('resultsSection');
+
+        emailInput.addEventListener('input', () => {
+            emailInput.classList.remove('input-error');
+            validationMsg.classList.remove('show');
+        });
+
+        emailInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                handleCheck();
+            }
+        });
+
+        function setLoading(loading) {
+            checkBtn.disabled = loading;
+            spinner.classList.toggle('active', loading);
+            btnIcon.style.display = loading ? 'none' : '';
+            btnText.textContent = loading ? 'Checking...' : 'Check Security';
+        }
+
+        async function handleCheck() {
+            const email = emailInput.value.trim();
+
+            if (!email) {
+                emailInput.classList.add('input-error');
+                validationText.textContent = 'Please enter an email address.';
+                validationMsg.classList.add('show');
+                emailInput.focus();
+                return;
+            }
+
+            if (!validateEmail(email)) {
+                emailInput.classList.add('input-error');
+                validationText.textContent = 'Please enter a valid email format (e.g., user@example.com).';
+                validationMsg.classList.add('show');
+                emailInput.focus();
+                return;
+            }
+
+            setLoading(true);
+            resultsSection.classList.remove('visible');
+
+            try {
+                const breaches = await queryBreachAPI(email);
+                renderResults(email, breaches);
+
+                if (breaches.length === 0) {
+                    showToast('Scan complete — no breaches found!', 'info');
+                } else {
+                    showToast(`Found ${breaches.length} breach${breaches.length > 1 ? 'es' : ''} for this email.`, 'warning');
+                }
+            } catch (err) {
+                if (err.status === 429) {
+                    showToast('Rate limit exceeded. Please wait a few seconds and try again.', 'warning');
+                } else if (err.status === 0) {
+                    showToast(err.message || 'Network error. Check your connection.', 'error');
+                } else {
+                    showToast(err.message || 'An unexpected error occurred. Please try again.', 'error');
+                }
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        // ============ REAL API QUERY ============
+        async function queryBreachAPI(email) {
+            const analyticsUrl = `https://api.xposedornot.com/v1/breach-analytics?email=${encodeURIComponent(email)}`;
+
+            let response;
+            try {
+                response = await fetch(analyticsUrl, {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json' }
+                });
+            } catch (networkErr) {
+                throw { message: 'Network error. Please check your internet connection and try again.', status: 0 };
+            }
+
+            if (response.status === 404) {
+                return [];
+            }
+
+            if (response.status === 429) {
+                throw { message: 'Rate limit exceeded. Please wait a moment and try again.', status: 429 };
+            }
+
+            if (!response.ok) {
+                throw { message: `API error (HTTP ${response.status}). Please try again later.`, status: response.status };
+            }
+
+            let data;
+            try {
+                data = await response.json();
+            } catch (parseErr) {
+                throw { message: 'Failed to parse the API response. Please try again.', status: 0 };
+            }
+
+            return parseXONResponse(data);
+        }
+
+        function parseXONResponse(data) {
+            const breaches = [];
+
+            if (data && data.ExposedBreaches && data.ExposedBreaches.breaches_details) {
+                const details = data.ExposedBreaches.breaches_details;
+
+                for (const b of details) {
+                    const dataClasses = b.xposed_data
+                        ? b.xposed_data.split(';').map(s => s.trim()).filter(s => s.length > 0)
+                        : ['Unknown'];
+
+                    breaches.push({
+                        Name: b.breach || 'Unknown Service',
+                        Domain: b.domain || 'N/A',
+                        BreachDate: b.xposed_date || 'Unknown',
+                        DataClasses: dataClasses,
+                        PwnCount: parseInt(b.xposed_records) || 0,
+                        Industry: b.industry || 'Unknown',
+                        PasswordRisk: b.password_risk || 'unknown',
+                        Verified: b.verified || 'Unknown',
+                        Logo: b.logo || ''
+                    });
+                }
+            }
+
+            breaches.sort((a, b) => {
+                const dateA = new Date(a.BreachDate);
+                const dateB = new Date(b.BreachDate);
+                if (isNaN(dateA)) return 1;
+                if (isNaN(dateB)) return -1;
+                return dateB - dateA;
+            });
+
+            return breaches;
+        }
+
+        // ============ RENDER RESULTS ============
+        function renderResults(email, breaches) {
+            let html = '';
+
+            if (breaches.length === 0) {
+                html = `
+                    <div class="alert-box safe">
+                        <div class="alert-icon"><i class="fas fa-circle-check"></i></div>
+                        <div class="alert-content">
+                            <div class="alert-title">Good News! No breaches found for this email.</div>
+                            <div class="alert-description">
+                                The email <span class="alert-email">${escapeHtml(email)}</span> was not found in any known data breaches in our database. Stay vigilant and keep your accounts secure!
+                            </div>
+                        </div>
+                    </div>
+                    <div class="safe-tips">
+                        <div class="safe-tips-title"><i class="fas fa-lightbulb" style="color: #f59e0b;"></i> Security Tips</div>
+                        <div class="tips-grid">
+                            <div class="tip-card">
+                                <div class="tip-icon"><i class="fas fa-key"></i></div>
+                                <div class="tip-text"><strong>Use strong passwords</strong>Create unique, complex passwords for each account with 12+ characters.</div>
+                            </div>
+                            <div class="tip-card">
+                                <div class="tip-icon"><i class="fas fa-mobile-screen"></i></div>
+                                <div class="tip-text"><strong>Enable 2FA</strong>Add two-factor authentication to all your important accounts.</div>
+                            </div>
+                            <div class="tip-card">
+                                <div class="tip-icon"><i class="fas fa-rotate"></i></div>
+                                <div class="tip-text"><strong>Regular checkups</strong>Periodically check your email against new breaches.</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                const allDataTypes = new Set();
+                breaches.forEach(b => b.DataClasses.forEach(dc => allDataTypes.add(dc)));
+
+                const passwordsExposed = [...allDataTypes].some(d =>
+                    d.toLowerCase().includes('password')
+                );
+
+                html = `
+                    <div class="alert-box breached">
+                        <div class="alert-icon"><i class="fas fa-triangle-exclamation"></i></div>
+                        <div class="alert-content">
+                            <div class="alert-title">Oh no! This email was found in ${breaches.length} data breach${breaches.length > 1 ? 'es' : ''}.</div>
+                            <div class="alert-description">
+                                The email <span class="alert-email">${escapeHtml(email)}</span> has appeared in known data breaches. We recommend changing your passwords immediately and enabling two-factor authentication.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="safe-tips" style="margin-top: 0; margin-bottom: 28px;">
+                        <div class="safe-tips-title"><i class="fas fa-shield-exclamation" style="color: var(--red);"></i><i class="fas fa-shield-halved" style="color: var(--red);"></i> Recommended Actions</div>
+                        <div class="tips-grid">
+                            <div class="tip-card" style="border-color: rgba(239,68,68,0.15);">
+                                <div class="tip-icon" style="background: rgba(239,68,68,0.1); color: var(--red);"><i class="fas fa-key"></i></div>
+                                <div class="tip-text"><strong>Change your passwords</strong>${passwordsExposed ? 'Passwords were exposed in these breaches. Change them immediately on all affected services.' : 'Update your passwords on the affected services as a precaution.'}</div>
+                            </div>
+                            <div class="tip-card" style="border-color: rgba(59,130,246,0.15);">
+                                <div class="tip-icon" style="background: rgba(59,130,246,0.1); color: var(--blue);"><i class="fas fa-mobile-screen"></i></div>
+                                <div class="tip-text"><strong>Enable 2FA everywhere</strong>Add two-factor authentication to all your accounts, especially the breached ones.</div>
+                            </div>
+                            <div class="tip-card" style="border-color: rgba(245,158,11,0.15);">
+                                <div class="tip-icon" style="background: rgba(245,158,11,0.1); color: #f59e0b;"><i class="fas fa-eye"></i></div>
+                                <div class="tip-text"><strong>Monitor your accounts</strong>Watch for suspicious login attempts and unauthorized activity on affected services.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="breach-grid-title">
+                        <i class="fas fa-database" style="color: var(--red);"></i>
+                        Breach Details
+                        <span class="count-badge">${breaches.length}</span>
+                    </div>
+                    <div class="breach-grid">
+                        ${breaches.map((b, i) => renderBreachCard(b, i)).join('')}
+                    </div>
+                `;
+            }
+
+            resultsSection.innerHTML = html;
+            resultsSection.classList.add('visible');
+            resultsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function renderBreachCard(breach, index) {
+            const date = new Date(breach.BreachDate);
+            const isValidDate = !isNaN(date.getTime());
+            const dateStr = isValidDate
+                ? date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+                : breach.BreachDate || 'Unknown';
+            const affected = breach.PwnCount ? formatNumber(breach.PwnCount) : 'Unknown';
+
+            let riskBadge = '';
+            const risk = (breach.PasswordRisk || '').toLowerCase();
+            if (risk === 'plaintext') {
+                riskBadge = '<span class="risk-badge risk-critical"><i class="fas fa-skull-crossbones"></i> Plaintext</span>';
+            } else if (risk === 'easytocrack' || risk === 'easy to crack') {
+                riskBadge = '<span class="risk-badge risk-high"><i class="fas fa-unlock"></i> Easy to Crack</span>';
+            } else if (risk === 'hardtocrack' || risk === 'hard to crack') {
+                riskBadge = '<span class="risk-badge risk-medium"><i class="fas fa-lock"></i> Hard to Crack</span>';
+            } else if (risk && risk !== 'unknown') {
+                riskBadge = `<span class="risk-badge risk-low"><i class="fas fa-shield-halved"></i> ${escapeHtml(breach.PasswordRisk)}</span>`;
+            }
+
+            let logoHtml = '';
+            if (breach.Logo && breach.Logo.startsWith('http')) {
+                logoHtml = `<img src="${escapeHtml(breach.Logo)}" alt="${escapeHtml(breach.Name)}" class="breach-card-logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="breach-card-icon-fallback" style="display:none;"><i class="fas fa-globe"></i></div>`;
+            } else if (breach.Domain && breach.Domain !== 'N/A') {
+                logoHtml = `<img src="https://www.google.com/s2/favicons?domain=${encodeURIComponent(breach.Domain)}&sz=64" alt="${escapeHtml(breach.Name)}" class="breach-card-logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="breach-card-icon-fallback" style="display:none;"><i class="fas fa-globe"></i></div>`;
+            } else {
+                logoHtml = `<div class="breach-card-icon-fallback"><i class="fas fa-globe"></i></div>`;
+            }
+
+            const industryTag = breach.Industry && breach.Industry !== 'Unknown'
+                ? `<div class="breach-detail-row">
+                        <span class="breach-detail-label"><i class="fas fa-building" style="margin-right:6px; color: var(--text-secondary);"></i>Industry</span>
+                        <span class="breach-detail-value">${escapeHtml(breach.Industry)}</span>
+                   </div>`
+                : '';
+
+            return `
+                <div class="breach-card" style="animation-delay: ${index * 0.1}s">
+                    <div class="breach-card-header">
+                        <div class="breach-card-icon breach-card-icon-img">
+                            ${logoHtml}
+                        </div>
+                        <div>
+                            <div class="breach-card-name">${escapeHtml(breach.Name)}</div>
+                            <div class="breach-card-domain">${escapeHtml(breach.Domain)}</div>
+                        </div>
+                        ${riskBadge}
+                    </div>
+                    <div class="breach-card-details">
+                        <div class="breach-detail-row">
+                            <span class="breach-detail-label"><i class="fas fa-calendar-days" style="margin-right:6px; color: var(--text-secondary);"></i>Breach Date</span>
+                            <span class="breach-detail-value">${dateStr}</span>
+                        </div>
+                        <div class="breach-detail-row">
+                            <span class="breach-detail-label"><i class="fas fa-users" style="margin-right:6px; color: var(--text-secondary);"></i>Affected</span>
+                            <span class="breach-detail-value">${affected} accounts</span>
+                        </div>
+                        ${industryTag}
+                        <div class="breach-detail-row">
+                            <span class="breach-detail-label"><i class="fas fa-unlock" style="margin-right:6px; color: var(--text-secondary);"></i>Compromised</span>
+                            <div class="data-tags">
+                                ${breach.DataClasses.map(dc => `<span class="data-tag">${escapeHtml(dc)}</span>`).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function formatNumber(num) {
+            if (num >= 1e9) return (num / 1e9).toFixed(1) + 'B';
+            if (num >= 1e6) return (num / 1e6).toFixed(1) + 'M';
+            if (num >= 1e3) return (num / 1e3).toFixed(1) + 'K';
+            return num.toString();
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ============ SCROLL REVEAL (Adjusted for remaining cards) ============
+        (function initScrollReveal() {
+            const whyCards = document.querySelectorAll('.why-card');
+
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px 0px -60px 0px',
+                threshold: 0.15
+            };
+
+            const cardObserver = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        cardObserver.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            whyCards.forEach((card, i) => {
+                card.style.transitionDelay = `${i * 0.1}s`;
+                card.style.transitionDuration = '0.5s';
+                card.style.transitionProperty = 'opacity, transform';
+                card.style.transitionTimingFunction = 'ease';
+                cardObserver.observe(card);
+            });
+        })();
+    </script>
+</body>
+</html>
