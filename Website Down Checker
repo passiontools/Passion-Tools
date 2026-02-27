@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Down Checker - PassionTools</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #f1f5f9;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+            --shadow-lg: 0 10px 40px rgba(0,0,0,0.1);
+            --input-bg: #ffffff;
+            --input-border: #cbd5e1;
+            --card-bg: #ffffff;
+            --footer-bg: #111827;
+            --hero-icon-bg: linear-gradient(135deg, #fee2e2, #fce7f3, #ede9fe);
+            --hero-icon-color: #dc2626;
+            --result-up-bg: #f0fdf4;
+            --result-up-border: #86efac;
+            --result-up-text: #166534;
+            --result-down-bg: #fef2f2;
+            --result-down-border: #fca5a5;
+            --result-down-text: #991b1b;
+            --toast-bg: #1e293b;
+            --toast-text: #f8fafc;
+            --red: #ef4444;
+            --btn-action-bg: rgba(239, 68, 68, 0.08);
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-color: #334155;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.3);
+            --shadow-lg: 0 10px 40px rgba(0,0,0,0.4);
+            --input-bg: #1e293b;
+            --input-border: #475569;
+            --card-bg: #1e293b;
+            --footer-bg: #020617;
+            --hero-icon-bg: linear-gradient(135deg, #3b1a1a, #3b1a2e, #2e1a3b);
+            --hero-icon-color: #f87171;
+            --result-up-bg: #052e16;
+            --result-up-border: #166534;
+            --result-up-text: #86efac;
+            --result-down-bg: #450a0a;
+            --result-down-border: #991b1b;
+            --result-down-text: #fca5a5;
+            --toast-bg: #f8fafc;
+            --toast-text: #0f172a;
+            --red: #f87171;
+            --btn-action-bg: rgba(248, 113, 113, 0.12);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background 0.3s ease, color 0.3s ease;
+            line-height: 1.6;
+        }
+
+        /* ===== HEADER ===== */
+        header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 24px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo {
+            text-decoration: none;
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-passion {
+            color: #000000;
+            transition: color 0.25s ease;
+        }
+
+        [data-theme="dark"] .logo-passion {
+            color: #f1f5f9;
+        }
+
+        .logo-tools {
+            background: linear-gradient(135deg, #ff0000, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* ===== BACK TO TOOLS LINK ===== */
+        .back-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0;
+            border: none;
+            border-radius: 0;
+            background: none;
+            transition: color 0.25s ease;
+            white-space: nowrap;
+        }
+
+        .back-link:hover {
+            color: var(--red);
+        }
+
+        .back-link i {
+            font-size: 12px;
+            transition: transform 0.25s ease;
+        }
+
+        .back-link:hover i {
+            transform: translateX(-3px);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        /* ===== THEME TOGGLE ===== */
+        .theme-toggle {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 50px;
+            width: 52px;
+            height: 30px;
+            cursor: pointer;
+            position: relative;
+            transition: background 0.3s ease, border-color 0.3s ease;
+            display: flex;
+            align-items: center;
+            padding: 0;
+            outline: none;
+        }
+
+        .theme-toggle::after {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #ffffff;
+            left: 2px;
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s ease;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+        }
+
+        [data-theme="dark"] .theme-toggle::after {
+            transform: translateX(22px);
+            background: #334155;
+        }
+
+        .theme-toggle .toggle-emoji {
+            position: absolute;
+            font-size: 13px;
+            line-height: 1;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            font-style: normal;
+            z-index: 1;
+        }
+
+        .theme-toggle .sun-emoji {
+            left: 6px;
+            opacity: 1;
+            transform: scale(1) rotate(0deg);
+        }
+
+        .theme-toggle .moon-emoji {
+            right: 6px;
+            opacity: 0;
+            transform: scale(0.5) rotate(90deg);
+        }
+
+        [data-theme="dark"] .theme-toggle .sun-emoji {
+            opacity: 0;
+            transform: scale(0.5) rotate(-90deg);
+        }
+
+        [data-theme="dark"] .theme-toggle .moon-emoji {
+            opacity: 1;
+            transform: scale(1) rotate(0deg);
+        }
+
+        /* ===== MAIN ===== */
+        main {
+            flex: 1;
+            max-width: 720px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 48px 20px 60px;
+        }
+
+        /* ===== HERO ===== */
+        .hero {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .hero-icon-wrapper {
+            width: 80px;
+            height: 80px;
+            border-radius: 22px;
+            background: var(--hero-icon-bg);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            transition: background 0.3s ease;
+        }
+
+        .hero-icon-wrapper i {
+            font-size: 34px;
+            color: var(--hero-icon-color);
+            transition: color 0.3s ease;
+        }
+
+        .hero h1 {
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .hero p {
+            font-size: 16px;
+            color: var(--text-secondary);
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        /* ===== INPUT AREA ===== */
+        .input-area {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 24px;
+            transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        .input-group input {
+            flex: 1;
+            height: 48px;
+            padding: 0 16px;
+            border: 1.5px solid var(--input-border);
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            background: var(--input-bg);
+            color: var(--text-primary);
+            outline: none;
+            transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.3s ease;
+        }
+
+        .input-group input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .input-group input:focus {
+            border-color: #a855f7;
+            box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.15);
+        }
+
+        .btn-check {
+            height: 48px;
+            padding: 0 24px;
+            background: linear-gradient(135deg, #ef4444, #a855f7);
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+            transition: opacity 0.25s ease, transform 0.15s ease;
+        }
+
+        .btn-check:hover { opacity: 0.9; }
+        .btn-check:active { transform: scale(0.97); }
+
+        .btn-check:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .btn-check .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2.5px solid rgba(255,255,255,0.3);
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            display: none;
+        }
+
+        .btn-check.loading .spinner { display: block; }
+        .btn-check.loading .btn-text { display: none; }
+        .btn-check.loading .btn-icon { display: none; }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ===== RESULTS ===== */
+        .result-box {
+            border-radius: 14px;
+            padding: 24px;
+            margin-bottom: 24px;
+            display: none;
+            animation: fadeInUp 0.4s ease;
+            border: 1.5px solid;
+        }
+
+        .result-box.show { display: block; }
+
+        .result-box.up {
+            background: var(--result-up-bg);
+            border-color: var(--result-up-border);
+            color: var(--result-up-text);
+        }
+
+        .result-box.down {
+            background: var(--result-down-bg);
+            border-color: var(--result-down-border);
+            color: var(--result-down-text);
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .result-header .status-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .result-box.up .status-icon {
+            background: rgba(34, 197, 94, 0.15);
+            color: #16a34a;
+        }
+
+        [data-theme="dark"] .result-box.up .status-icon {
+            background: rgba(34, 197, 94, 0.2);
+            color: #4ade80;
+        }
+
+        .result-box.down .status-icon {
+            background: rgba(239, 68, 68, 0.15);
+            color: #dc2626;
+        }
+
+        [data-theme="dark"] .result-box.down .status-icon {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+        }
+
+        .result-title {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .result-subtitle {
+            font-size: 14px;
+            opacity: 0.85;
+            margin-top: 2px;
+        }
+
+        .result-details {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+            margin-top: 4px;
+        }
+
+        .result-detail {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .result-detail i {
+            font-size: 13px;
+            opacity: 0.7;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(14px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== WHY CHECK SECTION ===== */
+        .why-section {
+            margin-top: 56px;
+        }
+
+        .why-section h2 {
+            font-size: 22px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .why-section > p {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 15px;
+            margin-bottom: 28px;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .benefit-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 24px 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease, border-color 0.3s ease;
+        }
+
+        .benefit-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .card-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin-bottom: 14px;
+        }
+
+        .card-icon.red { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+        .card-icon.purple { background: rgba(168, 85, 247, 0.1); color: #a855f7; }
+        .card-icon.blue { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+        .card-icon.green { background: rgba(34, 197, 94, 0.1); color: #22c55e; }
+
+        [data-theme="dark"] .card-icon.red { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+        [data-theme="dark"] .card-icon.purple { background: rgba(168, 85, 247, 0.15); color: #c084fc; }
+        [data-theme="dark"] .card-icon.blue { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+        [data-theme="dark"] .card-icon.green { background: rgba(34, 197, 94, 0.15); color: #4ade80; }
+
+        .benefit-card h3 {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: var(--text-primary);
+        }
+
+        .benefit-card p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.55;
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            background: var(--footer-bg);
+            text-align: center;
+            padding: 30px 20px;
+            font-size: 14px;
+            color: #94a3b8;
+            margin-top: auto;
+            transition: background 0.3s ease;
+        }
+
+        /* ===== TOAST ===== */
+        .toast-container {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            background: var(--toast-bg);
+            color: var(--toast-text);
+            padding: 14px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            transform: translateX(120%);
+            transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+            max-width: 360px;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.error i { color: #ef4444; }
+        .toast.success i { color: #22c55e; }
+        .toast.info i { color: #3b82f6; }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 600px) {
+            .input-group {
+                flex-direction: column;
+            }
+
+            .btn-check {
+                justify-content: center;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero h1 {
+                font-size: 26px;
+            }
+
+            main {
+                padding: 32px 16px 48px;
+            }
+
+            .result-details {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            header {
+                padding: 0 16px;
+            }
+
+            .header-right {
+                gap: 10px;
+            }
+
+            .back-link {
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header>
+        <div class="header-left">
+            <a href="#" class="logo">
+                <span class="logo-passion">Passion</span><span class="logo-tools">Tools</span>
+            </a>
+        </div>
+        <div class="header-right">
+            <a href="index.html" class="back-link">
+                <i class="fas fa-arrow-left"></i>
+                Back to Tools
+            </a>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <span class="toggle-emoji sun-emoji">☀️</span>
+                <span class="toggle-emoji moon-emoji">🌙</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN -->
+    <main>
+        <!-- HERO -->
+        <section class="hero">
+            <div class="hero-icon-wrapper">
+                <i class="fas fa-globe"></i>
+            </div>
+            <h1>Website Down Checker</h1>
+            <p>Instantly check if a website is down or it's just you. Get real-time status updates in seconds.</p>
+        </section>
+
+        <!-- INPUT -->
+        <div class="input-area">
+            <div class="input-group">
+                <input type="text" id="urlInput" placeholder="Enter a URL, e.g. google.com" autocomplete="off" spellcheck="false">
+                <button class="btn-check" id="checkBtn" onclick="checkWebsite()">
+                    <i class="fas fa-search btn-icon"></i>
+                    <span class="btn-text">Check Status</span>
+                    <div class="spinner"></div>
+                </button>
+            </div>
+        </div>
+
+        <!-- RESULT -->
+        <div class="result-box" id="resultBox">
+            <div class="result-header">
+                <div class="status-icon" id="resultIcon"></div>
+                <div>
+                    <div class="result-title" id="resultTitle"></div>
+                    <div class="result-subtitle" id="resultSubtitle"></div>
+                </div>
+            </div>
+            <div class="result-details" id="resultDetails"></div>
+        </div>
+
+        <!-- WHY CHECK SECTION -->
+        <section class="why-section">
+            <h2>Why Check Website Status?</h2>
+            <p>Understanding downtime helps you act fast and stay informed.</p>
+            <div class="cards-grid">
+                <div class="benefit-card">
+                    <div class="card-icon red">
+                        <i class="fas fa-wrench"></i>
+                    </div>
+                    <h3>Quick Troubleshooting</h3>
+                    <p>Determine if a site is truly down or if the issue is on your end — saving you hours of debugging.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="card-icon purple">
+                        <i class="fas fa-globe-americas"></i>
+                    </div>
+                    <h3>Global vs. Local Outage</h3>
+                    <p>Find out whether an outage affects everyone worldwide or just your local network and ISP.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="card-icon blue">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Uptime Monitoring</h3>
+                    <p>Keep track of your own website's availability and catch downtime before your users do.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="card-icon green">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Security Awareness</h3>
+                    <p>Unexpected downtime can signal a cyberattack. Early detection helps protect your data and users.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        © 2026 Passion Tools. Secure client-side processing.
+    </footer>
+
+    <!-- TOAST CONTAINER -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        // ===== THEME TOGGLE =====
+        const themeToggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+
+        const savedTheme = localStorage.getItem('pt-theme') || 'light';
+        html.setAttribute('data-theme', savedTheme);
+
+        themeToggle.addEventListener('click', () => {
+            const current = html.getAttribute('data-theme');
+            const next = current === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', next);
+            localStorage.setItem('pt-theme', next);
+        });
+
+        // ===== TOAST NOTIFICATIONS =====
+        function showToast(message, type = 'error') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+
+            let icon;
+            if (type === 'error') icon = 'fa-circle-exclamation';
+            else if (type === 'success') icon = 'fa-circle-check';
+            else icon = 'fa-circle-info';
+
+            toast.innerHTML = `<i class="fas ${icon}"></i><span>${message}</span>`;
+            container.appendChild(toast);
+
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    toast.classList.add('show');
+                });
+            });
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 450);
+            }, 3500);
+        }
+
+        // ===== URL VALIDATION =====
+        function normalizeUrl(input) {
+            let url = input.trim();
+            if (!url) return null;
+
+            if (!/^https?:\/\//i.test(url)) {
+                url = 'https://' + url;
+            }
+
+            try {
+                const parsed = new URL(url);
+                if (!parsed.hostname.includes('.') || parsed.hostname.length < 4) {
+                    return null;
+                }
+                return parsed.href;
+            } catch {
+                return null;
+            }
+        }
+
+        // ===== HELPERS =====
+        function createAbort(ms) {
+            const controller = new AbortController();
+            const id = setTimeout(() => controller.abort(), ms);
+            return { signal: controller.signal, clear: () => clearTimeout(id) };
+        }
+
+        // ===== CHECK WEBSITE =====
+        const urlInput = document.getElementById('urlInput');
+        const checkBtn = document.getElementById('checkBtn');
+        const resultBox = document.getElementById('resultBox');
+
+        urlInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') checkWebsite();
+        });
+
+        async function checkWebsite() {
+            const rawInput = urlInput.value;
+            const url = normalizeUrl(rawInput);
+
+            if (!url) {
+                showToast('Please enter a valid URL or domain.', 'error');
+                urlInput.focus();
+                return;
+            }
+
+            // UI: loading state
+            checkBtn.classList.add('loading');
+            checkBtn.disabled = true;
+            resultBox.classList.remove('show');
+            resultBox.className = 'result-box';
+
+            const startTime = performance.now();
+            let checked = false;
+
+            // ── METHOD 1: allorigins.win ──
+            if (!checked) {
+                try {
+                    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+                    const { signal, clear } = createAbort(10000);
+                    const response = await fetch(proxyUrl, { signal });
+                    clear();
+                    const responseTime = Math.round(performance.now() - startTime);
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        const httpCode = data?.status?.http_code;
+                        const hasContent = !!(data?.contents && data.contents.length > 0);
+
+                        if (hasContent || (httpCode && httpCode >= 200 && httpCode < 400)) {
+                            showResult('up', url, httpCode || 200, responseTime);
+                            checked = true;
+                        } else if (httpCode && httpCode >= 400) {
+                            showResult('down', url, httpCode, responseTime);
+                            checked = true;
+                        }
+                    }
+                } catch (e) {
+                    // allorigins failed – try next
+                }
+            }
+
+            // ── METHOD 2: corsproxy.io ──
+            if (!checked) {
+                try {
+                    const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(url)}`;
+                    const { signal, clear } = createAbort(10000);
+                    const response = await fetch(proxyUrl, { signal });
+                    clear();
+                    const responseTime = Math.round(performance.now() - startTime);
+
+                    if (response.ok) {
+                        showResult('up', url, response.status, responseTime);
+                        checked = true;
+                    } else if (response.status >= 400) {
+                        showResult('down', url, response.status, responseTime);
+                        checked = true;
+                    }
+                } catch (e) {
+                    // corsproxy failed – try next
+                }
+            }
+
+            // ── METHOD 3: cors-proxy on corsproxy.org ──
+            if (!checked) {
+                try {
+                    const proxyUrl = `https://corsproxy.org/?${encodeURIComponent(url)}`;
+                    const { signal, clear } = createAbort(10000);
+                    const response = await fetch(proxyUrl, { signal });
+                    clear();
+                    const responseTime = Math.round(performance.now() - startTime);
+
+                    if (response.ok) {
+                        showResult('up', url, response.status, responseTime);
+                        checked = true;
+                    } else if (response.status >= 400) {
+                        showResult('down', url, response.status, responseTime);
+                        checked = true;
+                    }
+                } catch (e) {
+                    // this proxy also failed – try next
+                }
+            }
+
+            // ── METHOD 4: no-cors direct fetch (last resort) ──
+            if (!checked) {
+                try {
+                    const { signal, clear } = createAbort(8000);
+                    await fetch(url, { mode: 'no-cors', method: 'HEAD', signal });
+                    clear();
+                    const responseTime = Math.round(performance.now() - startTime);
+                    showResult('up', url, 'Reachable', responseTime);
+                    checked = true;
+                } catch (e) {
+                    const responseTime = Math.round(performance.now() - startTime);
+                    if (e.name === 'AbortError') {
+                        showResult('down', url, 'Timeout', responseTime);
+                        showToast('Request timed out — the site may be unreachable.', 'error');
+                    } else {
+                        showResult('down', url, 'Unreachable', responseTime);
+                    }
+                    checked = true;
+                }
+            }
+
+            checkBtn.classList.remove('loading');
+            checkBtn.disabled = false;
+        }
+
+        function showResult(status, url, code, time) {
+            const resultIcon = document.getElementById('resultIcon');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultSubtitle = document.getElementById('resultSubtitle');
+            const resultDetails = document.getElementById('resultDetails');
+
+            let displayUrl;
+            try {
+                displayUrl = new URL(url).hostname;
+            } catch {
+                displayUrl = url;
+            }
+
+            resultBox.className = 'result-box';
+
+            if (status === 'up') {
+                resultBox.classList.add('up', 'show');
+                resultIcon.innerHTML = '<i class="fas fa-check"></i>';
+                resultTitle.textContent = `${displayUrl} is UP`;
+                resultSubtitle.textContent = 'The website is reachable and responding normally.';
+                resultDetails.innerHTML = `
+                    <div class="result-detail">
+                        <i class="fas fa-signal"></i>
+                        <span>HTTP ${code}</span>
+                    </div>
+                    <div class="result-detail">
+                        <i class="fas fa-clock"></i>
+                        <span>~${time}ms response</span>
+                    </div>
+                    <div class="result-detail">
+                        <i class="fas fa-calendar-day"></i>
+                        <span>Checked ${new Date().toLocaleTimeString()}</span>
+                    </div>
+                `;
+            } else {
+                resultBox.classList.add('down', 'show');
+                resultIcon.innerHTML = '<i class="fas fa-times"></i>';
+                resultTitle.textContent = `${displayUrl} appears DOWN`;
+                resultSubtitle.textContent = 'The website is unreachable or returned an error.';
+                resultDetails.innerHTML = `
+                    <div class="result-detail">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>Status: ${code}</span>
+                    </div>
+                    <div class="result-detail">
+                        <i class="fas fa-clock"></i>
+                        <span>~${time}ms elapsed</span>
+                    </div>
+                    <div class="result-detail">
+                        <i class="fas fa-calendar-day"></i>
+                        <span>Checked ${new Date().toLocaleTimeString()}</span>
+                    </div>
+                `;
+            }
+
+            resultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    </script>
+</body>
+</html>
