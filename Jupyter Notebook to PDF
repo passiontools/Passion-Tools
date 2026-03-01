@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jupyter Notebook to PDF – PassionTools</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" id="hljs-light">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" id="hljs-dark" disabled>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.0/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        :root {
+            --red: #ef4444;
+            --purple: #a855f7;
+            --blue: #3b82f6;
+            --blue-dark: #2563eb;
+            --green: #22c55e;
+            --bg-color: #f9fafb;
+            --card-bg: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --hover-gray: #f3f4f6;
+            --btn-action-bg: #fef2f2;
+            --logo-passion: #000000;
+            --footer-bg: #111827;
+            --code-bg: #f6f8fa;
+            --code-border: #e1e4e8;
+            --output-bg: #f0f0f0;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+            --shadow-lg: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #020617;
+            --card-bg: #111827;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border-color: #1e293b;
+            --hover-gray: #1e293b;
+            --btn-action-bg: #450a0a;
+            --logo-passion: #ffffff;
+            --footer-bg: #020617;
+            --code-bg: #0d1117;
+            --code-border: #30363d;
+            --output-bg: #161b22;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.4);
+            --shadow-lg: 0 10px 40px rgba(0,0,0,0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.75);
+            border-bottom: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        [data-theme="dark"] .header {
+            background: rgba(2, 6, 23, 0.8);
+        }
+
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo-link {
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .logo-passion {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--logo-passion);
+            transition: color 0.3s ease;
+        }
+
+        .logo-tools {
+            font-size: 22px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--red), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .back-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.3s ease;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+
+        .back-link:hover {
+            color: var(--red);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .theme-toggle:hover {
+            background: var(--hover-gray);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 48px 24px 60px;
+        }
+
+        /* Tool Header */
+        .tool-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .tool-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+            transition: color 0.3s ease;
+        }
+
+        .tool-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+            max-width: 520px;
+            margin: 0 auto;
+            line-height: 1.7;
+            transition: color 0.3s ease;
+        }
+
+        /* Card */
+        .tool-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+        }
+
+        /* Upload Area */
+        .upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 56px 32px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .upload-area:hover,
+        .upload-area.drag-over {
+            border-color: var(--blue);
+            background: rgba(59, 130, 246, 0.04);
+        }
+
+        [data-theme="dark"] .upload-area:hover,
+        [data-theme="dark"] .upload-area.drag-over {
+            background: rgba(59, 130, 246, 0.08);
+        }
+
+        .upload-area input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .upload-icon {
+            font-size: 40px;
+            color: var(--blue);
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .upload-text-primary {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+            transition: color 0.3s ease;
+        }
+
+        .upload-text-secondary {
+            font-size: 13px;
+            color: var(--text-secondary);
+            transition: color 0.3s ease;
+        }
+
+        /* Processing State */
+        .processing-state {
+            display: none;
+            text-align: center;
+            padding: 56px 32px;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--border-color);
+            border-top-color: var(--blue);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .processing-text {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        /* Success State */
+        .success-state {
+            display: none;
+        }
+
+        .success-banner {
+            background: linear-gradient(135deg, rgba(34,197,94,0.1), rgba(34,197,94,0.05));
+            border: 1px solid rgba(34,197,94,0.25);
+            border-radius: 12px;
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+
+        .success-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .success-icon i {
+            color: #fff;
+            font-size: 18px;
+        }
+
+        .success-info h3 {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--green);
+            margin-bottom: 2px;
+        }
+
+        .success-info p {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .file-details {
+            background: var(--hover-gray);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 28px;
+            transition: background 0.3s ease;
+        }
+
+        .file-detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            font-size: 13px;
+        }
+
+        .file-detail-row .label {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .file-detail-row .value {
+            color: var(--text-primary);
+            font-weight: 600;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 12px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-primary {
+            flex: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 24px;
+            background: var(--blue);
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: var(--blue-dark);
+            box-shadow: 0 4px 16px rgba(59,130,246,0.35);
+            transform: translateY(-1px);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-ghost {
+            flex: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 24px;
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-ghost:hover {
+            border-color: var(--text-secondary);
+            color: var(--text-primary);
+            background: var(--hover-gray);
+        }
+
+        .btn-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            display: none;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--footer-bg);
+            text-align: center;
+            padding: 30px 20px;
+            margin-top: auto;
+            transition: background 0.3s ease;
+        }
+
+        .footer-text {
+            font-size: 14px;
+            color: #94a3b8;
+        }
+
+        /* Hidden render container */
+        #render-container {
+            position: absolute;
+            left: -9999px;
+            top: 0;
+            width: 750px;
+            background: #ffffff;
+            color: #1f2937;
+            font-family: 'Inter', sans-serif;
+            padding: 32px;
+            line-height: 1.65;
+        }
+
+        #render-container .nb-markdown-cell {
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #1f2937;
+        }
+
+        #render-container .nb-markdown-cell h1 {
+            font-size: 26px;
+            font-weight: 800;
+            margin: 18px 0 10px;
+            color: #111827;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 8px;
+        }
+
+        #render-container .nb-markdown-cell h2 {
+            font-size: 21px;
+            font-weight: 700;
+            margin: 16px 0 8px;
+            color: #1f2937;
+        }
+
+        #render-container .nb-markdown-cell h3 {
+            font-size: 17px;
+            font-weight: 600;
+            margin: 14px 0 6px;
+            color: #374151;
+        }
+
+        #render-container .nb-markdown-cell p {
+            margin-bottom: 10px;
+            line-height: 1.7;
+        }
+
+        #render-container .nb-markdown-cell ul,
+        #render-container .nb-markdown-cell ol {
+            margin: 8px 0 12px 20px;
+        }
+
+        #render-container .nb-markdown-cell li {
+            margin-bottom: 4px;
+        }
+
+        #render-container .nb-markdown-cell code {
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 12px;
+        }
+
+        #render-container .nb-markdown-cell pre {
+            background: #f6f8fa;
+            padding: 14px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 10px 0;
+            border: 1px solid #e1e4e8;
+        }
+
+        #render-container .nb-markdown-cell pre code {
+            background: none;
+            padding: 0;
+        }
+
+        #render-container .nb-markdown-cell blockquote {
+            border-left: 4px solid #3b82f6;
+            padding-left: 16px;
+            margin: 10px 0;
+            color: #6b7280;
+            font-style: italic;
+        }
+
+        #render-container .nb-markdown-cell table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        #render-container .nb-markdown-cell th,
+        #render-container .nb-markdown-cell td {
+            border: 1px solid #e5e7eb;
+            padding: 8px 12px;
+            text-align: left;
+            font-size: 13px;
+        }
+
+        #render-container .nb-markdown-cell th {
+            background: #f3f4f6;
+            font-weight: 600;
+        }
+
+        #render-container .nb-code-cell {
+            margin-bottom: 20px;
+        }
+
+        #render-container .nb-code-cell .cell-label {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 11px;
+            color: #94a3b8;
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+
+        #render-container .nb-code-cell pre {
+            background: #f6f8fa;
+            border: 1px solid #e1e4e8;
+            border-radius: 8px;
+            padding: 14px 16px;
+            overflow-x: auto;
+            margin: 0;
+            font-size: 13px;
+        }
+
+        #render-container .nb-code-cell pre code {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 13px;
+            line-height: 1.55;
+        }
+
+        #render-container .nb-output {
+            background: #fafafa;
+            border: 1px solid #e5e7eb;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            padding: 12px 16px;
+            margin-top: -1px;
+        }
+
+        #render-container .nb-output pre {
+            background: none;
+            border: none;
+            padding: 0;
+            margin: 0;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 12px;
+            color: #374151;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        #render-container .nb-output img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+            margin: 4px 0;
+        }
+
+        #render-container .nb-output .output-label {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 11px;
+            color: #94a3b8;
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+
+        #render-container .nb-separator {
+            border: none;
+            border-top: 1px solid #f0f0f0;
+            margin: 6px 0;
+        }
+
+        /* Preview section */
+        .preview-section {
+            display: none;
+            margin-top: 24px;
+        }
+
+        .preview-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 8px 0;
+            transition: color 0.3s ease;
+            background: none;
+            border: none;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .preview-toggle:hover {
+            color: var(--text-primary);
+        }
+
+        .preview-content {
+            background: var(--hover-gray);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            display: none;
+            transition: background 0.3s ease;
+        }
+
+        .preview-content.open {
+            display: block;
+        }
+
+        .preview-cell {
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .preview-cell:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .preview-cell-badge {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        .badge-markdown {
+            background: rgba(168, 85, 247, 0.12);
+            color: var(--purple);
+        }
+
+        .badge-code {
+            background: rgba(59, 130, 246, 0.12);
+            color: var(--blue);
+        }
+
+        .preview-cell pre {
+            background: var(--code-bg);
+            border: 1px solid var(--code-border);
+            border-radius: 8px;
+            padding: 12px;
+            overflow-x: auto;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 12px;
+            line-height: 1.5;
+            color: var(--text-primary);
+        }
+
+        .preview-cell .md-render {
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        .preview-cell .md-render h1,
+        .preview-cell .md-render h2,
+        .preview-cell .md-render h3 {
+            margin-bottom: 6px;
+            font-weight: 700;
+        }
+
+        .preview-cell .md-render p {
+            margin-bottom: 6px;
+        }
+
+        .preview-cell .md-render code {
+            background: var(--code-bg);
+            padding: 1px 5px;
+            border-radius: 4px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 12px;
+        }
+
+        /* Error */
+        .error-banner {
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            border-radius: 12px;
+            padding: 20px 24px;
+            display: none;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .error-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--red);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .error-icon i {
+            color: #fff;
+            font-size: 18px;
+        }
+
+        .error-info h3 {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--red);
+            margin-bottom: 2px;
+        }
+
+        .error-info p {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .main-content {
+                padding: 32px 16px 48px;
+            }
+
+            .tool-card {
+                padding: 28px 20px;
+            }
+
+            .tool-title {
+                font-size: 26px;
+            }
+
+            .tool-subtitle {
+                font-size: 14px;
+            }
+
+            .upload-area {
+                padding: 40px 20px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .header-inner {
+                padding: 12px 16px;
+            }
+
+            .back-link span {
+                display: none;
+            }
+
+            .success-banner {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-inner">
+            <a href="#" onclick="event.preventDefault();" class="logo-link">
+                <span class="logo-passion">Passion</span><span class="logo-tools">Tools</span>
+            </a>
+            <div class="header-actions">
+                <a href="index.html" class="back-link">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Back to Tools</span>
+                </a>
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">☀️</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main -->
+    <main class="main-content">
+        <!-- Tool Header -->
+        <div class="tool-header">
+            <h1 class="tool-title">Jupyter Notebook to PDF</h1>
+            <p class="tool-subtitle">Convert your .ipynb data science notebooks into clean, readable PDF reports. 100% private in-browser processing.</p>
+        </div>
+
+        <!-- Tool Card -->
+        <div class="tool-card">
+            <!-- Error Banner -->
+            <div class="error-banner" id="errorBanner">
+                <div class="error-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                <div class="error-info">
+                    <h3>Invalid File</h3>
+                    <p id="errorText">Please upload a valid .ipynb Jupyter Notebook file.</p>
+                </div>
+            </div>
+
+            <!-- State 1: Upload -->
+            <div id="uploadState">
+                <div class="upload-area" id="uploadArea">
+                    <input type="file" id="fileInput" accept=".ipynb">
+                    <i class="fas fa-file-code upload-icon"></i>
+                    <p class="upload-text-primary">Click or Drag & Drop .ipynb file here</p>
+                    <p class="upload-text-secondary">Supports Jupyter Notebook files (.ipynb)</p>
+                </div>
+            </div>
+
+            <!-- State 2: Processing -->
+            <div class="processing-state" id="processingState">
+                <div class="spinner"></div>
+                <p class="processing-text">Parsing cells and rendering code...</p>
+            </div>
+
+            <!-- State 3: Success -->
+            <div class="success-state" id="successState">
+                <div class="success-banner">
+                    <div class="success-icon"><i class="fas fa-check"></i></div>
+                    <div class="success-info">
+                        <h3>Notebook Parsed Successfully</h3>
+                        <p>Your notebook is ready to be exported as a PDF document.</p>
+                    </div>
+                </div>
+                <div class="file-details">
+                    <div class="file-detail-row">
+                        <span class="label">File Name</span>
+                        <span class="value" id="fileName">—</span>
+                    </div>
+                    <div class="file-detail-row">
+                        <span class="label">Total Cells</span>
+                        <span class="value" id="cellCount">—</span>
+                    </div>
+                    <div class="file-detail-row">
+                        <span class="label">Code Cells</span>
+                        <span class="value" id="codeCellCount">—</span>
+                    </div>
+                    <div class="file-detail-row">
+                        <span class="label">Markdown Cells</span>
+                        <span class="value" id="mdCellCount">—</span>
+                    </div>
+                </div>
+
+                <!-- Preview -->
+                <div class="preview-section" id="previewSection">
+                    <button class="preview-toggle" id="previewToggle">
+                        <i class="fas fa-eye"></i> Preview Cells
+                        <i class="fas fa-chevron-down" style="font-size:10px;"></i>
+                    </button>
+                    <div class="preview-content" id="previewContent"></div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn-primary" id="downloadBtn">
+                        <i class="fas fa-file-pdf"></i>
+                        <span>Download PDF Document</span>
+                        <div class="btn-spinner" id="downloadSpinner"></div>
+                    </button>
+                    <button class="btn-ghost" id="resetBtn">
+                        <i class="fas fa-redo"></i>
+                        Convert Another Notebook
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Hidden render container for PDF -->
+    <div id="render-container" aria-hidden="true"></div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p class="footer-text">© 2026 Passion Tools. Secure client-side processing.</p>
+    </footer>
+
+    <script>
+        // Theme Management
+        const themeToggle = document.getElementById('themeToggle');
+        const htmlEl = document.documentElement;
+        const hljsLight = document.getElementById('hljs-light');
+        const hljsDark = document.getElementById('hljs-dark');
+
+        function setTheme(theme) {
+            htmlEl.setAttribute('data-theme', theme);
+            themeToggle.textContent = theme === 'dark' ? '🌙' : '☀️';
+            localStorage.setItem('passion-tools-theme', theme);
+            if (theme === 'dark') {
+                hljsLight.disabled = true;
+                hljsDark.disabled = false;
+            } else {
+                hljsLight.disabled = false;
+                hljsDark.disabled = true;
+            }
+        }
+
+        const savedTheme = localStorage.getItem('passion-tools-theme') ||
+            (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        setTheme(savedTheme);
+
+        themeToggle.addEventListener('click', () => {
+            const current = htmlEl.getAttribute('data-theme');
+            setTheme(current === 'dark' ? 'light' : 'dark');
+        });
+
+        // DOM References
+        const uploadState = document.getElementById('uploadState');
+        const processingState = document.getElementById('processingState');
+        const successState = document.getElementById('successState');
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const errorBanner = document.getElementById('errorBanner');
+        const errorText = document.getElementById('errorText');
+        const fileNameEl = document.getElementById('fileName');
+        const cellCountEl = document.getElementById('cellCount');
+        const codeCellCountEl = document.getElementById('codeCellCount');
+        const mdCellCountEl = document.getElementById('mdCellCount');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const downloadSpinner = document.getElementById('downloadSpinner');
+        const resetBtn = document.getElementById('resetBtn');
+        const renderContainer = document.getElementById('render-container');
+        const previewSection = document.getElementById('previewSection');
+        const previewToggle = document.getElementById('previewToggle');
+        const previewContent = document.getElementById('previewContent');
+
+        let notebookData = null;
+        let originalFileName = '';
+
+        // Drag and Drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('drag-over');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('drag-over');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) handleFile(files[0]);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) handleFile(e.target.files[0]);
+        });
+
+        function showError(msg) {
+            errorText.textContent = msg;
+            errorBanner.style.display = 'flex';
+        }
+
+        function hideError() {
+            errorBanner.style.display = 'none';
+        }
+
+        function showState(state) {
+            uploadState.style.display = 'none';
+            processingState.style.display = 'none';
+            successState.style.display = 'none';
+            if (state === 'upload') uploadState.style.display = 'block';
+            else if (state === 'processing') processingState.style.display = 'block';
+            else if (state === 'success') successState.style.display = 'block';
+        }
+
+        function handleFile(file) {
+            hideError();
+
+            if (!file.name.endsWith('.ipynb')) {
+                showError('Invalid file type. Please upload a .ipynb Jupyter Notebook file.');
+                return;
+            }
+
+            originalFileName = file.name;
+            showState('processing');
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const nb = JSON.parse(e.target.result);
+                    if (!nb.cells || !Array.isArray(nb.cells)) {
+                        throw new Error('Invalid notebook structure: no cells array found.');
+                    }
+                    notebookData = nb;
+                    processNotebook(nb, file.name);
+                } catch (err) {
+                    showState('upload');
+                    showError('Failed to parse notebook: ' + err.message);
+                }
+            };
+            reader.onerror = () => {
+                showState('upload');
+                showError('Failed to read file. Please try again.');
+            };
+            reader.readAsText(file);
+        }
+
+        function getCellSource(cell) {
+            if (Array.isArray(cell.source)) return cell.source.join('');
+            return cell.source || '';
+        }
+
+        function getOutputText(output) {
+            if (output.text) {
+                return Array.isArray(output.text) ? output.text.join('') : output.text;
+            }
+            if (output.data && output.data['text/plain']) {
+                const t = output.data['text/plain'];
+                return Array.isArray(t) ? t.join('') : t;
+            }
+            return '';
+        }
+
+        function getOutputImage(output) {
+            if (output.data) {
+                if (output.data['image/png']) {
+                    const d = output.data['image/png'];
+                    const base64 = Array.isArray(d) ? d.join('') : d;
+                    return 'data:image/png;base64,' + base64.trim();
+                }
+                if (output.data['image/jpeg']) {
+                    const d = output.data['image/jpeg'];
+                    const base64 = Array.isArray(d) ? d.join('') : d;
+                    return 'data:image/jpeg;base64,' + base64.trim();
+                }
+                if (output.data['image/svg+xml']) {
+                    const d = output.data['image/svg+xml'];
+                    const svg = Array.isArray(d) ? d.join('') : d;
+                    return 'data:image/svg+xml;base64,' + btoa(svg);
+                }
+            }
+            return null;
+        }
+
+        function getOutputHtml(output) {
+            if (output.data && output.data['text/html']) {
+                const h = output.data['text/html'];
+                return Array.isArray(h) ? h.join('') : h;
+            }
+            return null;
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function processNotebook(nb, name) {
+            const cells = nb.cells;
+            const codeCells = cells.filter(c => c.cell_type === 'code');
+            const mdCells = cells.filter(c => c.cell_type === 'markdown');
+            const rawCells = cells.filter(c => c.cell_type === 'raw');
+
+            // Populate render container for PDF
+            renderContainer.innerHTML = '';
+            let codeIndex = 0;
+
+            cells.forEach((cell, idx) => {
+                const source = getCellSource(cell);
+                if (!source.trim() && cell.cell_type !== 'code') return;
+
+                if (cell.cell_type === 'markdown') {
+                    const div = document.createElement('div');
+                    div.className = 'nb-markdown-cell';
+                    div.innerHTML = marked.parse(source);
+                    renderContainer.appendChild(div);
+                } else if (cell.cell_type === 'code') {
+                    codeIndex++;
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'nb-code-cell';
+
+                    const label = document.createElement('div');
+                    label.className = 'cell-label';
+                    label.textContent = 'In [' + codeIndex + ']:';
+                    wrapper.appendChild(label);
+
+                    const pre = document.createElement('pre');
+                    const code = document.createElement('code');
+                    code.className = 'language-python';
+                    code.textContent = source;
+                    pre.appendChild(code);
+                    wrapper.appendChild(pre);
+
+                    // Highlight
+                    hljs.highlightElement(code);
+
+                    // Outputs
+                    if (cell.outputs && cell.outputs.length > 0) {
+                        const outputDiv = document.createElement('div');
+                        outputDiv.className = 'nb-output';
+
+                        const outLabel = document.createElement('div');
+                        outLabel.className = 'output-label';
+                        outLabel.textContent = 'Out [' + codeIndex + ']:';
+                        outputDiv.appendChild(outLabel);
+
+                        cell.outputs.forEach(output => {
+                            const imgSrc = getOutputImage(output);
+                            const htmlContent = getOutputHtml(output);
+                            const textContent = getOutputText(output);
+
+                            if (imgSrc) {
+                                const img = document.createElement('img');
+                                img.src = imgSrc;
+                                outputDiv.appendChild(img);
+                            } else if (htmlContent) {
+                                const htmlDiv = document.createElement('div');
+                                htmlDiv.innerHTML = htmlContent;
+                                outputDiv.appendChild(htmlDiv);
+                            } else if (textContent) {
+                                const outPre = document.createElement('pre');
+                                outPre.textContent = textContent;
+                                outputDiv.appendChild(outPre);
+                            }
+
+                            // Handle stream and error outputs
+                            if (output.output_type === 'stream' && !textContent) {
+                                const streamText = output.text;
+                                if (streamText) {
+                                    const outPre = document.createElement('pre');
+                                    outPre.textContent = Array.isArray(streamText) ? streamText.join('') : streamText;
+                                    outputDiv.appendChild(outPre);
+                                }
+                            }
+
+                            if (output.output_type === 'error') {
+                                const errPre = document.createElement('pre');
+                                errPre.style.color = '#ef4444';
+                                const tb = output.traceback || [];
+                                errPre.textContent = tb.map(line => line.replace(/\x1b\[[0-9;]*m/g, '')).join('\n');
+                                outputDiv.appendChild(errPre);
+                            }
+                        });
+
+                        wrapper.appendChild(outputDiv);
+                    }
+
+                    renderContainer.appendChild(wrapper);
+                } else if (cell.cell_type === 'raw') {
+                    const div = document.createElement('div');
+                    div.className = 'nb-code-cell';
+                    const pre = document.createElement('pre');
+                    pre.textContent = source;
+                    div.appendChild(pre);
+                    renderContainer.appendChild(div);
+                }
+            });
+
+            // Build preview
+            previewContent.innerHTML = '';
+            cells.forEach((cell, idx) => {
+                const source = getCellSource(cell);
+                if (!source.trim() && cell.cell_type !== 'code') return;
+
+                const cellDiv = document.createElement('div');
+                cellDiv.className = 'preview-cell';
+
+                const badge = document.createElement('span');
+                badge.className = 'preview-cell-badge ' + (cell.cell_type === 'markdown' ? 'badge-markdown' : 'badge-code');
+                badge.textContent = cell.cell_type;
+                cellDiv.appendChild(badge);
+
+                if (cell.cell_type === 'markdown') {
+                    const mdDiv = document.createElement('div');
+                    mdDiv.className = 'md-render';
+                    mdDiv.innerHTML = marked.parse(source);
+                    cellDiv.appendChild(mdDiv);
+                } else {
+                    const pre = document.createElement('pre');
+                    const codeEl = document.createElement('code');
+                    codeEl.className = 'language-python';
+                    codeEl.textContent = source;
+                    pre.appendChild(codeEl);
+                    cellDiv.appendChild(pre);
+                    hljs.highlightElement(codeEl);
+                }
+
+                previewContent.appendChild(cellDiv);
+            });
+
+            // Update info
+            setTimeout(() => {
+                fileNameEl.textContent = name;
+                cellCountEl.textContent = cells.length;
+                codeCellCountEl.textContent = codeCells.length;
+                mdCellCountEl.textContent = mdCells.length;
+                previewSection.style.display = 'block';
+                showState('success');
+            }, 600);
+        }
+
+        // Preview toggle
+        let previewOpen = false;
+        previewToggle.addEventListener('click', () => {
+            previewOpen = !previewOpen;
+            previewContent.classList.toggle('open', previewOpen);
+            const icon = previewToggle.querySelector('.fa-chevron-down, .fa-chevron-up');
+            if (previewOpen) {
+                icon.classList.remove('fa-chevron-down');
+                icon.classList.add('fa-chevron-up');
+            } else {
+                icon.classList.remove('fa-chevron-up');
+                icon.classList.add('fa-chevron-down');
+            }
+        });
+
+        // Download PDF
+        downloadBtn.addEventListener('click', async () => {
+            downloadBtn.disabled = true;
+            downloadSpinner.style.display = 'inline-block';
+            downloadBtn.querySelector('span').textContent = 'Generating PDF...';
+            downloadBtn.querySelector('i').style.display = 'none';
+
+            const pdfName = originalFileName.replace('.ipynb', '') + '.pdf';
+
+            const opt = {
+                margin: [12, 12, 12, 12],
+                filename: pdfName,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: {
+                    scale: 2,
+                    useCORS: true,
+                    letterRendering: true,
+                    logging: false,
+                    scrollY: 0,
+                    windowWidth: 750
+                },
+                jsPDF: {
+                    unit: 'mm',
+                    format: 'a4',
+                    orientation: 'portrait'
+                },
+                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+            };
+
+            try {
+                await html2pdf().set(opt).from(renderContainer).save();
+            } catch (err) {
+                console.error('PDF generation failed:', err);
+                showError('PDF generation failed. Please try again.');
+            } finally {
+                downloadBtn.disabled = false;
+                downloadSpinner.style.display = 'none';
+                downloadBtn.querySelector('span').textContent = 'Download PDF Document';
+                downloadBtn.querySelector('i').style.display = '';
+            }
+        });
+
+        // Reset
+        resetBtn.addEventListener('click', () => {
+            hideError();
+            notebookData = null;
+            originalFileName = '';
+            fileInput.value = '';
+            renderContainer.innerHTML = '';
+            previewContent.innerHTML = '';
+            previewOpen = false;
+            previewContent.classList.remove('open');
+            previewSection.style.display = 'none';
+            showState('upload');
+        });
+    </script>
+</body>
+</html>
