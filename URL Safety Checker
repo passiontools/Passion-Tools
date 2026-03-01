@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Safety Checker - PassionTools</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --red: #ef4444;
+            --purple: #a855f7;
+            --blue: #3b82f6;
+            --blue-dark: #2563eb;
+            --green: #22c55e;
+            --yellow: #f59e0b;
+            --bg-color: #f9fafb;
+            --card-bg: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --hover-gray: #f3f4f6;
+            --btn-action-bg: #fef2f2;
+            --logo-passion: #000000;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #020617;
+            --card-bg: #111827;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border-color: #1e293b;
+            --hover-gray: #1e293b;
+            --btn-action-bg: #450a0a;
+            --logo-passion: #ffffff;
+        }
+
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            line-height: 1.6;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.72);
+            border-bottom: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        [data-theme="dark"] .header {
+            background: rgba(2, 6, 23, 0.75);
+        }
+
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            text-decoration: none;
+            font-size: 1.35rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .logo .passion {
+            color: var(--logo-passion);
+            transition: color 0.3s ease;
+        }
+
+        .logo .tools {
+            background: linear-gradient(135deg, var(--red), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .back-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: var(--red);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.15rem;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            background: var(--hover-gray);
+        }
+
+        /* ===== MAIN ===== */
+        .main {
+            flex: 1;
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 48px 24px 64px;
+        }
+
+        /* ===== TOOL HEADER ===== */
+        .tool-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .tool-title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+            transition: color 0.3s ease;
+        }
+
+        .tool-subtitle {
+            font-size: 1rem;
+            font-weight: 400;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.7;
+            transition: color 0.3s ease;
+        }
+
+        /* ===== SEARCH AREA ===== */
+        .search-area {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+            align-items: stretch;
+            transition: all 0.4s ease;
+        }
+
+        .url-input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        .url-input {
+            width: 100%;
+            padding: 16px 20px 16px 48px;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            font-weight: 400;
+            color: var(--text-primary);
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 14px;
+            outline: none;
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .url-input::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+
+        .url-input:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+        }
+
+        .url-input-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .url-input:focus ~ .url-input-icon {
+            color: var(--blue);
+        }
+
+        .analyze-btn {
+            padding: 16px 32px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #ffffff;
+            background: linear-gradient(135deg, var(--blue), var(--blue-dark));
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25);
+        }
+
+        .analyze-btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.35);
+        }
+
+        .analyze-btn:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .analyze-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .analyze-btn .spinner {
+            display: none;
+            width: 18px;
+            height: 18px;
+            border: 2.5px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+
+        .analyze-btn.loading .spinner {
+            display: inline-block;
+        }
+
+        .analyze-btn.loading .btn-label {
+            display: none;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error-msg {
+            color: var(--red);
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-top: 8px;
+            margin-bottom: 20px;
+            display: none;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .error-msg.show {
+            display: flex;
+        }
+
+        /* ===== START OVER ===== */
+        .start-over-wrapper {
+            display: none;
+            justify-content: center;
+            margin-top: 36px;
+            margin-bottom: 8px;
+            animation: fadeSlideUp 0.5s ease forwards;
+        }
+
+        .start-over-wrapper.show {
+            display: flex;
+        }
+
+        .start-over-btn {
+            padding: 14px 36px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 14px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .start-over-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(59,130,246,0.06), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .start-over-btn:hover::before {
+            left: 100%;
+        }
+
+        .start-over-btn:hover {
+            border-color: var(--blue);
+            color: var(--blue);
+            box-shadow: 0 4px 20px rgba(59,130,246,0.12);
+            transform: translateY(-2px);
+        }
+
+        .start-over-btn:active {
+            transform: translateY(0);
+        }
+
+        .start-over-btn i {
+            font-size: 0.9rem;
+            transition: transform 0.3s ease;
+        }
+
+        .start-over-btn:hover i {
+            transform: rotate(-180deg);
+        }
+
+        /* ===== RESULTS ===== */
+        .results-section {
+            display: none;
+            animation: fadeSlideUp 0.5s ease forwards;
+        }
+
+        .results-section.show {
+            display: block;
+        }
+
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-12px); }
+        }
+
+        .results-section.hiding {
+            animation: fadeOut 0.35s ease forwards;
+        }
+
+        /* Safety Banner */
+        .safety-banner {
+            border-radius: 16px;
+            padding: 28px 32px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 32px;
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .safety-banner.safe {
+            background: linear-gradient(135deg, rgba(34,197,94,0.08), rgba(34,197,94,0.03));
+            border-color: rgba(34,197,94,0.25);
+        }
+        .safety-banner.safe .banner-icon {
+            background: rgba(34,197,94,0.12);
+            color: var(--green);
+        }
+
+        .safety-banner.suspicious {
+            background: linear-gradient(135deg, rgba(245,158,11,0.08), rgba(245,158,11,0.03));
+            border-color: rgba(245,158,11,0.25);
+        }
+        .safety-banner.suspicious .banner-icon {
+            background: rgba(245,158,11,0.12);
+            color: var(--yellow);
+        }
+
+        .safety-banner.danger {
+            background: linear-gradient(135deg, rgba(239,68,68,0.08), rgba(239,68,68,0.03));
+            border-color: rgba(239,68,68,0.25);
+        }
+        .safety-banner.danger .banner-icon {
+            background: rgba(239,68,68,0.12);
+            color: var(--red);
+        }
+
+        .banner-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+
+        .banner-text h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 2px;
+            color: var(--text-primary);
+        }
+
+        .banner-text p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .analyzed-url {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            word-break: break-all;
+            margin-top: 4px;
+            font-family: 'Inter', monospace;
+            opacity: 0.7;
+        }
+
+        /* Score ring */
+        .score-ring-container {
+            flex-shrink: 0;
+            margin-left: auto;
+            text-align: center;
+        }
+
+        .score-ring {
+            width: 64px;
+            height: 64px;
+            position: relative;
+        }
+
+        .score-ring svg {
+            transform: rotate(-90deg);
+        }
+
+        .score-ring-bg {
+            fill: none;
+            stroke: var(--border-color);
+            stroke-width: 5;
+        }
+
+        .score-ring-fill {
+            fill: none;
+            stroke-width: 5;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1s ease, stroke 0.3s ease;
+        }
+
+        .score-ring-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .score-label {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        /* Heuristics Grid */
+        .heuristics-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .heuristics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .heuristic-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 22px;
+            transition: all 0.3s ease;
+            animation: fadeSlideUp 0.4s ease forwards;
+            opacity: 0;
+        }
+
+        .heuristic-card:nth-child(1) { animation-delay: 0.1s; }
+        .heuristic-card:nth-child(2) { animation-delay: 0.15s; }
+        .heuristic-card:nth-child(3) { animation-delay: 0.2s; }
+        .heuristic-card:nth-child(4) { animation-delay: 0.25s; }
+        .heuristic-card:nth-child(5) { animation-delay: 0.3s; }
+        .heuristic-card:nth-child(6) { animation-delay: 0.35s; }
+
+        .heuristic-card:hover {
+            border-color: var(--blue);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        }
+
+        [data-theme="dark"] .heuristic-card:hover {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .heuristic-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .heuristic-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .heuristic-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+            flex-shrink: 0;
+        }
+
+        .heuristic-icon.pass {
+            background: rgba(34,197,94,0.1);
+            color: var(--green);
+        }
+
+        .heuristic-icon.fail {
+            background: rgba(239,68,68,0.1);
+            color: var(--red);
+        }
+
+        .heuristic-icon.warn {
+            background: rgba(245,158,11,0.1);
+            color: var(--yellow);
+        }
+
+        .heuristic-icon.info {
+            background: rgba(59,130,246,0.1);
+            color: var(--blue);
+        }
+
+        .heuristic-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .heuristic-badge {
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .heuristic-badge.pass {
+            background: rgba(34,197,94,0.1);
+            color: var(--green);
+        }
+
+        .heuristic-badge.fail {
+            background: rgba(239,68,68,0.1);
+            color: var(--red);
+        }
+
+        .heuristic-badge.warn {
+            background: rgba(245,158,11,0.1);
+            color: var(--yellow);
+        }
+
+        .heuristic-badge.info {
+            background: rgba(59,130,246,0.1);
+            color: var(--blue);
+        }
+
+        .heuristic-desc {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            line-height: 1.55;
+        }
+
+        .heuristic-detail {
+            margin-top: 10px;
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            background: var(--hover-gray);
+            padding: 8px 12px;
+            border-radius: 8px;
+            word-break: break-all;
+            font-family: 'Inter', monospace;
+            border-left: 3px solid var(--border-color);
+        }
+
+        .heuristic-detail.pass-detail { border-left-color: var(--green); }
+        .heuristic-detail.fail-detail { border-left-color: var(--red); }
+        .heuristic-detail.warn-detail { border-left-color: var(--yellow); }
+        .heuristic-detail.info-detail { border-left-color: var(--blue); }
+
+
+
+        /* ===== FOOTER ===== */
+        .footer {
+            background: #111827;
+            padding: 30px 20px;
+            text-align: center;
+            margin-top: auto;
+        }
+
+        [data-theme="dark"] .footer {
+            background: #020617;
+        }
+
+        .footer p {
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            color: #94a3b8;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 700px) {
+            .search-area {
+                flex-direction: column;
+            }
+
+            .analyze-btn {
+                width: 100%;
+                justify-content: center;
+                padding: 16px;
+            }
+
+            .heuristics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tool-title {
+                font-size: 1.55rem;
+            }
+
+            .tool-subtitle {
+                font-size: 0.92rem;
+            }
+
+            .safety-banner {
+                flex-direction: column;
+                text-align: center;
+                padding: 24px 20px;
+            }
+
+            .score-ring-container {
+                margin-left: 0;
+            }
+
+            .main {
+                padding: 32px 16px 48px;
+            }
+
+            .start-over-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-inner {
+                padding: 0 16px;
+            }
+
+            .back-link span {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-inner">
+            <a href="#" class="logo" onclick="event.preventDefault();">
+                <span class="passion">Passion</span><span class="tools">Tools</span>
+            </a>
+            <div class="header-actions">
+                <a href="index.html" class="back-link">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Back to Tools</span>
+                </a>
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">☀️</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="main">
+        <!-- Tool Header -->
+        <div class="tool-header" id="toolHeader">
+            <h1 class="tool-title">URL Safety Checker</h1>
+            <p class="tool-subtitle">Analyze links for malicious behavior, phishing patterns, and security risks before you click. 100% private in-browser analysis.</p>
+        </div>
+
+        <!-- Search Area -->
+        <div class="search-area" id="searchArea">
+            <div class="url-input-wrapper">
+                <input type="url" id="urlInput" class="url-input" placeholder="Paste a link to analyze (e.g., https://example.com/...)" autocomplete="off" spellcheck="false">
+                <i class="fas fa-link url-input-icon"></i>
+            </div>
+            <button class="analyze-btn" id="analyzeBtn" onclick="analyzeURL()">
+                <span class="spinner"></span>
+                <span class="btn-label"><i class="fas fa-shield-halved"></i> Analyze Link</span>
+            </button>
+        </div>
+        <div class="error-msg" id="errorMsg">
+            <i class="fas fa-circle-exclamation"></i>
+            <span id="errorText">Invalid URL format.</span>
+        </div>
+
+        <!-- Results Section -->
+        <div class="results-section" id="resultsSection">
+            <!-- Safety Banner -->
+            <div class="safety-banner" id="safetyBanner">
+                <div class="banner-icon" id="bannerIcon"><i class="fas fa-shield-halved"></i></div>
+                <div class="banner-text">
+                    <h3 id="bannerTitle">Appears Safe</h3>
+                    <p id="bannerDesc">No major issues detected.</p>
+                    <div class="analyzed-url" id="analyzedUrl"></div>
+                </div>
+                <div class="score-ring-container">
+                    <div class="score-ring">
+                        <svg width="64" height="64" viewBox="0 0 64 64">
+                            <circle class="score-ring-bg" cx="32" cy="32" r="27"/>
+                            <circle class="score-ring-fill" id="scoreRingFill" cx="32" cy="32" r="27" stroke-dasharray="169.65" stroke-dashoffset="169.65"/>
+                        </svg>
+                        <span class="score-ring-text" id="scoreText">100</span>
+                    </div>
+                    <div class="score-label">Safety</div>
+                </div>
+            </div>
+
+            <!-- Heuristics Grid -->
+            <div class="heuristics-title"><i class="fas fa-microscope"></i> Analysis Breakdown</div>
+            <div class="heuristics-grid" id="heuristicsGrid"></div>
+
+            <!-- Start Over Button -->
+            <div class="start-over-wrapper show" id="startOverWrapper">
+                <button class="start-over-btn" id="startOverBtn" onclick="startOver()">
+                    <i class="fas fa-rotate-left"></i>
+                    <span>Start Over</span>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <p>© 2026 Passion Tools. Secure client-side processing.</p>
+    </footer>
+
+    <script>
+        // ===== THEME TOGGLE =====
+        const themeToggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+
+        function applyTheme(theme) {
+            html.setAttribute('data-theme', theme);
+            themeToggle.textContent = theme === 'dark' ? '🌙' : '☀️';
+            localStorage.setItem('pt-theme', theme);
+        }
+
+        (function initTheme() {
+            const saved = localStorage.getItem('pt-theme');
+            if (saved) {
+                applyTheme(saved);
+            } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                applyTheme('dark');
+            }
+        })();
+
+        themeToggle.addEventListener('click', () => {
+            const current = html.getAttribute('data-theme');
+            applyTheme(current === 'dark' ? 'light' : 'dark');
+        });
+
+        // ===== URL INPUT: Enter key =====
+        document.getElementById('urlInput').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') analyzeURL();
+        });
+
+        // ===== KNOWN SHORTENERS =====
+        const URL_SHORTENERS = [
+            'bit.ly', 'tinyurl.com', 't.co', 'goo.gl', 'ow.ly', 'is.gd',
+            'buff.ly', 'adf.ly', 'bl.ink', 'lnkd.in', 'db.tt', 'qr.ae',
+            'rebrand.ly', 'rb.gy', 'cutt.ly', 'shorturl.at', 'v.gd',
+            'soo.gd', 'tiny.cc', 's.id', 'rotf.lol', 'cli.re', 'shorte.st',
+            'bc.vc', 'budurl.com', 'mcaf.ee', 'su.pr', 'vzturl.com', 'tr.im',
+            'u.to', 'short.io', 'hyper.co', 'han.gl', 'bmc.link'
+        ];
+
+        // ===== SUSPICIOUS TLDs =====
+        const SUSPICIOUS_TLDS = [
+            '.tk', '.ml', '.ga', '.cf', '.gq', '.buzz', '.xyz', '.top',
+            '.club', '.work', '.click', '.link', '.info', '.icu', '.rest',
+            '.monster', '.surf'
+        ];
+
+        // ===== START OVER =====
+        function startOver() {
+            const resultsSection = document.getElementById('resultsSection');
+            const errorEl = document.getElementById('errorMsg');
+            const urlInput = document.getElementById('urlInput');
+
+            // Animate out
+            resultsSection.classList.add('hiding');
+
+            setTimeout(() => {
+                resultsSection.classList.remove('show', 'hiding');
+                errorEl.classList.remove('show');
+
+                // Clear input
+                urlInput.value = '';
+
+                // Scroll to top smoothly
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+
+                // Focus input after scroll
+                setTimeout(() => {
+                    urlInput.focus();
+                }, 400);
+            }, 350);
+        }
+
+        // ===== MAIN ANALYSIS =====
+        function analyzeURL() {
+            const input = document.getElementById('urlInput').value.trim();
+            const errorEl = document.getElementById('errorMsg');
+            const errorText = document.getElementById('errorText');
+            const resultsSection = document.getElementById('resultsSection');
+            const btn = document.getElementById('analyzeBtn');
+
+            errorEl.classList.remove('show');
+            resultsSection.classList.remove('show');
+
+            if (!input) {
+                errorText.textContent = 'Please enter a URL to analyze.';
+                errorEl.classList.add('show');
+                return;
+            }
+
+            // Loading state
+            btn.classList.add('loading');
+            btn.disabled = true;
+
+            // Simulate slight delay for UX
+            setTimeout(() => {
+                let urlObj = null;
+                let rawInput = input;
+
+                try {
+                    urlObj = new URL(input);
+                } catch {
+                    try {
+                        rawInput = 'http://' + input;
+                        urlObj = new URL(rawInput);
+                    } catch {
+                        errorText.textContent = 'Invalid URL format. Please enter a valid web address.';
+                        errorEl.classList.add('show');
+                        btn.classList.remove('loading');
+                        btn.disabled = false;
+                        return;
+                    }
+                }
+
+                const results = runHeuristics(urlObj, rawInput);
+                renderResults(urlObj, results);
+
+                btn.classList.remove('loading');
+                btn.disabled = false;
+            }, 800);
+        }
+
+        // ===== HEURISTIC ENGINE =====
+        function runHeuristics(url, rawInput) {
+            const checks = [];
+
+            // 1. Protocol Check
+            const isHTTPS = url.protocol === 'https:';
+            const isHTTP = url.protocol === 'http:';
+            checks.push({
+                name: 'Protocol Check',
+                icon: isHTTPS ? 'fa-lock' : 'fa-lock-open',
+                status: isHTTPS ? 'pass' : (isHTTP ? 'fail' : 'warn'),
+                badge: isHTTPS ? 'Secure' : (isHTTP ? 'Insecure' : 'Unknown'),
+                weight: isHTTPS ? 0 : (isHTTP ? 25 : 10),
+                desc: isHTTPS
+                    ? 'This URL uses HTTPS, which encrypts the connection between your browser and the server.'
+                    : isHTTP
+                        ? 'This URL uses plain HTTP with no encryption. Data sent to this site can be intercepted by third parties.'
+                        : `Uses non-standard protocol: ${url.protocol}`,
+                detail: `Protocol: ${url.protocol.replace(':', '').toUpperCase()}`
+            });
+
+            // 2. Domain Analysis (IP Address check)
+            const host = url.hostname;
+            const ipv4Regex = /^(\d{1,3}\.){3}\d{1,3}$/;
+            const ipv6Regex = /^\[?[0-9a-fA-F:]+\]?$/;
+            const isIP = ipv4Regex.test(host) || ipv6Regex.test(host);
+            checks.push({
+                name: 'Domain Analysis',
+                icon: isIP ? 'fa-server' : 'fa-globe',
+                status: isIP ? 'fail' : 'pass',
+                badge: isIP ? 'IP Address' : 'Domain',
+                weight: isIP ? 30 : 0,
+                desc: isIP
+                    ? 'This URL points to a raw IP address instead of a domain name. This is a common phishing technique used to hide the real destination.'
+                    : 'This URL uses a standard domain name, which is typical for legitimate websites.',
+                detail: `Host: ${host}`
+            });
+
+            // 3. Credential Spoofing (@ symbol)
+            const atInAuthority = /\/\/[^/]*@/.test(rawInput);
+            checks.push({
+                name: 'Credential Spoofing',
+                icon: atInAuthority ? 'fa-user-secret' : 'fa-user-shield',
+                status: atInAuthority ? 'fail' : 'pass',
+                badge: atInAuthority ? 'Detected' : 'Clear',
+                weight: atInAuthority ? 35 : 0,
+                desc: atInAuthority
+                    ? 'An "@" symbol was detected in the URL authority. This technique is used to make a URL look like it leads to a trusted site (e.g., http://google.com@malicious.com) while actually navigating to a malicious domain.'
+                    : 'No credential spoofing patterns detected. The URL does not use the "@" trick to obfuscate the destination.',
+                detail: atInAuthority
+                    ? `Actual destination host: ${url.hostname}`
+                    : `No "@" symbol in URL authority`
+            });
+
+            // 4. URL Length & Complexity
+            const totalLength = rawInput.length;
+            const subdomains = host.split('.');
+            const subdomainCount = subdomains.length;
+            const isLong = totalLength > 100;
+            const isVeryLong = totalLength > 200;
+            const excessiveSubdomains = subdomainCount > 4;
+            const hasEncodedChars = /%[0-9a-fA-F]{2}/.test(rawInput);
+            const complexIssues = [];
+            if (isVeryLong) complexIssues.push('extremely long URL');
+            else if (isLong) complexIssues.push('long URL');
+            if (excessiveSubdomains) complexIssues.push(`${subdomainCount} subdomain levels`);
+            if (hasEncodedChars) complexIssues.push('encoded characters');
+
+            let complexStatus = 'pass';
+            let complexWeight = 0;
+            if (isVeryLong || (isLong && excessiveSubdomains)) {
+                complexStatus = 'fail';
+                complexWeight = 20;
+            } else if (isLong || excessiveSubdomains || hasEncodedChars) {
+                complexStatus = 'warn';
+                complexWeight = 10;
+            }
+
+            checks.push({
+                name: 'URL Length & Complexity',
+                icon: complexStatus === 'pass' ? 'fa-check-circle' : 'fa-ruler-horizontal',
+                status: complexStatus,
+                badge: complexStatus === 'pass' ? 'Normal' : (complexStatus === 'warn' ? 'Moderate' : 'Complex'),
+                weight: complexWeight,
+                desc: complexStatus === 'pass'
+                    ? 'The URL length and structure appear normal. No excessive subdomains or unusual encoding detected.'
+                    : `Potential concerns detected: ${complexIssues.join(', ')}. Attackers often use complex URLs to confuse users and hide the real destination.`,
+                detail: `Length: ${totalLength} chars | Subdomains: ${subdomainCount} levels${hasEncodedChars ? ' | Contains encoded chars' : ''}`
+            });
+
+            // 5. URL Shortener
+            const hostLower = host.toLowerCase();
+            const isShortener = URL_SHORTENERS.some(s => hostLower === s || hostLower.endsWith('.' + s));
+            checks.push({
+                name: 'URL Shortener Detection',
+                icon: isShortener ? 'fa-compress' : 'fa-expand',
+                status: isShortener ? 'warn' : 'pass',
+                badge: isShortener ? 'Shortener' : 'Direct',
+                weight: isShortener ? 15 : 0,
+                desc: isShortener
+                    ? `The domain "${host}" is a known URL shortener service. Shortened URLs hide the final destination and can be used to mask malicious links. Proceed with caution.`
+                    : 'This URL does not use a known URL shortener. The domain directly represents the destination.',
+                detail: isShortener ? `Matched shortener: ${host}` : `Domain: ${host} (not a known shortener)`
+            });
+
+            // 6. Suspicious TLD Check
+            const tld = '.' + hostLower.split('.').pop();
+            const isSuspiciousTLD = SUSPICIOUS_TLDS.includes(tld);
+            if (isSuspiciousTLD) {
+                checks.push({
+                    name: 'Suspicious TLD',
+                    icon: 'fa-triangle-exclamation',
+                    status: 'warn',
+                    badge: 'Risky TLD',
+                    weight: 10,
+                    desc: `The top-level domain "${tld}" is frequently associated with spam and phishing campaigns due to low registration costs and minimal verification.`,
+                    detail: `TLD: ${tld}`
+                });
+            }
+
+            return checks;
+        }
+
+        // ===== RENDER RESULTS =====
+        function renderResults(urlObj, checks) {
+            const totalWeight = checks.reduce((sum, c) => sum + c.weight, 0);
+            const score = Math.max(0, 100 - totalWeight);
+
+            let level, levelTitle, levelDesc, bannerClass, bannerIconClass, ringColor;
+            if (score >= 80) {
+                level = 'safe';
+                levelTitle = 'Appears Safe';
+                levelDesc = 'No major security issues were detected in this URL.';
+                bannerClass = 'safe';
+                bannerIconClass = 'fa-shield-halved';
+                ringColor = '#22c55e';
+            } else if (score >= 50) {
+                level = 'suspicious';
+                levelTitle = 'Suspicious';
+                levelDesc = 'Some potential risks were found. Proceed with caution.';
+                bannerClass = 'suspicious';
+                bannerIconClass = 'fa-exclamation-triangle';
+                ringColor = '#f59e0b';
+            } else {
+                level = 'danger';
+                levelTitle = 'High Risk';
+                levelDesc = 'Multiple security red flags detected. Avoid visiting this URL.';
+                bannerClass = 'danger';
+                bannerIconClass = 'fa-skull-crossbones';
+                ringColor = '#ef4444';
+            }
+
+            // Banner
+            const banner = document.getElementById('safetyBanner');
+            banner.className = 'safety-banner ' + bannerClass;
+            document.getElementById('bannerIcon').innerHTML = `<i class="fas ${bannerIconClass}"></i>`;
+            document.getElementById('bannerTitle').textContent = levelTitle;
+            document.getElementById('bannerDesc').textContent = levelDesc;
+            document.getElementById('analyzedUrl').textContent = urlObj.href;
+
+            // Score ring
+            const circumference = 2 * Math.PI * 27; // ~169.65
+            const offset = circumference - (score / 100) * circumference;
+            const ringFill = document.getElementById('scoreRingFill');
+            ringFill.style.stroke = ringColor;
+            ringFill.style.strokeDasharray = circumference;
+            ringFill.style.strokeDashoffset = circumference;
+            document.getElementById('scoreText').textContent = score;
+            document.getElementById('scoreText').style.color = ringColor;
+
+            // Animate ring
+            requestAnimationFrame(() => {
+                setTimeout(() => {
+                    ringFill.style.strokeDashoffset = offset;
+                }, 50);
+            });
+
+            // Heuristics grid
+            const grid = document.getElementById('heuristicsGrid');
+            grid.innerHTML = '';
+
+            checks.forEach(check => {
+                const card = document.createElement('div');
+                card.className = 'heuristic-card';
+                card.innerHTML = `
+                    <div class="heuristic-top">
+                        <div class="heuristic-label">
+                            <div class="heuristic-icon ${check.status}">
+                                <i class="fas ${check.icon}"></i>
+                            </div>
+                            <span class="heuristic-name">${check.name}</span>
+                        </div>
+                        <span class="heuristic-badge ${check.status}">${check.badge}</span>
+                    </div>
+                    <div class="heuristic-desc">${check.desc}</div>
+                    <div class="heuristic-detail ${check.status}-detail">${check.detail}</div>
+                `;
+                grid.appendChild(card);
+            });
+
+            // Show results
+            const resultsSection = document.getElementById('resultsSection');
+            resultsSection.classList.remove('show', 'hiding');
+            // Force reflow for re-animation
+            void resultsSection.offsetWidth;
+            resultsSection.classList.add('show');
+
+            // Scroll to results
+            setTimeout(() => {
+                resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        }
+    </script>
+</body>
+</html>
