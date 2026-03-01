@@ -1,0 +1,1379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Scanner & Safety Checker | PassionTools</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --red: #ef4444;
+            --purple: #a855f7;
+            --blue: #3b82f6;
+            --blue-dark: #2563eb;
+            --green: #22c55e;
+            --yellow: #f59e0b;
+            --orange: #f97316;
+            --bg-color: #f9fafb;
+            --card-bg: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --hover-gray: #f3f4f6;
+            --btn-action-bg: #fef2f2;
+            --footer-bg: #111827;
+            --logo-passion: #000000;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #020617;
+            --card-bg: #111827;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border-color: #1e293b;
+            --hover-gray: #1e293b;
+            --btn-action-bg: #450a0a;
+            --footer-bg: #020617;
+            --logo-passion: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* ===== HEADER ===== */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.75);
+            border-bottom: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        [data-theme="dark"] header {
+            background: rgba(2, 6, 23, 0.75);
+        }
+
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo-link {
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            background: none;
+            border: none;
+            outline: none;
+        }
+
+        .logo-passion {
+            font-family: 'Inter', sans-serif;
+            font-weight: 800;
+            font-size: 22px;
+            color: var(--logo-passion);
+            letter-spacing: -0.5px;
+            transition: color 0.3s ease;
+        }
+
+        .logo-tools {
+            font-family: 'Inter', sans-serif;
+            font-weight: 800;
+            font-size: 22px;
+            background: linear-gradient(135deg, var(--red), var(--purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .back-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.3s ease;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+
+        .back-link:hover {
+            color: var(--red);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            padding: 6px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+        }
+
+        .theme-toggle:hover {
+            background: var(--hover-gray);
+        }
+
+        /* ===== MAIN ===== */
+        main {
+            flex: 1;
+            max-width: 720px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 40px 20px 60px;
+        }
+
+        /* Tool Header */
+        .tool-header {
+            text-align: center;
+            margin-bottom: 36px;
+        }
+
+        .tool-header h1 {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+            transition: color 0.3s ease;
+        }
+
+        .tool-header p {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            max-width: 560px;
+            margin: 0 auto;
+            transition: color 0.3s ease;
+        }
+
+        /* Card */
+        .tool-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 32px;
+            transition: all 0.3s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+
+        /* ===== STATE 1: UPLOAD AREA ===== */
+        .upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 48px 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .upload-area:hover,
+        .upload-area.drag-over {
+            border-color: var(--blue);
+            background: rgba(59, 130, 246, 0.04);
+        }
+
+        [data-theme="dark"] .upload-area:hover,
+        [data-theme="dark"] .upload-area.drag-over {
+            background: rgba(59, 130, 246, 0.08);
+        }
+
+        .upload-area input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .upload-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            background: var(--hover-gray);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .upload-area:hover .upload-icon {
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .upload-icon i {
+            font-size: 24px;
+            color: var(--blue);
+        }
+
+        .upload-text-primary {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+            transition: color 0.3s ease;
+        }
+
+        .upload-text-secondary {
+            font-size: 13px;
+            color: var(--text-secondary);
+            transition: color 0.3s ease;
+        }
+
+        /* ===== STATE 2: SCANNING ===== */
+        .scanning-state {
+            display: none;
+            text-align: center;
+            padding: 40px 24px;
+        }
+
+        .scanning-visual {
+            position: relative;
+            width: 80px;
+            height: 96px;
+            margin: 0 auto 28px;
+        }
+
+        .scan-file-icon {
+            width: 80px;
+            height: 96px;
+            position: relative;
+        }
+
+        .scan-file-icon svg {
+            width: 80px;
+            height: 96px;
+        }
+
+        .scan-line {
+            position: absolute;
+            top: 0;
+            left: 4px;
+            right: 4px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--blue), transparent);
+            border-radius: 2px;
+            animation: scanMove 1.8s ease-in-out infinite;
+            box-shadow: 0 0 12px rgba(59, 130, 246, 0.5);
+        }
+
+        @keyframes scanMove {
+            0%, 100% { top: 8px; opacity: 0.3; }
+            50% { top: 85px; opacity: 1; }
+        }
+
+        .scanning-text {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            transition: color 0.3s ease;
+        }
+
+        .progress-bar-track {
+            width: 100%;
+            max-width: 320px;
+            height: 6px;
+            background: var(--hover-gray);
+            border-radius: 3px;
+            margin: 0 auto;
+            overflow: hidden;
+            transition: background 0.3s ease;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--blue), var(--purple));
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-bar-fill.animating {
+            animation: progressPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes progressPulse {
+            0% { width: 5%; }
+            50% { width: 75%; }
+            90% { width: 90%; }
+            100% { width: 95%; }
+        }
+
+        /* ===== STATE 3: RESULTS ===== */
+        .results-state {
+            display: none;
+        }
+
+        /* Safety Verdict Banner */
+        .verdict-banner {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 18px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .verdict-banner.safe {
+            background: rgba(34, 197, 94, 0.08);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+
+        [data-theme="dark"] .verdict-banner.safe {
+            background: rgba(34, 197, 94, 0.1);
+            border-color: rgba(34, 197, 94, 0.2);
+        }
+
+        .verdict-banner.warning {
+            background: rgba(245, 158, 11, 0.08);
+            border: 1px solid rgba(245, 158, 11, 0.25);
+        }
+
+        [data-theme="dark"] .verdict-banner.warning {
+            background: rgba(245, 158, 11, 0.1);
+            border-color: rgba(245, 158, 11, 0.2);
+        }
+
+        .verdict-banner.unsafe {
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.25);
+        }
+
+        [data-theme="dark"] .verdict-banner.unsafe {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+
+        .verdict-shield {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .verdict-banner.safe .verdict-shield {
+            background: var(--green);
+        }
+
+        .verdict-banner.warning .verdict-shield {
+            background: var(--yellow);
+        }
+
+        .verdict-banner.unsafe .verdict-shield {
+            background: var(--red);
+        }
+
+        .verdict-shield i {
+            color: #fff;
+            font-size: 22px;
+        }
+
+        .verdict-text h3 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 3px;
+        }
+
+        .verdict-banner.safe .verdict-text h3 {
+            color: var(--green);
+        }
+
+        .verdict-banner.warning .verdict-text h3 {
+            color: var(--yellow);
+        }
+
+        .verdict-banner.unsafe .verdict-text h3 {
+            color: var(--red);
+        }
+
+        .verdict-text p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            transition: color 0.3s ease;
+        }
+
+        /* Threat details */
+        .threat-details {
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .threat-details.visible {
+            display: block;
+        }
+
+        .threat-details.warning-details {
+            background: rgba(245, 158, 11, 0.06);
+            border: 1px solid rgba(245, 158, 11, 0.15);
+        }
+
+        .threat-details.unsafe-details {
+            background: rgba(239, 68, 68, 0.06);
+            border: 1px solid rgba(239, 68, 68, 0.15);
+        }
+
+        [data-theme="dark"] .threat-details.warning-details {
+            background: rgba(245, 158, 11, 0.08);
+        }
+
+        [data-theme="dark"] .threat-details.unsafe-details {
+            background: rgba(239, 68, 68, 0.08);
+        }
+
+        .threat-details-title {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .threat-details.warning-details .threat-details-title {
+            color: var(--yellow);
+        }
+
+        .threat-details.unsafe-details .threat-details-title {
+            color: var(--red);
+        }
+
+        .threat-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 6px 0;
+            font-size: 13px;
+            color: var(--text-primary);
+            transition: color 0.3s ease;
+        }
+
+        .threat-item i {
+            margin-top: 2px;
+            font-size: 11px;
+            flex-shrink: 0;
+        }
+
+        .threat-details.warning-details .threat-item i {
+            color: var(--yellow);
+        }
+
+        .threat-details.unsafe-details .threat-item i {
+            color: var(--red);
+        }
+
+        /* Success Banner (hash confirmation) */
+        .success-banner {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 20px;
+            background: rgba(59, 130, 246, 0.06);
+            border: 1px solid rgba(59, 130, 246, 0.15);
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+
+        [data-theme="dark"] .success-banner {
+            background: rgba(59, 130, 246, 0.08);
+            border-color: rgba(59, 130, 246, 0.15);
+        }
+
+        .success-shield {
+            width: 36px;
+            height: 36px;
+            border-radius: 9px;
+            background: var(--blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .success-shield i {
+            color: #fff;
+            font-size: 16px;
+        }
+
+        .success-text p {
+            font-size: 12.5px;
+            color: var(--text-secondary);
+            transition: color 0.3s ease;
+        }
+
+        /* Data Grid */
+        .data-grid {
+            display: grid;
+            gap: 0;
+            margin-bottom: 24px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: border-color 0.3s ease;
+        }
+
+        .data-row {
+            display: flex;
+            align-items: center;
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .data-row:last-child {
+            border-bottom: none;
+        }
+
+        .data-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            min-width: 100px;
+            flex-shrink: 0;
+            transition: color 0.3s ease;
+        }
+
+        .data-value {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            word-break: break-all;
+            transition: color 0.3s ease;
+        }
+
+        .data-value.safe-tag {
+            color: var(--green);
+            font-weight: 600;
+        }
+
+        .data-value.warning-tag {
+            color: var(--yellow);
+            font-weight: 600;
+        }
+
+        .data-value.unsafe-tag {
+            color: var(--red);
+            font-weight: 600;
+        }
+
+        /* Hash Block */
+        .hash-block {
+            background: var(--hover-gray);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .hash-label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .hash-label span {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: color 0.3s ease;
+        }
+
+        .copy-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            color: var(--blue);
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: rgba(59, 130, 246, 0.18);
+        }
+
+        .copy-btn.copied {
+            color: var(--green);
+            background: rgba(34, 197, 94, 0.1);
+            border-color: rgba(34, 197, 94, 0.25);
+        }
+
+        .hash-value {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 13.5px;
+            font-weight: 500;
+            color: var(--text-primary);
+            line-height: 1.7;
+            word-break: break-all;
+            user-select: all;
+            transition: color 0.3s ease;
+        }
+
+        /* Scan Another Button */
+        .scan-another-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 14px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-primary);
+            background: transparent;
+            border: 1.5px solid var(--border-color);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .scan-another-btn:hover {
+            border-color: var(--blue);
+            color: var(--blue);
+            background: rgba(59, 130, 246, 0.04);
+        }
+
+        /* Error State */
+        .error-state {
+            display: none;
+            text-align: center;
+            padding: 32px 24px;
+        }
+
+        .error-icon-wrapper {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            background: rgba(239, 68, 68, 0.1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        .error-icon-wrapper i {
+            font-size: 24px;
+            color: var(--red);
+        }
+
+        .error-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--red);
+            margin-bottom: 6px;
+        }
+
+        .error-message {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            line-height: 1.5;
+            transition: color 0.3s ease;
+        }
+
+        .error-retry-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-primary);
+            background: transparent;
+            border: 1.5px solid var(--border-color);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .error-retry-btn:hover {
+            border-color: var(--blue);
+            color: var(--blue);
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            background: var(--footer-bg);
+            text-align: center;
+            padding: 30px 20px;
+            transition: background 0.3s ease;
+        }
+
+        footer p {
+            font-size: 14px;
+            color: #94a3b8;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 640px) {
+            main {
+                padding: 28px 16px 48px;
+            }
+
+            .tool-header h1 {
+                font-size: 22px;
+            }
+
+            .tool-header p {
+                font-size: 14px;
+            }
+
+            .tool-card {
+                padding: 20px;
+            }
+
+            .upload-area {
+                padding: 36px 16px;
+            }
+
+            .data-label {
+                min-width: 80px;
+            }
+
+            .hash-value {
+                font-size: 12px;
+            }
+
+            .header-inner {
+                padding: 0 16px;
+            }
+
+            .back-link span {
+                display: none;
+            }
+
+            .verdict-banner {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+                padding: 16px;
+            }
+
+            .threat-item {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== HEADER ===== -->
+    <header>
+        <div class="header-inner">
+            <a href="#" class="logo-link" onclick="event.preventDefault();">
+                <span class="logo-passion">Passion</span><span class="logo-tools">Tools</span>
+            </a>
+            <div class="header-actions">
+                <a href="index.html" class="back-link">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Back to Tools</span>
+                </a>
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">☀️</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===== MAIN ===== -->
+    <main>
+        <!-- Tool Header (no icon) -->
+        <div class="tool-header">
+            <h1>File Scanner & Safety Checker</h1>
+            <p>Analyze files and generate local cryptographic hashes (SHA-256) to verify file integrity. 100% private in-browser processing.</p>
+        </div>
+
+        <!-- Tool Card -->
+        <div class="tool-card">
+
+            <!-- State 1: Upload -->
+            <div id="uploadState">
+                <div class="upload-area" id="uploadArea">
+                    <input type="file" id="fileInput" aria-label="Upload file">
+                    <div class="upload-icon">
+                        <i class="fas fa-shield-halved"></i>
+                    </div>
+                    <div class="upload-text-primary">Click or Drag & Drop File here</div>
+                    <div class="upload-text-secondary">Supports all file types · 100% local processing</div>
+                </div>
+            </div>
+
+            <!-- State 2: Scanning -->
+            <div class="scanning-state" id="scanningState">
+                <div class="scanning-visual">
+                    <div class="scan-file-icon">
+                        <svg viewBox="0 0 80 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="2" y="2" width="60" height="76" rx="6" fill="var(--hover-gray)" stroke="var(--border-color)" stroke-width="2"/>
+                            <path d="M48 2v18h18" stroke="var(--border-color)" stroke-width="2" fill="none"/>
+                            <rect x="14" y="32" width="36" height="4" rx="2" fill="var(--border-color)" opacity="0.6"/>
+                            <rect x="14" y="42" width="28" height="4" rx="2" fill="var(--border-color)" opacity="0.4"/>
+                            <rect x="14" y="52" width="32" height="4" rx="2" fill="var(--border-color)" opacity="0.3"/>
+                            <rect x="14" y="62" width="20" height="4" rx="2" fill="var(--border-color)" opacity="0.2"/>
+                        </svg>
+                    </div>
+                    <div class="scan-line"></div>
+                </div>
+                <div class="scanning-text">Analyzing file and calculating cryptographic hash...</div>
+                <div class="progress-bar-track">
+                    <div class="progress-bar-fill animating" id="progressBar"></div>
+                </div>
+            </div>
+
+            <!-- State 3: Results -->
+            <div class="results-state" id="resultsState">
+
+                <!-- Safety Verdict Banner -->
+                <div class="verdict-banner safe" id="verdictBanner">
+                    <div class="verdict-shield" id="verdictShield">
+                        <i class="fas fa-shield-halved" id="verdictIcon"></i>
+                    </div>
+                    <div class="verdict-text">
+                        <h3 id="verdictTitle">File Appears Safe</h3>
+                        <p id="verdictDescription">No suspicious patterns detected. This file passed all safety checks.</p>
+                    </div>
+                </div>
+
+                <!-- Threat Details (shown for warning/unsafe) -->
+                <div class="threat-details" id="threatDetails">
+                    <div class="threat-details-title">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span>Detected Issues</span>
+                    </div>
+                    <div id="threatList"></div>
+                </div>
+
+                <!-- Data Grid -->
+                <div class="data-grid">
+                    <div class="data-row">
+                        <div class="data-label">File Name</div>
+                        <div class="data-value" id="resultFileName">—</div>
+                    </div>
+                    <div class="data-row">
+                        <div class="data-label">File Size</div>
+                        <div class="data-value" id="resultFileSize">—</div>
+                    </div>
+                    <div class="data-row">
+                        <div class="data-label">File Type</div>
+                        <div class="data-value" id="resultFileType">—</div>
+                    </div>
+                    <div class="data-row">
+                        <div class="data-label">Safety</div>
+                        <div class="data-value" id="resultSafety">—</div>
+                    </div>
+                </div>
+
+                <!-- Hash info -->
+                <div class="success-banner">
+                    <div class="success-shield">
+                        <i class="fas fa-fingerprint"></i>
+                    </div>
+                    <div class="success-text">
+                        <p>SHA-256 hash generated locally. No data left your browser.</p>
+                    </div>
+                </div>
+
+                <div class="hash-block">
+                    <div class="hash-label">
+                        <span>SHA-256 Checksum</span>
+                        <button class="copy-btn" id="copyBtn" onclick="copyHash()">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                    </div>
+                    <div class="hash-value" id="hashValue">—</div>
+                </div>
+
+                <button class="scan-another-btn" onclick="resetTool()">
+                    <i class="fas fa-rotate-right"></i> Scan Another File
+                </button>
+            </div>
+
+            <!-- Error State -->
+            <div class="error-state" id="errorState">
+                <div class="error-icon-wrapper">
+                    <i class="fas fa-triangle-exclamation"></i>
+                </div>
+                <div class="error-title">Processing Error</div>
+                <div class="error-message" id="errorMessage">This file exceeds local processing limits. Try a smaller file.</div>
+                <button class="error-retry-btn" onclick="resetTool()">
+                    <i class="fas fa-rotate-right"></i> Try Again
+                </button>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- ===== FOOTER ===== -->
+    <footer>
+        <p>© 2026 Passion Tools. Secure client-side processing.</p>
+    </footer>
+
+    <!-- ===== JAVASCRIPT ===== -->
+    <script>
+        // ===== THEME TOGGLE =====
+        const themeToggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+
+        function applyTheme(theme) {
+            html.setAttribute('data-theme', theme);
+            themeToggle.textContent = theme === 'dark' ? '🌙' : '☀️';
+            localStorage.setItem('passion-tools-theme', theme);
+        }
+
+        (function initTheme() {
+            const saved = localStorage.getItem('passion-tools-theme');
+            if (saved) {
+                applyTheme(saved);
+            } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                applyTheme('dark');
+            } else {
+                applyTheme('light');
+            }
+        })();
+
+        themeToggle.addEventListener('click', () => {
+            const current = html.getAttribute('data-theme');
+            applyTheme(current === 'dark' ? 'light' : 'dark');
+        });
+
+        // ===== FILE UPLOAD & DRAG-DROP =====
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const uploadState = document.getElementById('uploadState');
+        const scanningState = document.getElementById('scanningState');
+        const resultsState = document.getElementById('resultsState');
+        const errorState = document.getElementById('errorState');
+
+        ['dragenter', 'dragover'].forEach(evt => {
+            uploadArea.addEventListener(evt, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                uploadArea.classList.add('drag-over');
+            });
+        });
+
+        ['dragleave', 'drop'].forEach(evt => {
+            uploadArea.addEventListener(evt, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                uploadArea.classList.remove('drag-over');
+            });
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            const files = e.dataTransfer.files;
+            if (files.length > 0) processFile(files[0]);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) processFile(e.target.files[0]);
+        });
+
+        // ===== DANGEROUS EXTENSIONS =====
+        const dangerousExtensions = [
+            'exe', 'bat', 'cmd', 'com', 'msi', 'scr', 'pif', 'vbs', 'vbe',
+            'js', 'jse', 'wsf', 'wsh', 'ps1', 'ps2', 'psc1', 'psc2',
+            'reg', 'inf', 'hta', 'cpl', 'dll', 'sys', 'drv',
+            'lnk', 'url', 'iso', 'img'
+        ];
+
+        const suspiciousExtensions = [
+            'docm', 'xlsm', 'pptm', 'dotm', 'xltm', 'potm',
+            'jar', 'apk', 'deb', 'rpm', 'sh', 'bash', 'csh',
+            'swf', 'class', 'pyc'
+        ];
+
+        // ===== SAFETY ANALYSIS =====
+        function analyzeFileSafety(file, buffer) {
+            const threats = [];
+            let level = 'safe'; // safe, warning, unsafe
+            const ext = file.name.split('.').pop().toLowerCase();
+            const mimeType = file.type.toLowerCase();
+
+            // 1. Check dangerous extensions
+            if (dangerousExtensions.includes(ext)) {
+                threats.push(`Executable file type (.${ext}) — can run code on your system`);
+                level = 'unsafe';
+            }
+
+            // 2. Check suspicious macro-enabled extensions
+            if (suspiciousExtensions.includes(ext)) {
+                threats.push(`Potentially risky file type (.${ext}) — may contain macros or executable code`);
+                level = level === 'unsafe' ? 'unsafe' : 'warning';
+            }
+
+            // 3. Check for double extensions (e.g., document.pdf.exe)
+            const parts = file.name.split('.');
+            if (parts.length > 2) {
+                const lastExt = parts[parts.length - 1].toLowerCase();
+                const secondLastExt = parts[parts.length - 2].toLowerCase();
+                if (dangerousExtensions.includes(lastExt) && !dangerousExtensions.includes(secondLastExt)) {
+                    threats.push(`Double extension detected (${secondLastExt}.${lastExt}) — common disguise technique`);
+                    level = 'unsafe';
+                }
+            }
+
+            // 4. MIME type mismatch check
+            if (ext === 'pdf' && mimeType && !mimeType.includes('pdf')) {
+                threats.push('File extension is .pdf but MIME type doesn\'t match — file may be disguised');
+                level = level === 'unsafe' ? 'unsafe' : 'warning';
+            }
+
+            // 5. PDF-specific deep scan
+            if (ext === 'pdf' || mimeType.includes('pdf')) {
+                const pdfThreats = analyzePDF(buffer);
+                if (pdfThreats.length > 0) {
+                    threats.push(...pdfThreats);
+                    // Determine severity
+                    const hasCritical = pdfThreats.some(t =>
+                        t.includes('JavaScript') || t.includes('Launch') || t.includes('EmbeddedFile') || t.includes('executable')
+                    );
+                    if (hasCritical) {
+                        level = 'unsafe';
+                    } else if (level !== 'unsafe') {
+                        level = 'warning';
+                    }
+                }
+            }
+
+            // 6. Check for executable magic bytes (PE header, ELF, etc.)
+            if (buffer.byteLength >= 4) {
+                const header = new Uint8Array(buffer.slice(0, 4));
+                // MZ header (Windows executables)
+                if (header[0] === 0x4D && header[1] === 0x5A) {
+                    if (ext !== 'exe' && ext !== 'dll' && ext !== 'sys' && ext !== 'msi') {
+                        threats.push('File contains Windows executable header (MZ) but has a non-executable extension — may be disguised malware');
+                        level = 'unsafe';
+                    }
+                }
+                // ELF header (Linux executables)
+                if (header[0] === 0x7F && header[1] === 0x45 && header[2] === 0x4C && header[3] === 0x46) {
+                    if (ext !== 'so' && ext !== 'o' && ext !== 'elf') {
+                        threats.push('File contains Linux executable header (ELF) but has a non-executable extension');
+                        level = level === 'unsafe' ? 'unsafe' : 'warning';
+                    }
+                }
+            }
+
+            // 7. Very large files get a note
+            if (file.size > 500 * 1024 * 1024) {
+                threats.push('Unusually large file size (>500 MB) — exercise caution');
+                if (level === 'safe') level = 'warning';
+            }
+
+            return { level, threats };
+        }
+
+        // ===== PDF DEEP ANALYSIS =====
+        function analyzePDF(buffer) {
+            const threats = [];
+
+            try {
+                // Convert first 5MB to text for pattern scanning (larger PDFs get partial scan)
+                const scanSize = Math.min(buffer.byteLength, 5 * 1024 * 1024);
+                const bytes = new Uint8Array(buffer.slice(0, scanSize));
+                let text = '';
+                for (let i = 0; i < bytes.length; i++) {
+                    text += String.fromCharCode(bytes[i]);
+                }
+
+                // Check PDF header
+                if (!text.startsWith('%PDF')) {
+                    threats.push('File claims to be PDF but missing valid PDF header — may be disguised');
+                    return threats;
+                }
+
+                // Dangerous: Embedded JavaScript
+                if (/\/JavaScript\b/i.test(text) || /\/JS\b/i.test(text)) {
+                    threats.push('Contains embedded JavaScript — can execute malicious code when opened');
+                }
+
+                // Dangerous: Auto-action on open
+                if (/\/OpenAction\b/i.test(text)) {
+                    threats.push('Contains OpenAction — triggers automatic actions when the PDF is opened');
+                }
+
+                // Dangerous: Additional Actions
+                if (/\/AA\b/.test(text)) {
+                    threats.push('Contains Additional Actions (AA) — can trigger actions on various events');
+                }
+
+                // Dangerous: Launch action (can run programs)
+                if (/\/Launch\b/i.test(text)) {
+                    threats.push('Contains Launch action — can attempt to run programs on your system');
+                }
+
+                // Suspicious: Embedded files
+                if (/\/EmbeddedFile\b/i.test(text) || /\/EmbeddedFiles\b/i.test(text)) {
+                    threats.push('Contains embedded file attachments — could hide malicious files inside');
+                }
+
+                // Suspicious: URI actions (external links)
+                if (/\/URI\b/i.test(text)) {
+                    threats.push('Contains URI links — may redirect to external/phishing websites');
+                }
+
+                // Suspicious: SubmitForm (can exfiltrate data)
+                if (/\/SubmitForm\b/i.test(text)) {
+                    threats.push('Contains SubmitForm action — can send form data to external servers');
+                }
+
+                // Suspicious: AcroForm (interactive forms)
+                if (/\/AcroForm\b/i.test(text)) {
+                    // Only flag if combined with JavaScript
+                    if (/\/JavaScript\b/i.test(text) || /\/JS\b/i.test(text)) {
+                        threats.push('Contains interactive forms with JavaScript — potential for exploit delivery');
+                    }
+                }
+
+                // Suspicious: Encrypted/encoded streams that could hide exploits
+                if (/\/RichMedia\b/i.test(text)) {
+                    threats.push('Contains RichMedia (Flash/multimedia) — historically used for exploits');
+                }
+
+                // Suspicious: XFA Forms
+                if (/\/XFA\b/i.test(text)) {
+                    threats.push('Contains XFA forms — known attack surface for PDF exploits');
+                }
+
+                // Check for obfuscation patterns
+                const hexEscapeCount = (text.match(/#[0-9a-fA-F]{2}/g) || []).length;
+                if (hexEscapeCount > 50) {
+                    threats.push('High use of hex-encoded characters — possible obfuscation of malicious content');
+                }
+
+            } catch (e) {
+                // If analysis fails, don't block — just note it
+                console.warn('PDF analysis encountered an issue:', e);
+            }
+
+            return threats;
+        }
+
+        // ===== FILE PROCESSING =====
+        async function processFile(file) {
+            showState('scanning');
+
+            try {
+                const buffer = await file.arrayBuffer();
+
+                // Compute SHA-256 hash
+                const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+                // Run safety analysis
+                const safety = analyzeFileSafety(file, buffer);
+
+                // Populate file info
+                document.getElementById('resultFileName').textContent = file.name;
+                document.getElementById('resultFileSize').textContent = formatFileSize(file.size);
+                document.getElementById('resultFileType').textContent = file.type || 'Unknown / Binary';
+                document.getElementById('hashValue').textContent = hashHex;
+
+                // Populate safety verdict
+                updateVerdict(safety);
+
+                // Brief delay for visual feedback
+                await delay(1400);
+
+                const progressBar = document.getElementById('progressBar');
+                progressBar.classList.remove('animating');
+                progressBar.style.width = '100%';
+
+                await delay(400);
+
+                showState('results');
+
+            } catch (err) {
+                console.error('File processing error:', err);
+                document.getElementById('errorMessage').textContent =
+                    'This file exceeds local processing limits or could not be read. Please try a smaller file.';
+                showState('error');
+            }
+        }
+
+        // ===== UPDATE VERDICT UI =====
+        function updateVerdict(safety) {
+            const banner = document.getElementById('verdictBanner');
+            const shield = document.getElementById('verdictShield');
+            const icon = document.getElementById('verdictIcon');
+            const title = document.getElementById('verdictTitle');
+            const desc = document.getElementById('verdictDescription');
+            const safetyValue = document.getElementById('resultSafety');
+            const threatDetails = document.getElementById('threatDetails');
+            const threatList = document.getElementById('threatList');
+
+            // Remove old classes
+            banner.className = 'verdict-banner';
+            threatDetails.className = 'threat-details';
+            safetyValue.className = 'data-value';
+
+            if (safety.level === 'safe') {
+                banner.classList.add('safe');
+                icon.className = 'fas fa-shield-halved';
+                title.textContent = 'File Appears Safe';
+                desc.textContent = 'No suspicious patterns detected. This file passed all safety checks.';
+                safetyValue.textContent = '✓ Safe — No threats detected';
+                safetyValue.classList.add('safe-tag');
+                threatDetails.style.display = 'none';
+
+            } else if (safety.level === 'warning') {
+                banner.classList.add('warning');
+                icon.className = 'fas fa-exclamation-triangle';
+                title.textContent = 'Caution — Suspicious Patterns Found';
+                desc.textContent = `${safety.threats.length} potential issue${safety.threats.length > 1 ? 's' : ''} detected. Review details below before opening.`;
+                safetyValue.textContent = '⚠ Caution — ' + safety.threats.length + ' issue(s) found';
+                safetyValue.classList.add('warning-tag');
+                threatDetails.classList.add('warning-details', 'visible');
+                threatDetails.style.display = 'block';
+
+            } else {
+                banner.classList.add('unsafe');
+                icon.className = 'fas fa-shield-virus';
+                title.textContent = 'Unsafe — Threats Detected';
+                desc.textContent = `${safety.threats.length} dangerous pattern${safety.threats.length > 1 ? 's' : ''} found. Do NOT open this file unless you trust its source.`;
+                safetyValue.textContent = '✕ Unsafe — ' + safety.threats.length + ' threat(s) detected';
+                safetyValue.classList.add('unsafe-tag');
+                threatDetails.classList.add('unsafe-details', 'visible');
+                threatDetails.style.display = 'block';
+            }
+
+            // Populate threat list
+            threatList.innerHTML = '';
+            safety.threats.forEach(threat => {
+                const item = document.createElement('div');
+                item.className = 'threat-item';
+                item.innerHTML = '<i class="fas fa-circle"></i><span>' + escapeHTML(threat) + '</span>';
+                threatList.appendChild(item);
+            });
+        }
+
+        function escapeHTML(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function showState(state) {
+            uploadState.style.display = state === 'upload' ? 'block' : 'none';
+            scanningState.style.display = state === 'scanning' ? 'block' : 'none';
+            resultsState.style.display = state === 'results' ? 'block' : 'none';
+            errorState.style.display = state === 'error' ? 'block' : 'none';
+        }
+
+        function resetTool() {
+            fileInput.value = '';
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.width = '0%';
+            progressBar.classList.add('animating');
+            const copyBtn = document.getElementById('copyBtn');
+            copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copy';
+            copyBtn.classList.remove('copied');
+            document.getElementById('threatDetails').style.display = 'none';
+            document.getElementById('threatList').innerHTML = '';
+            showState('upload');
+        }
+
+        // ===== COPY HASH =====
+        async function copyHash() {
+            const hash = document.getElementById('hashValue').textContent;
+            const copyBtn = document.getElementById('copyBtn');
+            try {
+                await navigator.clipboard.writeText(hash);
+                copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                copyBtn.classList.add('copied');
+                setTimeout(() => {
+                    copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copy';
+                    copyBtn.classList.remove('copied');
+                }, 2200);
+            } catch {
+                const textarea = document.createElement('textarea');
+                textarea.value = hash;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                copyBtn.classList.add('copied');
+                setTimeout(() => {
+                    copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copy';
+                    copyBtn.classList.remove('copied');
+                }, 2200);
+            }
+        }
+
+        // ===== UTILITIES =====
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            if (bytes < 1024) return bytes + ' Bytes';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + ' KB';
+            if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+            return (bytes / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
+        }
+
+        function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+    </script>
+</body>
+</html>
