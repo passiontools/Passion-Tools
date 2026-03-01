@@ -1,0 +1,2033 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Enhancer - PassionTools</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --red: #ef4444;
+            --red-light: #fca5a5;
+            --purple: #a855f7;
+            --blue: #3b82f6;
+            --blue-dark: #2563eb;
+            --green: #22c55e;
+            --yellow: #eab308;
+            --orange: #f97316;
+            --pink: #ec4899;
+            --cyan: #06b6d4;
+            --bg-color: #f9fafb;
+            --card-bg: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --hover-gray: #f3f4f6;
+            --btn-action-bg: #fef2f2;
+            --logo-passion: #000000;
+            --footer-bg: #111827;
+            --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.06);
+            --canvas-bg: #e5e7eb;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #020617;
+            --card-bg: #111827;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border-color: #1e293b;
+            --hover-gray: #1e293b;
+            --btn-action-bg: #450a0a;
+            --logo-passion: #ffffff;
+            --footer-bg: #020617;
+            --shadow: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.4), 0 4px 6px -4px rgba(0,0,0,0.3);
+            --canvas-bg: #0f172a;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background 0.3s ease, color 0.3s ease;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ─── HEADER ─── */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            background: rgba(255,255,255,0.72);
+            border-bottom: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+        [data-theme="dark"] .header { background: rgba(2,6,23,0.78); }
+        .header-inner {
+            max-width: 1360px;
+            margin: 0 auto;
+            padding: 0 24px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .logo {
+            text-decoration: none;
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            display: inline-flex;
+            background: none;
+            border: none;
+        }
+        .logo .passion { color: var(--logo-passion); transition: none; }
+        .logo .tools {
+            background: linear-gradient(135deg, var(--red), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .header-actions { display: flex; align-items: center; gap: 20px; }
+        .back-link {
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.3s ease;
+            background: none; border: none; padding: 0;
+        }
+        .back-link:hover { color: var(--red); }
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border-color);
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        .theme-toggle:hover { background: var(--hover-gray); }
+
+        /* ─── MAIN ─── */
+        .main-content {
+            flex: 1;
+            max-width: 1360px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 32px 24px 60px;
+        }
+
+        /* ─── TOOL HEADER ─── */
+        .tool-header { text-align: center; margin-bottom: 30px; }
+        .tool-header h1 { font-size: 32px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 8px; }
+        .tool-header p { font-size: 15px; color: var(--text-secondary); max-width: 560px; margin: 0 auto; line-height: 1.6; }
+
+        /* ─── UPLOAD ─── */
+        .upload-area {
+            padding: 60px 32px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 2.5px dashed var(--border-color);
+            border-radius: 16px;
+            transition: all 0.3s ease;
+            background: var(--card-bg);
+        }
+        .upload-area:hover, .upload-area.drag-over {
+            border-color: var(--blue);
+            background: var(--hover-gray);
+        }
+        .upload-area .icon-circle {
+            width: 64px; height: 64px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(59,130,246,0.1), rgba(168,85,247,0.1));
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 16px;
+            font-size: 26px;
+            color: var(--blue);
+        }
+        .upload-area .upload-title { font-size: 17px; font-weight: 600; margin-bottom: 6px; }
+        .upload-area .upload-sub { font-size: 13px; color: var(--text-secondary); }
+        .file-input { display: none; }
+
+        /* ─── WORKSPACE ─── */
+        .workspace { display: none; }
+        .workspace.active { display: block; }
+
+        /* Toolbar */
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 16px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            box-shadow: var(--shadow);
+        }
+        .toolbar-group {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .toolbar-sep {
+            width: 1px;
+            height: 28px;
+            background: var(--border-color);
+            margin: 0 8px;
+        }
+        .tool-btn {
+            background: none;
+            border: 1px solid transparent;
+            width: 36px; height: 36px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .tool-btn:hover { background: var(--hover-gray); color: var(--text-primary); border-color: var(--border-color); }
+        .tool-btn.active { background: rgba(59,130,246,0.1); color: var(--blue); border-color: rgba(59,130,246,0.3); }
+        .tool-btn[data-tooltip]:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--text-primary);
+            color: var(--bg-color);
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            white-space: nowrap;
+            z-index: 10;
+            pointer-events: none;
+        }
+        .zoom-display {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            min-width: 44px;
+            text-align: center;
+            user-select: none;
+        }
+
+        .workspace-grid {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 20px;
+        }
+
+        /* Canvas Area */
+        .canvas-wrap {
+            position: relative;
+            background: var(--canvas-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow: hidden;
+            min-height: 460px;
+            display: flex;
+            flex-direction: column;
+        }
+        .canvas-viewport {
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        /* Checkerboard bg for transparency */
+        .canvas-viewport::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(45deg, rgba(128,128,128,0.08) 25%, transparent 25%),
+                linear-gradient(-45deg, rgba(128,128,128,0.08) 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, rgba(128,128,128,0.08) 75%),
+                linear-gradient(-45deg, transparent 75%, rgba(128,128,128,0.08) 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+            pointer-events: none;
+        }
+
+        .compare-container {
+            position: relative;
+            display: inline-block;
+            border-radius: 6px;
+            overflow: hidden;
+            cursor: ew-resize;
+            user-select: none;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            max-width: 100%;
+        }
+        .compare-container .enhanced-canvas {
+            display: block;
+            max-width: 100%;
+            max-height: 520px;
+            width: auto;
+            height: auto;
+        }
+        .compare-overlay {
+            position: absolute;
+            top: 0; left: 0;
+            width: 50%;
+            height: 100%;
+            overflow: hidden;
+            border-right: 3px solid rgba(255,255,255,0.9);
+        }
+        .compare-overlay canvas {
+            display: block;
+            position: absolute;
+            top: 0; left: 0;
+        }
+        .compare-handle {
+            position: absolute;
+            top: 0; bottom: 0;
+            left: 50%;
+            width: 44px;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+            cursor: ew-resize;
+        }
+        .compare-handle-icon {
+            width: 36px; height: 36px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            color: #1f2937;
+        }
+        .compare-line {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 3px;
+            height: 100%;
+            background: rgba(255,255,255,0.9);
+            transform: translateX(-50%);
+            z-index: 4;
+            pointer-events: none;
+        }
+        .compare-label {
+            position: absolute;
+            top: 12px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            background: rgba(0,0,0,0.6);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            pointer-events: none;
+            z-index: 6;
+            backdrop-filter: blur(4px);
+        }
+        .compare-label.before { left: 12px; }
+        .compare-label.after { right: 12px; }
+
+        .image-meta {
+            display: flex; gap: 16px; flex-wrap: wrap;
+            padding: 10px 16px;
+            border-top: 1px solid var(--border-color);
+            font-size: 12px; color: var(--text-secondary);
+            background: var(--card-bg);
+        }
+        .image-meta span { display: flex; align-items: center; gap: 5px; }
+
+        /* ─── CONTROLS PANEL ─── */
+        .controls-panel {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            height: fit-content;
+            position: sticky;
+            top: 84px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            max-height: calc(100vh - 100px);
+        }
+        .controls-scroll {
+            padding: 18px;
+            overflow-y: auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .controls-scroll::-webkit-scrollbar { width: 4px; }
+        .controls-scroll::-webkit-scrollbar-track { background: transparent; }
+        .controls-scroll::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+
+        .controls-title {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-primary);
+        }
+        .controls-title i { color: var(--blue); font-size: 13px; }
+
+        /* Tabs */
+        .panel-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--card-bg);
+        }
+        .panel-tab {
+            flex: 1;
+            padding: 12px 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        .panel-tab:hover { color: var(--text-primary); background: var(--hover-gray); }
+        .panel-tab.active { color: var(--blue); border-bottom-color: var(--blue); }
+        .panel-tab i { font-size: 12px; }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Quick presets */
+        .presets-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+        .preset-btn {
+            padding: 8px 4px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-color);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+        .preset-btn:hover { border-color: var(--blue); color: var(--blue); background: rgba(59,130,246,0.05); }
+        .preset-btn.active { border-color: var(--blue); background: rgba(59,130,246,0.1); color: var(--blue); }
+
+        .slider-group { margin-bottom: 6px; }
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 5px;
+            color: var(--text-primary);
+        }
+        .slider-label .label-icon { color: var(--text-secondary); margin-right: 4px; font-size: 11px; }
+        .slider-value {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--blue);
+            background: rgba(59,130,246,0.08);
+            padding: 1px 7px;
+            border-radius: 5px;
+            min-width: 32px;
+            text-align: center;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 5px;
+            border-radius: 3px;
+            background: var(--border-color);
+            outline: none;
+            transition: all 0.2s ease;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px; height: 16px;
+            border-radius: 50%;
+            background: var(--blue);
+            cursor: pointer;
+            box-shadow: 0 1px 4px rgba(59,130,246,0.35);
+            transition: transform 0.2s ease;
+        }
+        input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+        input[type="range"]::-moz-range-thumb {
+            width: 16px; height: 16px;
+            border-radius: 50%;
+            background: var(--blue);
+            cursor: pointer;
+            border: none;
+        }
+
+        .divider { height: 1px; background: var(--border-color); margin: 10px 0; }
+
+        .section-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--text-secondary);
+            margin: 8px 0 6px;
+        }
+
+        .upscale-select, .format-select {
+            width: 100%;
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-color);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .upscale-select:focus, .format-select:focus { border-color: var(--blue); }
+
+        .btn-reset, .btn-auto {
+            margin-top: 6px;
+            padding: 9px 16px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: transparent;
+            color: var(--text-secondary);
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        .btn-reset:hover { border-color: var(--red); color: var(--red); }
+        .btn-auto {
+            background: linear-gradient(135deg, rgba(59,130,246,0.08), rgba(168,85,247,0.08));
+            border-color: rgba(59,130,246,0.2);
+            color: var(--blue);
+        }
+        .btn-auto:hover { border-color: var(--blue); background: rgba(59,130,246,0.12); }
+
+        /* Histogram */
+        .histogram-wrap {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .histogram-wrap canvas {
+            width: 100%;
+            height: 70px;
+            border-radius: 6px;
+        }
+        .histogram-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* ─── ACTIONS BAR ─── */
+        .actions-bar {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 28px;
+            border-radius: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            text-decoration: none;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--blue), var(--blue-dark));
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(59,130,246,0.35);
+        }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(59,130,246,0.45); }
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1.5px solid var(--border-color);
+        }
+        .btn-ghost:hover { border-color: var(--text-secondary); color: var(--text-primary); }
+
+        /* ─── LOADING ─── */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .loading-overlay.active { display: flex; }
+        .spinner {
+            width: 48px; height: 48px;
+            border: 4px solid rgba(255,255,255,0.2);
+            border-top: 4px solid #fff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-overlay p { color: #fff; font-size: 15px; font-weight: 500; }
+
+        /* ─── FOOTER ─── */
+        .footer {
+            background: var(--footer-bg);
+            text-align: center;
+            padding: 30px 20px;
+            font-size: 14px;
+            color: #94a3b8;
+            margin-top: auto;
+        }
+
+        /* ─── RESPONSIVE ─── */
+        @media (max-width: 960px) {
+            .workspace-grid { grid-template-columns: 1fr; }
+            .controls-panel { position: static; max-height: none; }
+        }
+        @media (max-width: 600px) {
+            .tool-header h1 { font-size: 24px; }
+            .header-inner { padding: 0 16px; }
+            .main-content { padding: 20px 12px 40px; }
+            .actions-bar { flex-direction: column; }
+            .btn { width: 100%; }
+            .toolbar { gap: 4px; padding: 8px 10px; }
+            .presets-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            box-shadow: var(--shadow-lg);
+            z-index: 200;
+            transition: transform 0.4s cubic-bezier(0.22,1,0.36,1), opacity 0.4s ease;
+            opacity: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+        /* Crop overlay */
+        .crop-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 10;
+            cursor: crosshair;
+            display: none;
+        }
+        .crop-overlay.active { display: block; }
+        .crop-box {
+            position: absolute;
+            border: 2px dashed #fff;
+            box-shadow: 0 0 0 9999px rgba(0,0,0,0.5);
+            min-width: 20px;
+            min-height: 20px;
+        }
+        .crop-actions {
+            position: absolute;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 11;
+        }
+        .crop-action-btn {
+            padding: 8px 18px;
+            border-radius: 8px;
+            border: none;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .crop-apply { background: var(--green); color: #fff; }
+        .crop-cancel { background: rgba(255,255,255,0.9); color: #1f2937; }
+    </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+    <div class="header-inner">
+        <a href="#" onclick="event.preventDefault();" class="logo">
+            <span class="passion">Passion</span><span class="tools">Tools</span>
+        </a>
+        <div class="header-actions">
+            <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Tools</a>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">☀️</button>
+        </div>
+    </div>
+</header>
+
+<!-- MAIN -->
+<main class="main-content">
+    <div class="tool-header">
+        <h1>Image Enhancer</h1>
+        <p>Improve image quality, adjust lighting, and upscale resolution instantly. 100% private in-browser processing.</p>
+    </div>
+
+    <!-- Upload -->
+    <div id="uploadCard">
+        <div class="upload-area" id="uploadArea">
+            <div class="icon-circle"><i class="fas fa-image"></i></div>
+            <div class="upload-title">Click or Drag & Drop Image here</div>
+            <div class="upload-sub">Supports PNG, JPG, JPEG, WEBP • Max 50MB</div>
+            <input type="file" class="file-input" id="fileInput" accept=".png,.jpg,.jpeg,.webp">
+        </div>
+    </div>
+
+    <!-- Workspace -->
+    <div class="workspace" id="workspace">
+        <!-- Toolbar -->
+        <div class="toolbar" id="toolbar">
+            <div class="toolbar-group">
+                <button class="tool-btn" id="undoBtn" data-tooltip="Undo"><i class="fas fa-undo"></i></button>
+                <button class="tool-btn" id="redoBtn" data-tooltip="Redo"><i class="fas fa-redo"></i></button>
+            </div>
+            <div class="toolbar-sep"></div>
+            <div class="toolbar-group">
+                <button class="tool-btn" id="rotateLeftBtn" data-tooltip="Rotate Left"><i class="fas fa-rotate-left"></i></button>
+                <button class="tool-btn" id="rotateRightBtn" data-tooltip="Rotate Right"><i class="fas fa-rotate-right"></i></button>
+                <button class="tool-btn" id="flipHBtn" data-tooltip="Flip Horizontal"><i class="fas fa-arrows-left-right"></i></button>
+                <button class="tool-btn" id="flipVBtn" data-tooltip="Flip Vertical"><i class="fas fa-arrows-up-down"></i></button>
+            </div>
+            <div class="toolbar-sep"></div>
+            <div class="toolbar-group">
+                <button class="tool-btn" id="cropBtn" data-tooltip="Crop"><i class="fas fa-crop-simple"></i></button>
+            </div>
+            <div class="toolbar-sep"></div>
+            <div class="toolbar-group">
+                <button class="tool-btn" id="zoomOutBtn" data-tooltip="Zoom Out"><i class="fas fa-magnifying-glass-minus"></i></button>
+                <span class="zoom-display" id="zoomDisplay">100%</span>
+                <button class="tool-btn" id="zoomInBtn" data-tooltip="Zoom In"><i class="fas fa-magnifying-glass-plus"></i></button>
+                <button class="tool-btn" id="zoomFitBtn" data-tooltip="Fit to View"><i class="fas fa-expand"></i></button>
+            </div>
+        </div>
+
+        <div class="workspace-grid">
+            <!-- Canvas -->
+            <div>
+                <div class="canvas-wrap" id="canvasWrap">
+                    <div class="canvas-viewport" id="canvasViewport">
+                        <!-- Built by JS -->
+                    </div>
+                    <div class="crop-overlay" id="cropOverlay">
+                        <div class="crop-actions">
+                            <button class="crop-action-btn crop-apply" id="cropApply"><i class="fas fa-check"></i> Apply</button>
+                            <button class="crop-action-btn crop-cancel" id="cropCancel"><i class="fas fa-times"></i> Cancel</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="image-meta" id="imageMeta"></div>
+            </div>
+
+            <!-- Controls -->
+            <div class="controls-panel">
+                <div class="panel-tabs">
+                    <button class="panel-tab active" data-tab="adjust"><i class="fas fa-sliders-h"></i> Adjust</button>
+                    <button class="panel-tab" data-tab="effects"><i class="fas fa-magic"></i> Effects</button>
+                    <button class="panel-tab" data-tab="export"><i class="fas fa-file-export"></i> Export</button>
+                </div>
+
+                <div class="controls-scroll">
+                    <!-- TAB: Adjust -->
+                    <div class="tab-content active" id="tabAdjust">
+                        <button class="btn-auto" id="autoEnhanceBtn"><i class="fas fa-wand-magic-sparkles"></i> Auto Enhance</button>
+
+                        <div class="divider"></div>
+
+                        <div class="section-label">Light</div>
+                        <div class="slider-group">
+                            <div class="slider-label"><span><i class="fas fa-sun label-icon"></i>Exposure</span><span class="slider-value" data-for="exposure">0</span></div>
+                            <input type="range" data-slider="exposure" min="-100" max="100" value="0">
+                        </div>
+                        <div class="slider-group">
+                            <div class="slider-label"><span><i class="fas fa-circle-half-stroke label-icon"></i>Brightness</span><span class="slider-value" data-for="brightness">0</span></div>
+                            <input type="range" data-slider="brightness" min="-100" max="100" value="0">
+                        </div>
+                        <div class="slider-group">
+                            <div class="slider-label"><span><i class="fas fa-adjust label-icon"></i>Contrast</span><span class="slider-value" data-for="contrast">0</span></div>
+                            <input type="range" data-slider="contrast" min="-100" max="100" value="0">
+                        </div>
+                        <div class="slider-group">
+                            <div class="slider-label"><span><i class="fas fa-cloud-sun label-icon"></i>Highlights</span><span class="slider-value" data-for="highlights">0</span></div>
+                            <input type="range" data-slider="highlights" min="-100" max="100" value="0">
+                        </div>
+                        <div class="slider-group">
+                            <div class="slider-label"><span><i class="fas fa-moon label-icon"></i>Shadows</span><span class="slider-value" data-for="shadows">0</span></div>
+                            <input type="range" data-slider="shadows" min="-100" max="100" value="0">
+                        </div>
+
+                        <div class="divider"></div>
+                        <div class="section-label">Color</div>
+                        <div class="slider-group">
+                            <div class="slider-label"><span><i class="fas fa-droplet label-icon"></i>Saturation</span><span class="slider-value" data-for="saturation">0</span></div>
+                            <input type="range" data-slider="saturation" min="-100" max="100" value="0">
+                        </div>
+                        <div class="slider-group">
+                            <div class="slider-label"><span><i class="fas fa-palette label-icon"></i>Vibrance</span><span class="slider-value" data-for="vibrance">0</span></div>
+                            <input type="range" data-slider="vibrance" min="-100" max="100" value="0">
+                        </div>
+                        <div class="slider-group">
+                            <div class="slider-label"><span><i class="fas fa-temperature-half label-icon"></i>Temperature</span><span class="slider-value" data-for="temperature">0</span></div>
+                            <input type="range" data-slider="temperature" min="-100" max="100" value="0">
+                        </div>
+                        <div class="slider-group">
+                            <div class="slider-label"><span><i class="fas fa-tint label-icon"></i>Tint</span><span class="slider-value" data-for="tint">0</span></div>
+                            <input type="range" data-slider="tint" min="-100" max="100" value="0">
+                        </div>
+
+                        <div class="divider"></div>
+                        <div class="section-label">Detail</div>
+                        <div class="slider-group">
+                            <div class="slider-label"><span><i class="fas fa-diamond label-icon"></i>Sharpness</span><span class="slider-value" data-for="sharpness">0</span></div>
+                            <input type="range" data-slider="sharpness" min="0" max="100" value="0">
+                        </div>
+                        <div class="slider-group">
+                            <div class="slider-label"><span><i class="fas fa-eraser label-icon"></i>Noise Reduction</span><span class="slider-value" data-for="denoise">0</span></div>
+                            <input type="range" data-slider="denoise" min="0" max="100" value="0">
+                        </div>
+                        <div class="slider-group">
+                            <div class="slider-label"><span><i class="fas fa-circle label-icon"></i>Clarity</span><span class="slider-value" data-for="clarity">0</span></div>
+                            <input type="range" data-slider="clarity" min="-100" max="100" value="0">
+                        </div>
+
+                        <div class="divider"></div>
+                        <button class="btn-reset" id="resetBtn"><i class="fas fa-undo"></i> Reset All Adjustments</button>
+                    </div>
+
+                    <!-- TAB: Effects -->
+                    <div class="tab-content" id="tabEffects">
+                        <div class="section-label">Presets</div>
+                        <div class="presets-grid">
+                            <button class="preset-btn" data-preset="none">None</button>
+                            <button class="preset-btn" data-preset="vivid">Vivid</button>
+                            <button class="preset-btn" data-preset="dramatic">Dramatic</button>
+                            <button class="preset-btn" data-preset="mono">Mono</button>
+                            <button class="preset-btn" data-preset="noir">Noir</button>
+                            <button class="preset-btn" data-preset="vintage">Vintage</button>
+                            <button class="preset-btn" data-preset="warm">Warm</button>
+                            <button class="preset-btn" data-preset="cool">Cool</button>
+                            <button class="preset-btn" data-preset="fade">Fade</button>
+                        </div>
+
+                        <div class="divider"></div>
+                        <div class="section-label">Effects</div>
+                        <div class="slider-group">
+                            <div class="slider-label"><span><i class="fas fa-circle-dot label-icon"></i>Vignette</span><span class="slider-value" data-for="vignette">0</span></div>
+                            <input type="range" data-slider="vignette" min="0" max="100" value="0">
+                        </div>
+                        <div class="slider-group">
+                            <div class="slider-label"><span><i class="fas fa-film label-icon"></i>Grain</span><span class="slider-value" data-for="grain">0</span></div>
+                            <input type="range" data-slider="grain" min="0" max="100" value="0">
+                        </div>
+                        <div class="slider-group">
+                            <div class="slider-label"><span><i class="fas fa-water label-icon"></i>Blur</span><span class="slider-value" data-for="blur">0</span></div>
+                            <input type="range" data-slider="blur" min="0" max="30" value="0">
+                        </div>
+                        <div class="slider-group">
+                            <div class="slider-label"><span><i class="fas fa-ghost label-icon"></i>Fade</span><span class="slider-value" data-for="fade">0</span></div>
+                            <input type="range" data-slider="fade" min="0" max="100" value="0">
+                        </div>
+                        <div class="slider-group">
+                            <div class="slider-label"><span><i class="fas fa-swatchbook label-icon"></i>Sepia</span><span class="slider-value" data-for="sepia">0</span></div>
+                            <input type="range" data-slider="sepia" min="0" max="100" value="0">
+                        </div>
+                        <div class="slider-group">
+                            <div class="slider-label"><span><i class="fas fa-rotate label-icon"></i>Hue Rotate</span><span class="slider-value" data-for="hue">0°</span></div>
+                            <input type="range" data-slider="hue" min="0" max="360" value="0">
+                        </div>
+
+                        <div class="divider"></div>
+                        <div class="section-label">Histogram</div>
+                        <div class="histogram-wrap">
+                            <div class="histogram-label"><i class="fas fa-chart-area"></i> RGB Distribution</div>
+                            <canvas id="histogramCanvas" width="280" height="70"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- TAB: Export -->
+                    <div class="tab-content" id="tabExport">
+                        <div class="section-label">Upscale</div>
+                        <div class="slider-group">
+                            <select class="upscale-select" id="upscaleSelect">
+                                <option value="1">None (Original Size)</option>
+                                <option value="1.5">1.5× Upscale</option>
+                                <option value="2">2× Upscale</option>
+                                <option value="3">3× Upscale</option>
+                                <option value="4">4× Upscale</option>
+                            </select>
+                        </div>
+
+                        <div class="divider"></div>
+                        <div class="section-label">Format</div>
+                        <div class="slider-group">
+                            <select class="format-select" id="formatSelect">
+                                <option value="image/png">PNG (Lossless)</option>
+                                <option value="image/jpeg">JPEG (Smaller)</option>
+                                <option value="image/webp">WebP (Modern)</option>
+                            </select>
+                        </div>
+
+                        <div class="slider-group" id="qualityGroup">
+                            <div class="slider-label"><span><i class="fas fa-gem label-icon"></i>Quality</span><span class="slider-value" data-for="quality">92%</span></div>
+                            <input type="range" data-slider="quality" min="10" max="100" value="92">
+                        </div>
+
+                        <div class="divider"></div>
+                        <div class="section-label">Output Info</div>
+                        <div id="exportInfo" style="font-size:12px;color:var(--text-secondary);line-height:1.7;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="actions-bar">
+            <button class="btn btn-primary" id="downloadBtn"><i class="fas fa-download"></i> Save & Download Image</button>
+            <button class="btn btn-ghost" id="startOverBtn"><i class="fas fa-redo"></i> Start Over</button>
+        </div>
+    </div>
+</main>
+
+<footer class="footer">© 2026 Passion Tools. Secure client-side processing.</footer>
+
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+    <p id="loadingText">Processing image…</p>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+    // ─── Theme ───
+    const html = document.documentElement;
+    const toggle = document.getElementById('themeToggle');
+    const saved = localStorage.getItem('pt-theme');
+    if (saved) { html.setAttribute('data-theme', saved); toggle.textContent = saved === 'dark' ? '🌙' : '☀️'; }
+    else if (matchMedia('(prefers-color-scheme:dark)').matches) { html.setAttribute('data-theme', 'dark'); toggle.textContent = '🌙'; }
+    toggle.addEventListener('click', () => {
+        const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        html.setAttribute('data-theme', next);
+        toggle.textContent = next === 'dark' ? '🌙' : '☀️';
+        localStorage.setItem('pt-theme', next);
+    });
+
+    // ─── DOM ───
+    const uploadCard = document.getElementById('uploadCard');
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('fileInput');
+    const workspace = document.getElementById('workspace');
+    const canvasViewport = document.getElementById('canvasViewport');
+    const imageMeta = document.getElementById('imageMeta');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const loadingText = document.getElementById('loadingText');
+    const toastEl = document.getElementById('toast');
+    const histCanvas = document.getElementById('histogramCanvas');
+    const exportInfo = document.getElementById('exportInfo');
+    const qualityGroup = document.getElementById('qualityGroup');
+    const formatSelect = document.getElementById('formatSelect');
+    const upscaleSelect = document.getElementById('upscaleSelect');
+    const cropOverlay = document.getElementById('cropOverlay');
+
+    // All sliders
+    const allSliders = {};
+    const allValDisplays = {};
+    document.querySelectorAll('input[data-slider]').forEach(el => {
+        const key = el.dataset.slider;
+        allSliders[key] = el;
+        allValDisplays[key] = document.querySelector(`.slider-value[data-for="${key}"]`);
+    });
+
+    let originalImage = null;
+    let originalData = null;
+    let currentImageData = null; // after transforms (rotate/flip/crop)
+    let fileName = 'enhanced-image.png';
+    let enhancedCanvas = null;
+    let originalCanvas = null;
+    let compareOverlay = null;
+    let compareHandle = null;
+    let compareLine = null;
+    let zoomLevel = 1;
+    let rotation = 0;
+    let flipH = false;
+    let flipV = false;
+
+    // Undo/Redo
+    let history = [];
+    let historyIndex = -1;
+    const MAX_HISTORY = 20;
+
+    function pushHistory() {
+        const state = {};
+        Object.keys(allSliders).forEach(k => state[k] = allSliders[k].value);
+        state._rotation = rotation;
+        state._flipH = flipH;
+        state._flipV = flipV;
+        // Remove future states
+        history = history.slice(0, historyIndex + 1);
+        history.push(JSON.stringify(state));
+        if (history.length > MAX_HISTORY) history.shift();
+        historyIndex = history.length - 1;
+    }
+
+    function restoreState(stateStr) {
+        const state = JSON.parse(stateStr);
+        Object.keys(allSliders).forEach(k => {
+            if (state[k] !== undefined) {
+                allSliders[k].value = state[k];
+                updateValDisplay(k);
+            }
+        });
+        if (state._rotation !== undefined) rotation = state._rotation;
+        if (state._flipH !== undefined) flipH = state._flipH;
+        if (state._flipV !== undefined) flipV = state._flipV;
+        rebuildCurrentImageData();
+        applyEnhancements();
+    }
+
+    // ─── Helpers ───
+    function showToast(msg, icon = 'check-circle') {
+        toastEl.innerHTML = `<i class="fas fa-${icon}" style="color:var(--green)"></i> ${msg}`;
+        toastEl.classList.add('show');
+        setTimeout(() => toastEl.classList.remove('show'), 2600);
+    }
+    function showLoading(msg) { loadingText.textContent = msg; loadingOverlay.classList.add('active'); }
+    function hideLoading() { loadingOverlay.classList.remove('active'); }
+
+    function updateValDisplay(key) {
+        if (!allValDisplays[key]) return;
+        let v = allSliders[key].value;
+        if (key === 'hue') v += '°';
+        else if (key === 'quality') v += '%';
+        allValDisplays[key].textContent = v;
+    }
+
+    // ─── Tabs ───
+    document.querySelectorAll('.panel-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            const target = tab.dataset.tab;
+            const map = { adjust: 'tabAdjust', effects: 'tabEffects', export: 'tabExport' };
+            document.getElementById(map[target]).classList.add('active');
+            if (target === 'effects' && enhancedCanvas) drawHistogram();
+            if (target === 'export') updateExportInfo();
+        });
+    });
+
+    // ─── Upload ───
+    uploadArea.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+    uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('drag-over'); });
+    uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('drag-over'));
+    uploadArea.addEventListener('drop', e => {
+        e.preventDefault();
+        uploadArea.classList.remove('drag-over');
+        if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+    });
+
+    function handleFile(file) {
+        if (!file.type.match(/image\/(png|jpe?g|webp)/)) { showToast('Unsupported format', 'exclamation-circle'); return; }
+        showLoading('Loading image…');
+        const ext = formatSelect.value === 'image/jpeg' ? 'jpg' : formatSelect.value === 'image/webp' ? 'webp' : 'png';
+        fileName = file.name.replace(/\.[^.]+$/, '') + '-enhanced.' + ext;
+        const reader = new FileReader();
+        reader.onload = ev => {
+            const img = new Image();
+            img.onload = () => {
+                originalImage = img;
+                rotation = 0;
+                flipH = false;
+                flipV = false;
+                history = [];
+                historyIndex = -1;
+                initWorkspace();
+                hideLoading();
+            };
+            img.onerror = () => { hideLoading(); showToast('Failed to load image', 'exclamation-circle'); };
+            img.src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // ─── Workspace Init ───
+    function initWorkspace() {
+        uploadCard.style.display = 'none';
+        workspace.classList.add('active');
+
+        rebuildCurrentImageData();
+
+        const w = currentImageData.width, h = currentImageData.height;
+        imageMeta.innerHTML = `
+            <span><i class="fas fa-ruler-combined"></i> ${w} × ${h}</span>
+            <span><i class="fas fa-palette"></i> ${(w * h / 1e6).toFixed(1)} MP</span>
+            <span><i class="fas fa-file-image"></i> ${originalImage.src.length > 1000 ? ((originalImage.src.length * 0.75) / 1024 / 1024).toFixed(1) + ' MB' : 'N/A'}</span>
+        `;
+
+        buildCompareView();
+        applyEnhancements();
+        pushHistory();
+        zoomLevel = 1;
+        updateZoomDisplay();
+        updateExportInfo();
+    }
+
+    function rebuildCurrentImageData() {
+        const natW = originalImage.naturalWidth;
+        const natH = originalImage.naturalHeight;
+        const swapped = rotation === 90 || rotation === 270;
+        const outW = swapped ? natH : natW;
+        const outH = swapped ? natW : natH;
+
+        const tmpC = document.createElement('canvas');
+        tmpC.width = outW;
+        tmpC.height = outH;
+        const ctx = tmpC.getContext('2d');
+
+        ctx.save();
+        ctx.translate(outW / 2, outH / 2);
+        ctx.rotate((rotation * Math.PI) / 180);
+        if (flipH) ctx.scale(-1, 1);
+        if (flipV) ctx.scale(1, -1);
+        ctx.drawImage(originalImage, -natW / 2, -natH / 2);
+        ctx.restore();
+
+        originalData = ctx.getImageData(0, 0, outW, outH);
+        currentImageData = originalData;
+    }
+
+    // ─── Compare View (FIXED) ───
+    function buildCompareView() {
+        canvasViewport.innerHTML = '';
+
+        const container = document.createElement('div');
+        container.className = 'compare-container';
+        container.id = 'compareWrap';
+
+        // Enhanced canvas (background, full image)
+        enhancedCanvas = document.createElement('canvas');
+        enhancedCanvas.className = 'enhanced-canvas';
+        container.appendChild(enhancedCanvas);
+
+        // Overlay div (original image, clipped)
+        compareOverlay = document.createElement('div');
+        compareOverlay.className = 'compare-overlay';
+        originalCanvas = document.createElement('canvas');
+        compareOverlay.appendChild(originalCanvas);
+        container.appendChild(compareOverlay);
+
+        // Divider line
+        compareLine = document.createElement('div');
+        compareLine.className = 'compare-line';
+        container.appendChild(compareLine);
+
+        // Handle
+        compareHandle = document.createElement('div');
+        compareHandle.className = 'compare-handle';
+        const handleIcon = document.createElement('div');
+        handleIcon.className = 'compare-handle-icon';
+        handleIcon.innerHTML = '<i class="fas fa-arrows-left-right"></i>';
+        compareHandle.appendChild(handleIcon);
+        container.appendChild(compareHandle);
+
+        // Labels (use createElement to avoid innerHTML += destroying refs)
+        const labelBefore = document.createElement('span');
+        labelBefore.className = 'compare-label before';
+        labelBefore.textContent = 'Before';
+        container.appendChild(labelBefore);
+
+        const labelAfter = document.createElement('span');
+        labelAfter.className = 'compare-label after';
+        labelAfter.textContent = 'After';
+        container.appendChild(labelAfter);
+
+        canvasViewport.appendChild(container);
+
+        // Draw original onto its canvas
+        drawOriginalCanvas();
+
+        // ─── Compare Slider Interaction ───
+        let dragging = false;
+        function onMove(clientX) {
+            const rect = container.getBoundingClientRect();
+            let x = clientX - rect.left;
+            x = Math.max(0, Math.min(x, rect.width));
+            const pct = (x / rect.width) * 100;
+            compareOverlay.style.width = pct + '%';
+            compareHandle.style.left = pct + '%';
+            compareLine.style.left = pct + '%';
+        }
+        container.addEventListener('mousedown', e => { dragging = true; onMove(e.clientX); e.preventDefault(); });
+        window.addEventListener('mousemove', e => { if (dragging) onMove(e.clientX); });
+        window.addEventListener('mouseup', () => dragging = false);
+        container.addEventListener('touchstart', e => { dragging = true; onMove(e.touches[0].clientX); }, { passive: true });
+        window.addEventListener('touchmove', e => { if (dragging) onMove(e.touches[0].clientX); }, { passive: true });
+        window.addEventListener('touchend', () => dragging = false);
+
+        // Start at 50%
+        requestAnimationFrame(() => {
+            compareOverlay.style.width = '50%';
+            compareHandle.style.left = '50%';
+            compareLine.style.left = '50%';
+        });
+    }
+
+    function drawOriginalCanvas() {
+        if (!currentImageData || !originalCanvas || !enhancedCanvas) return;
+        const w = currentImageData.width;
+        const h = currentImageData.height;
+        originalCanvas.width = w;
+        originalCanvas.height = h;
+        const ctx = originalCanvas.getContext('2d');
+        ctx.putImageData(currentImageData, 0, 0);
+
+        // Sync display sizes after a frame
+        requestAnimationFrame(() => syncCanvasSizes());
+    }
+
+    function syncCanvasSizes() {
+        if (!originalCanvas || !enhancedCanvas) return;
+        const displayW = enhancedCanvas.clientWidth;
+        const displayH = enhancedCanvas.clientHeight;
+        if (displayW > 0 && displayH > 0) {
+            originalCanvas.style.width = displayW + 'px';
+            originalCanvas.style.height = displayH + 'px';
+        }
+    }
+
+    // ─── Enhancement Engine ───
+    let rafId = null;
+    function scheduleApply() {
+        if (rafId) cancelAnimationFrame(rafId);
+        rafId = requestAnimationFrame(() => {
+            applyEnhancements();
+            rafId = null;
+        });
+    }
+
+    Object.keys(allSliders).forEach(key => {
+        allSliders[key].addEventListener('input', () => {
+            updateValDisplay(key);
+            if (key !== 'quality') scheduleApply();
+            if (key === 'quality') updateExportInfo();
+        });
+        allSliders[key].addEventListener('change', () => {
+            if (key !== 'quality') pushHistory();
+        });
+    });
+
+    function applyEnhancements() {
+        if (!currentImageData) return;
+        const w = currentImageData.width, h = currentImageData.height;
+        enhancedCanvas.width = w;
+        enhancedCanvas.height = h;
+        const ctx = enhancedCanvas.getContext('2d');
+
+        const src = currentImageData.data;
+        const imgData = ctx.createImageData(w, h);
+        const dst = imgData.data;
+        const len = src.length;
+
+        // Read slider values
+        const exposure = parseFloat(allSliders.exposure.value);
+        const brightness = parseFloat(allSliders.brightness.value);
+        const contrast = parseFloat(allSliders.contrast.value);
+        const highlights = parseFloat(allSliders.highlights.value);
+        const shadows = parseFloat(allSliders.shadows.value);
+        const saturation = parseFloat(allSliders.saturation.value);
+        const vibrance = parseFloat(allSliders.vibrance.value);
+        const temperature = parseFloat(allSliders.temperature.value);
+        const tint = parseFloat(allSliders.tint.value);
+        const clarity = parseFloat(allSliders.clarity.value);
+        const sepia = parseFloat(allSliders.sepia.value) / 100;
+        const hue = parseFloat(allSliders.hue.value);
+        const fadeAmount = parseFloat(allSliders.fade.value) / 100;
+
+        // Precompute
+        const exposureMul = Math.pow(2, exposure / 50);
+        const cFactor = (259 * (contrast + 255)) / (255 * (259 - contrast));
+        const sFactor = 1 + saturation / 100;
+        const vFactor = vibrance / 100;
+        const hueRad = (hue * Math.PI) / 180;
+        const cosH = Math.cos(hueRad);
+        const sinH = Math.sin(hueRad);
+
+        for (let i = 0; i < len; i += 4) {
+            let r = src[i], g = src[i + 1], b = src[i + 2];
+
+            // Exposure
+            r *= exposureMul; g *= exposureMul; b *= exposureMul;
+
+            // Brightness
+            r += brightness * 2.55;
+            g += brightness * 2.55;
+            b += brightness * 2.55;
+
+            // Contrast
+            r = cFactor * (r - 128) + 128;
+            g = cFactor * (g - 128) + 128;
+            b = cFactor * (b - 128) + 128;
+
+            // Highlights & Shadows
+            if (highlights !== 0 || shadows !== 0) {
+                const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+                const highlightMask = Math.max(0, Math.min(1, (lum - 128) / 127));
+                const shadowMask = Math.max(0, Math.min(1, (128 - lum) / 128));
+                const hAdj = highlights * highlightMask * 1.5;
+                const sAdj = shadows * shadowMask * 1.5;
+                r += hAdj + sAdj;
+                g += hAdj + sAdj;
+                b += hAdj + sAdj;
+            }
+
+            // Temperature (warm/cool shift)
+            if (temperature !== 0) {
+                r += temperature * 0.8;
+                b -= temperature * 0.8;
+            }
+
+            // Tint (green/magenta shift)
+            if (tint !== 0) {
+                g += tint * 0.6;
+            }
+
+            // Saturation
+            let gray = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+            r = gray + sFactor * (r - gray);
+            g = gray + sFactor * (g - gray);
+            b = gray + sFactor * (b - gray);
+
+            // Vibrance (boost low-saturation pixels more)
+            if (vFactor !== 0) {
+                const maxC = Math.max(r, g, b);
+                const minC = Math.min(r, g, b);
+                const sat = maxC === 0 ? 0 : (maxC - minC) / maxC;
+                const boost = 1 + vFactor * (1 - sat);
+                gray = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+                r = gray + boost * (r - gray);
+                g = gray + boost * (g - gray);
+                b = gray + boost * (b - gray);
+            }
+
+            // Hue rotate
+            if (hue !== 0) {
+                const rr = r, gg = g, bb = b;
+                const avgR = 0.213, avgG = 0.715, avgB = 0.072;
+                r = avgR + cosH * (1 - avgR) + sinH * (-avgR) ;
+                const m00 = avgR + cosH * (1 - avgR) + sinH * (-avgR);
+                const m01 = avgG + cosH * (-avgG) + sinH * (-avgG);
+                const m02 = avgB + cosH * (-avgB) + sinH * (1 - avgB);
+                const m10 = avgR + cosH * (-avgR) + sinH * (0.143);
+                const m11 = avgG + cosH * (1 - avgG) + sinH * (0.14);
+                const m12 = avgB + cosH * (-avgB) + sinH * (-0.283);
+                const m20 = avgR + cosH * (-avgR) + sinH * (-(1 - avgR));
+                const m21 = avgG + cosH * (-avgG) + sinH * (avgG);
+                const m22 = avgB + cosH * (1 - avgB) + sinH * (avgB);
+                r = m00 * rr + m01 * gg + m02 * bb;
+                g = m10 * rr + m11 * gg + m12 * bb;
+                b = m20 * rr + m21 * gg + m22 * bb;
+            }
+
+            // Sepia
+            if (sepia > 0) {
+                const sr = 0.393 * r + 0.769 * g + 0.189 * b;
+                const sg = 0.349 * r + 0.686 * g + 0.168 * b;
+                const sb = 0.272 * r + 0.534 * g + 0.131 * b;
+                r = r + (sr - r) * sepia;
+                g = g + (sg - g) * sepia;
+                b = b + (sb - b) * sepia;
+            }
+
+            // Fade (lift blacks)
+            if (fadeAmount > 0) {
+                const lift = fadeAmount * 60;
+                r = r + (lift - r) * fadeAmount * 0.3;
+                g = g + (lift - g) * fadeAmount * 0.3;
+                b = b + (lift - b) * fadeAmount * 0.3;
+            }
+
+            // Clamp
+            dst[i]     = r < 0 ? 0 : r > 255 ? 255 : r | 0;
+            dst[i + 1] = g < 0 ? 0 : g > 255 ? 255 : g | 0;
+            dst[i + 2] = b < 0 ? 0 : b > 255 ? 255 : b | 0;
+            dst[i + 3] = src[i + 3];
+        }
+
+        ctx.putImageData(imgData, 0, 0);
+
+        // Clarity (local contrast via unsharp mask with large radius — approximated)
+        if (clarity !== 0) {
+            const clData = ctx.getImageData(0, 0, w, h);
+            applyClarity(clData, w, h, clarity / 100);
+            ctx.putImageData(clData, 0, 0);
+        }
+
+        // Sharpness
+        const sharpness = parseFloat(allSliders.sharpness.value);
+        if (sharpness > 0) {
+            const sData = ctx.getImageData(0, 0, w, h);
+            applySharpen(sData, w, h, sharpness / 100);
+            ctx.putImageData(sData, 0, 0);
+        }
+
+        // Noise reduction (simple box blur applied selectively)
+        const denoise = parseFloat(allSliders.denoise.value);
+        if (denoise > 0) {
+            const dData = ctx.getImageData(0, 0, w, h);
+            applyDenoise(dData, w, h, denoise / 100);
+            ctx.putImageData(dData, 0, 0);
+        }
+
+        // Blur (CSS-like blur via CanvasRenderingContext2D.filter)
+        const blurVal = parseFloat(allSliders.blur.value);
+        if (blurVal > 0) {
+            const tmpCanvas = document.createElement('canvas');
+            tmpCanvas.width = w; tmpCanvas.height = h;
+            const tmpCtx = tmpCanvas.getContext('2d');
+            tmpCtx.filter = `blur(${blurVal}px)`;
+            tmpCtx.drawImage(enhancedCanvas, 0, 0);
+            ctx.clearRect(0, 0, w, h);
+            ctx.drawImage(tmpCanvas, 0, 0);
+        }
+
+        // Vignette
+        const vignette = parseFloat(allSliders.vignette.value);
+        if (vignette > 0) {
+            applyVignette(ctx, w, h, vignette / 100);
+        }
+
+        // Grain
+        const grain = parseFloat(allSliders.grain.value);
+        if (grain > 0) {
+            const gData = ctx.getImageData(0, 0, w, h);
+            applyGrain(gData, grain / 100);
+            ctx.putImageData(gData, 0, 0);
+        }
+
+        // Sync sizes
+        requestAnimationFrame(() => syncCanvasSizes());
+
+        // Update histogram if visible
+        const effectsTab = document.getElementById('tabEffects');
+        if (effectsTab.classList.contains('active')) drawHistogram();
+        updateExportInfo();
+    }
+
+    function applySharpen(imageData, w, h, amount) {
+        const src = new Uint8ClampedArray(imageData.data);
+        const dst = imageData.data;
+        for (let y = 1; y < h - 1; y++) {
+            for (let x = 1; x < w - 1; x++) {
+                const idx = (y * w + x) * 4;
+                for (let c = 0; c < 3; c++) {
+                    const center = src[idx + c];
+                    const neighbors =
+                        src[((y - 1) * w + x) * 4 + c] +
+                        src[((y + 1) * w + x) * 4 + c] +
+                        src[(y * w + x - 1) * 4 + c] +
+                        src[(y * w + x + 1) * 4 + c];
+                    const laplacian = center * 4 - neighbors;
+                    dst[idx + c] = Math.min(255, Math.max(0, center + laplacian * amount));
+                }
+            }
+        }
+    }
+
+    function applyClarity(imageData, w, h, amount) {
+        const src = new Uint8ClampedArray(imageData.data);
+        const dst = imageData.data;
+        const r = 2;
+        for (let y = r; y < h - r; y++) {
+            for (let x = r; x < w - r; x++) {
+                const idx = (y * w + x) * 4;
+                for (let c = 0; c < 3; c++) {
+                    let sum = 0, count = 0;
+                    for (let dy = -r; dy <= r; dy++) {
+                        for (let dx = -r; dx <= r; dx++) {
+                            sum += src[((y + dy) * w + (x + dx)) * 4 + c];
+                            count++;
+                        }
+                    }
+                    const avg = sum / count;
+                    const diff = src[idx + c] - avg;
+                    dst[idx + c] = Math.min(255, Math.max(0, src[idx + c] + diff * amount));
+                }
+            }
+        }
+    }
+
+    function applyDenoise(imageData, w, h, amount) {
+        const src = new Uint8ClampedArray(imageData.data);
+        const dst = imageData.data;
+        const radius = Math.max(1, Math.round(amount * 2));
+        for (let y = radius; y < h - radius; y++) {
+            for (let x = radius; x < w - radius; x++) {
+                const idx = (y * w + x) * 4;
+                for (let c = 0; c < 3; c++) {
+                    let sum = 0, count = 0;
+                    for (let dy = -radius; dy <= radius; dy++) {
+                        for (let dx = -radius; dx <= radius; dx++) {
+                            const ni = ((y + dy) * w + (x + dx)) * 4 + c;
+                            if (Math.abs(src[ni] - src[idx + c]) < 30 + amount * 40) {
+                                sum += src[ni];
+                                count++;
+                            }
+                        }
+                    }
+                    dst[idx + c] = Math.round(src[idx + c] * (1 - amount) + (sum / count) * amount);
+                }
+            }
+        }
+    }
+
+    function applyVignette(ctx, w, h, amount) {
+        const cx = w / 2, cy = h / 2;
+        const maxR = Math.sqrt(cx * cx + cy * cy);
+        const gradient = ctx.createRadialGradient(cx, cy, maxR * (0.4 - amount * 0.2), cx, cy, maxR);
+        gradient.addColorStop(0, 'rgba(0,0,0,0)');
+        gradient.addColorStop(1, `rgba(0,0,0,${0.3 + amount * 0.5})`);
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, w, h);
+    }
+
+    function applyGrain(imageData, amount) {
+        const dst = imageData.data;
+        const intensity = amount * 60;
+        for (let i = 0; i < dst.length; i += 4) {
+            const noise = (Math.random() - 0.5) * intensity;
+            dst[i]     = Math.min(255, Math.max(0, dst[i] + noise));
+            dst[i + 1] = Math.min(255, Math.max(0, dst[i + 1] + noise));
+            dst[i + 2] = Math.min(255, Math.max(0, dst[i + 2] + noise));
+        }
+    }
+
+    // ─── Histogram ───
+    function drawHistogram() {
+        if (!enhancedCanvas) return;
+        const ctx = enhancedCanvas.getContext('2d');
+        const data = ctx.getImageData(0, 0, enhancedCanvas.width, enhancedCanvas.height).data;
+        const rH = new Array(256).fill(0);
+        const gH = new Array(256).fill(0);
+        const bH = new Array(256).fill(0);
+
+        for (let i = 0; i < data.length; i += 16) { // sample every 4th pixel for speed
+            rH[data[i]]++;
+            gH[data[i + 1]]++;
+            bH[data[i + 2]]++;
+        }
+
+        const hCtx = histCanvas.getContext('2d');
+        const cw = histCanvas.width, ch = histCanvas.height;
+        hCtx.clearRect(0, 0, cw, ch);
+
+        const maxVal = Math.max(...rH, ...gH, ...bH) || 1;
+        const barW = cw / 256;
+
+        function drawChannel(hist, color) {
+            hCtx.beginPath();
+            hCtx.moveTo(0, ch);
+            for (let i = 0; i < 256; i++) {
+                const h = (hist[i] / maxVal) * ch;
+                hCtx.lineTo(i * barW, ch - h);
+            }
+            hCtx.lineTo(cw, ch);
+            hCtx.closePath();
+            hCtx.fillStyle = color;
+            hCtx.fill();
+        }
+
+        hCtx.globalCompositeOperation = 'source-over';
+        drawChannel(rH, 'rgba(239,68,68,0.35)');
+        hCtx.globalCompositeOperation = 'lighter';
+        drawChannel(gH, 'rgba(34,197,94,0.35)');
+        drawChannel(bH, 'rgba(59,130,246,0.35)');
+    }
+
+    // ─── Presets ───
+    const presets = {
+        none: {},
+        vivid: { contrast: 20, saturation: 40, vibrance: 30, clarity: 15 },
+        dramatic: { contrast: 40, saturation: 15, shadows: -30, highlights: -20, clarity: 30, vignette: 30 },
+        mono: { saturation: -100 },
+        noir: { saturation: -100, contrast: 50, brightness: -10, vignette: 40 },
+        vintage: { saturation: -20, temperature: 25, fade: 30, sepia: 25, grain: 15, vignette: 20 },
+        warm: { temperature: 35, saturation: 10, brightness: 5 },
+        cool: { temperature: -35, saturation: 5, brightness: 5, tint: -10 },
+        fade: { contrast: -15, fade: 50, brightness: 10, saturation: -15 }
+    };
+
+    document.querySelectorAll('.preset-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const p = presets[btn.dataset.preset] || {};
+
+            // Reset all first
+            Object.keys(allSliders).forEach(k => {
+                if (k === 'quality') return;
+                const def = (k === 'sharpness' || k === 'denoise' || k === 'vignette' || k === 'grain' || k === 'blur' || k === 'fade' || k === 'sepia' || k === 'hue') ? 0 : 0;
+                allSliders[k].value = p[k] !== undefined ? p[k] : def;
+                updateValDisplay(k);
+            });
+            applyEnhancements();
+            pushHistory();
+            showToast(`${btn.dataset.preset.charAt(0).toUpperCase() + btn.dataset.preset.slice(1)} preset applied`);
+        });
+    });
+
+    // ─── Auto Enhance ───
+    document.getElementById('autoEnhanceBtn').addEventListener('click', () => {
+        if (!currentImageData) return;
+        showLoading('Auto-enhancing…');
+        setTimeout(() => {
+            // Analyze image
+            const d = currentImageData.data;
+            let totalBri = 0, minV = 255, maxV = 0;
+            const sampleStep = Math.max(4, Math.floor(d.length / 40000)) * 4;
+            let count = 0;
+            for (let i = 0; i < d.length; i += sampleStep) {
+                const lum = 0.299 * d[i] + 0.587 * d[i+1] + 0.114 * d[i+2];
+                totalBri += lum;
+                if (lum < minV) minV = lum;
+                if (lum > maxV) maxV = lum;
+                count++;
+            }
+            const avgBri = totalBri / count;
+            const dynamicRange = maxV - minV;
+
+            // Set intelligent values
+            allSliders.exposure.value = Math.round((128 - avgBri) / 5);
+            allSliders.brightness.value = Math.round((128 - avgBri) / 8);
+            allSliders.contrast.value = dynamicRange < 180 ? Math.round((200 - dynamicRange) / 8) : 5;
+            allSliders.saturation.value = 12;
+            allSliders.vibrance.value = 20;
+            allSliders.sharpness.value = 25;
+            allSliders.clarity.value = 15;
+            allSliders.highlights.value = avgBri > 160 ? -20 : 0;
+            allSliders.shadows.value = avgBri < 80 ? 25 : 0;
+
+            Object.keys(allSliders).forEach(k => updateValDisplay(k));
+            applyEnhancements();
+            pushHistory();
+            hideLoading();
+            showToast('Auto enhancement applied!', 'wand-magic-sparkles');
+        }, 300);
+    });
+
+    // ─── Rotate & Flip ───
+    document.getElementById('rotateLeftBtn').addEventListener('click', () => {
+        rotation = (rotation - 90 + 360) % 360;
+        rebuildCurrentImageData();
+        drawOriginalCanvas();
+        applyEnhancements();
+        pushHistory();
+        updateMeta();
+        showToast('Rotated left');
+    });
+    document.getElementById('rotateRightBtn').addEventListener('click', () => {
+        rotation = (rotation + 90) % 360;
+        rebuildCurrentImageData();
+        drawOriginalCanvas();
+        applyEnhancements();
+        pushHistory();
+        updateMeta();
+        showToast('Rotated right');
+    });
+    document.getElementById('flipHBtn').addEventListener('click', () => {
+        flipH = !flipH;
+        rebuildCurrentImageData();
+        drawOriginalCanvas();
+        applyEnhancements();
+        pushHistory();
+        showToast('Flipped horizontally');
+    });
+    document.getElementById('flipVBtn').addEventListener('click', () => {
+        flipV = !flipV;
+        rebuildCurrentImageData();
+        drawOriginalCanvas();
+        applyEnhancements();
+        pushHistory();
+        showToast('Flipped vertically');
+    });
+
+    function updateMeta() {
+        if (!currentImageData) return;
+        const w = currentImageData.width, h = currentImageData.height;
+        imageMeta.innerHTML = `
+            <span><i class="fas fa-ruler-combined"></i> ${w} × ${h}</span>
+            <span><i class="fas fa-palette"></i> ${(w * h / 1e6).toFixed(1)} MP</span>
+        `;
+    }
+
+    // ─── Crop ───
+    let cropBox = null;
+    let cropStartX, cropStartY;
+    document.getElementById('cropBtn').addEventListener('click', () => {
+        if (!enhancedCanvas) return;
+        const btn = document.getElementById('cropBtn');
+        btn.classList.toggle('active');
+        if (btn.classList.contains('active')) {
+            cropOverlay.classList.add('active');
+            // Remove old crop box
+            const oldBox = cropOverlay.querySelector('.crop-box');
+            if (oldBox) oldBox.remove();
+            initCrop();
+        } else {
+            cropOverlay.classList.remove('active');
+        }
+    });
+
+    function initCrop() {
+        let drawing = false;
+        cropBox = null;
+
+        function onDown(e) {
+            const rect = cropOverlay.getBoundingClientRect();
+            cropStartX = (e.clientX || e.touches[0].clientX) - rect.left;
+            cropStartY = (e.clientY || e.touches[0].clientY) - rect.top;
+            drawing = true;
+            // Remove old box
+            const oldBox = cropOverlay.querySelector('.crop-box');
+            if (oldBox) oldBox.remove();
+            cropBox = document.createElement('div');
+            cropBox.className = 'crop-box';
+            cropOverlay.insertBefore(cropBox, cropOverlay.firstChild);
+        }
+        function onMoveHandler(e) {
+            if (!drawing || !cropBox) return;
+            const rect = cropOverlay.getBoundingClientRect();
+            const cx = (e.clientX || e.touches[0].clientX) - rect.left;
+            const cy = (e.clientY || e.touches[0].clientY) - rect.top;
+            const x = Math.min(cropStartX, cx);
+            const y = Math.min(cropStartY, cy);
+            const w = Math.abs(cx - cropStartX);
+            const h = Math.abs(cy - cropStartY);
+            cropBox.style.left = x + 'px';
+            cropBox.style.top = y + 'px';
+            cropBox.style.width = w + 'px';
+            cropBox.style.height = h + 'px';
+        }
+        function onUp() { drawing = false; }
+
+        cropOverlay.addEventListener('mousedown', onDown);
+        cropOverlay.addEventListener('mousemove', onMoveHandler);
+        cropOverlay.addEventListener('mouseup', onUp);
+        cropOverlay.addEventListener('touchstart', onDown, { passive: true });
+        cropOverlay.addEventListener('touchmove', onMoveHandler, { passive: true });
+        cropOverlay.addEventListener('touchend', onUp);
+
+        // Store cleanup
+        cropOverlay._cleanup = () => {
+            cropOverlay.removeEventListener('mousedown', onDown);
+            cropOverlay.removeEventListener('mousemove', onMoveHandler);
+            cropOverlay.removeEventListener('mouseup', onUp);
+            cropOverlay.removeEventListener('touchstart', onDown);
+            cropOverlay.removeEventListener('touchmove', onMoveHandler);
+            cropOverlay.removeEventListener('touchend', onUp);
+        };
+    }
+
+    document.getElementById('cropApply').addEventListener('click', () => {
+        if (!cropBox || !enhancedCanvas) return;
+        const overlayRect = cropOverlay.getBoundingClientRect();
+        const viewportRect = canvasViewport.getBoundingClientRect();
+        const canvasRect = enhancedCanvas.getBoundingClientRect();
+
+        const boxLeft = parseFloat(cropBox.style.left) || 0;
+        const boxTop = parseFloat(cropBox.style.top) || 0;
+        const boxW = parseFloat(cropBox.style.width) || 0;
+        const boxH = parseFloat(cropBox.style.height) || 0;
+
+        if (boxW < 10 || boxH < 10) { showToast('Crop area too small', 'exclamation-circle'); return; }
+
+        // Convert screen coords to canvas pixel coords
+        const scaleX = currentImageData.width / canvasRect.width;
+        const scaleY = currentImageData.height / canvasRect.height;
+        const canvasOffX = canvasRect.left - overlayRect.left;
+        const canvasOffY = canvasRect.top - overlayRect.top;
+
+        const cx = Math.max(0, Math.round((boxLeft - canvasOffX) * scaleX));
+        const cy = Math.max(0, Math.round((boxTop - canvasOffY) * scaleY));
+        const cw = Math.min(currentImageData.width - cx, Math.round(boxW * scaleX));
+        const ch = Math.min(currentImageData.height - cy, Math.round(boxH * scaleY));
+
+        if (cw < 5 || ch < 5) { showToast('Crop area too small', 'exclamation-circle'); return; }
+
+        // Crop the original data
+        const tmpC = document.createElement('canvas');
+        tmpC.width = currentImageData.width;
+        tmpC.height = currentImageData.height;
+        const tmpCtx = tmpC.getContext('2d');
+        tmpCtx.putImageData(currentImageData, 0, 0);
+
+        const croppedData = tmpCtx.getImageData(cx, cy, cw, ch);
+        currentImageData = croppedData;
+        originalData = croppedData;
+
+        // Cleanup crop
+        cropOverlay.classList.remove('active');
+        document.getElementById('cropBtn').classList.remove('active');
+        if (cropOverlay._cleanup) cropOverlay._cleanup();
+        const oldBox = cropOverlay.querySelector('.crop-box');
+        if (oldBox) oldBox.remove();
+
+        drawOriginalCanvas();
+        applyEnhancements();
+        pushHistory();
+        updateMeta();
+        showToast('Image cropped');
+    });
+
+    document.getElementById('cropCancel').addEventListener('click', () => {
+        cropOverlay.classList.remove('active');
+        document.getElementById('cropBtn').classList.remove('active');
+        if (cropOverlay._cleanup) cropOverlay._cleanup();
+        const oldBox = cropOverlay.querySelector('.crop-box');
+        if (oldBox) oldBox.remove();
+    });
+
+    // ─── Zoom ───
+    function updateZoomDisplay() {
+        document.getElementById('zoomDisplay').textContent = Math.round(zoomLevel * 100) + '%';
+        if (enhancedCanvas) {
+            const container = document.getElementById('compareWrap');
+            if (container) {
+                container.style.transform = `scale(${zoomLevel})`;
+                container.style.transformOrigin = 'center center';
+            }
+        }
+    }
+    document.getElementById('zoomInBtn').addEventListener('click', () => {
+        zoomLevel = Math.min(5, zoomLevel + 0.25);
+        updateZoomDisplay();
+    });
+    document.getElementById('zoomOutBtn').addEventListener('click', () => {
+        zoomLevel = Math.max(0.25, zoomLevel - 0.25);
+        updateZoomDisplay();
+    });
+    document.getElementById('zoomFitBtn').addEventListener('click', () => {
+        zoomLevel = 1;
+        updateZoomDisplay();
+    });
+
+    // ─── Undo / Redo ───
+    document.getElementById('undoBtn').addEventListener('click', () => {
+        if (historyIndex > 0) {
+            historyIndex--;
+            restoreState(history[historyIndex]);
+            showToast('Undo');
+        }
+    });
+    document.getElementById('redoBtn').addEventListener('click', () => {
+        if (historyIndex < history.length - 1) {
+            historyIndex++;
+            restoreState(history[historyIndex]);
+            showToast('Redo');
+        }
+    });
+
+    // ─── Format / Quality ───
+    formatSelect.addEventListener('change', () => {
+        qualityGroup.style.display = formatSelect.value === 'image/png' ? 'none' : 'block';
+        updateExportInfo();
+    });
+    qualityGroup.style.display = 'none'; // PNG default
+
+    function updateExportInfo() {
+        if (!currentImageData) { exportInfo.innerHTML = ''; return; }
+        const scale = parseFloat(upscaleSelect.value);
+        const outW = Math.round(currentImageData.width * scale);
+        const outH = Math.round(currentImageData.height * scale);
+        const fmt = formatSelect.value === 'image/png' ? 'PNG' : formatSelect.value === 'image/jpeg' ? 'JPEG' : 'WebP';
+        const q = formatSelect.value !== 'image/png' ? allSliders.quality.value + '%' : 'Lossless';
+        exportInfo.innerHTML = `
+            <div><i class="fas fa-image" style="color:var(--blue);margin-right:4px;"></i> Output: <strong>${outW} × ${outH}</strong></div>
+            <div><i class="fas fa-file" style="color:var(--purple);margin-right:4px;"></i> Format: <strong>${fmt}</strong> (${q})</div>
+            <div><i class="fas fa-microchip" style="color:var(--green);margin-right:4px;"></i> Pixels: <strong>${(outW * outH / 1e6).toFixed(1)} MP</strong></div>
+        `;
+    }
+
+    // ─── Reset ───
+    document.getElementById('resetBtn').addEventListener('click', () => {
+        Object.keys(allSliders).forEach(k => {
+            if (k === 'quality') { allSliders[k].value = 92; }
+            else { allSliders[k].value = 0; }
+            updateValDisplay(k);
+        });
+        upscaleSelect.value = '1';
+        document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+        applyEnhancements();
+        pushHistory();
+        showToast('All adjustments reset');
+    });
+
+    // ─── Download ───
+    document.getElementById('downloadBtn').addEventListener('click', () => {
+        if (!enhancedCanvas) return;
+        showLoading('Preparing download…');
+        setTimeout(() => {
+            const scale = parseFloat(upscaleSelect.value);
+            const srcW = enhancedCanvas.width, srcH = enhancedCanvas.height;
+            const outW = Math.round(srcW * scale), outH = Math.round(srcH * scale);
+
+            const outCanvas = document.createElement('canvas');
+            outCanvas.width = outW;
+            outCanvas.height = outH;
+            const outCtx = outCanvas.getContext('2d');
+            outCtx.imageSmoothingEnabled = true;
+            outCtx.imageSmoothingQuality = 'high';
+            outCtx.drawImage(enhancedCanvas, 0, 0, outW, outH);
+
+            const format = formatSelect.value;
+            const quality = format !== 'image/png' ? parseInt(allSliders.quality.value) / 100 : undefined;
+            const ext = format === 'image/jpeg' ? 'jpg' : format === 'image/webp' ? 'webp' : 'png';
+            const outName = fileName.replace(/\.[^.]+$/, '') + '.' + ext;
+
+            outCanvas.toBlob(blob => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = outName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                hideLoading();
+                const sizeMB = (blob.size / 1024 / 1024).toFixed(2);
+                showToast(`Downloaded ${outW}×${outH} • ${sizeMB} MB`);
+            }, format, quality);
+        }, 300);
+    });
+
+    // ─── Start Over ───
+    document.getElementById('startOverBtn').addEventListener('click', () => {
+        workspace.classList.remove('active');
+        uploadCard.style.display = '';
+        fileInput.value = '';
+        canvasViewport.innerHTML = '';
+        imageMeta.innerHTML = '';
+        originalImage = null;
+        originalData = null;
+        currentImageData = null;
+        enhancedCanvas = null;
+        originalCanvas = null;
+        rotation = 0;
+        flipH = false;
+        flipV = false;
+        history = [];
+        historyIndex = -1;
+        zoomLevel = 1;
+        Object.keys(allSliders).forEach(k => {
+            allSliders[k].value = k === 'quality' ? 92 : 0;
+            updateValDisplay(k);
+        });
+        upscaleSelect.value = '1';
+        formatSelect.value = 'image/png';
+        qualityGroup.style.display = 'none';
+        document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+    });
+
+    // ─── Keyboard Shortcuts ───
+    document.addEventListener('keydown', e => {
+        if (!workspace.classList.contains('active')) return;
+        if (e.ctrlKey || e.metaKey) {
+            if (e.key === 'z') { e.preventDefault(); document.getElementById('undoBtn').click(); }
+            if (e.key === 'y') { e.preventDefault(); document.getElementById('redoBtn').click(); }
+            if (e.key === 's') { e.preventDefault(); document.getElementById('downloadBtn').click(); }
+        }
+    });
+})();
+</script>
+</body>
+</html>
