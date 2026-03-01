@@ -348,7 +348,7 @@
     <header>
         <div class="container">
             <div class="header-content">
-                <a href="index.html" class="logo-text">
+                <a href="#" class="logo-text">
                     <span class="logo-passion">Passion</span><span class="logo-tools">Tools</span>
                 </a>
 
