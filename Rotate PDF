@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rotate PDF - PassionTools</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --red: #ef4444;
+            --purple: #a855f7;
+            --blue: #3b82f6;
+            --blue-dark: #2563eb;
+            --green: #22c55e;
+            --bg-color: #f9fafb;
+            --card-bg: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --hover-gray: #f3f4f6;
+            --btn-action-bg: #fef2f2;
+            --logo-passion: #000000;
+            --footer-bg: #111827;
+            --header-blur-bg: rgba(255,255,255,0.75);
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.04);
+            --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.08), 0 8px 10px -6px rgba(0,0,0,0.04);
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #020617;
+            --card-bg: #111827;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border-color: #1e293b;
+            --hover-gray: #1e293b;
+            --btn-action-bg: #450a0a;
+            --logo-passion: #ffffff;
+            --footer-bg: #020617;
+            --header-blur-bg: rgba(2,6,23,0.75);
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.4), 0 2px 4px -2px rgba(0,0,0,0.3);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.4), 0 4px 6px -4px rgba(0,0,0,0.3);
+            --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.5), 0 8px 10px -6px rgba(0,0,0,0.4);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            line-height: 1.6;
+        }
+
+        /* ─── HEADER ─── */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--header-blur-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+        .header-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .logo {
+            text-decoration: none;
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            display: inline-flex;
+            align-items: center;
+            background: none;
+            border: none;
+            outline: none;
+        }
+        .logo .passion { color: var(--logo-passion); transition: color 0.3s ease; }
+        .logo .tools {
+            background: linear-gradient(135deg, var(--red), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .back-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.3s ease;
+        }
+        .back-link:hover { color: var(--red); }
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        .theme-toggle:hover {
+            background: var(--hover-gray);
+            border-color: var(--text-secondary);
+        }
+
+        /* ─── MAIN ─── */
+        .main-content {
+            flex: 1;
+            max-width: 1100px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 40px 24px 60px;
+        }
+
+        /* ─── TOOL HEADER ─── */
+        .tool-header {
+            text-align: center;
+            margin-bottom: 36px;
+        }
+        .tool-header h1 {
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+        }
+        .tool-header p {
+            font-size: 16px;
+            color: var(--text-secondary);
+            max-width: 540px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        /* ─── UPLOAD AREA ─── */
+        .upload-area {
+            border: 2.5px dashed var(--border-color);
+            border-radius: 16px;
+            padding: 60px 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: var(--card-bg);
+        }
+        .upload-area:hover, .upload-area.drag-over {
+            border-color: var(--blue);
+            background: color-mix(in srgb, var(--blue) 4%, var(--card-bg));
+        }
+        .upload-area.drag-over {
+            transform: scale(1.01);
+        }
+        .upload-icon {
+            font-size: 48px;
+            color: var(--blue);
+            margin-bottom: 16px;
+        }
+        .upload-area h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .upload-area p.upload-sub {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        .upload-area .file-types {
+            margin-top: 14px;
+            display: inline-block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--blue);
+            background: color-mix(in srgb, var(--blue) 10%, transparent);
+            padding: 4px 14px;
+            border-radius: 20px;
+        }
+        #fileInput { display: none; }
+
+        /* ─── FILE INFO BAR ─── */
+        .file-info-bar {
+            display: none;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+        }
+        .file-info-bar.show { display: flex; }
+        .file-info-bar .fi-icon {
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--red), var(--purple));
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 16px; flex-shrink: 0;
+        }
+        .file-info-bar .fi-details { flex: 1; min-width: 0; }
+        .file-info-bar .fi-name {
+            font-size: 14px; font-weight: 600;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .file-info-bar .fi-meta { font-size: 12px; color: var(--text-secondary); }
+
+        /* ─── WORKSPACE ─── */
+        .workspace {
+            display: none;
+        }
+        .workspace.show { display: block; }
+
+        /* Global Toolbar */
+        .global-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 28px;
+            padding: 16px 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+        }
+        .toolbar-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            background: var(--card-bg);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .toolbar-btn:hover {
+            background: var(--btn-action-bg);
+            border-color: var(--red);
+            color: var(--red);
+        }
+        .toolbar-btn i { font-size: 15px; }
+        .toolbar-btn-accent {
+            background: linear-gradient(135deg, var(--blue), var(--purple));
+            color: #fff;
+            border-color: transparent;
+        }
+        .toolbar-btn-accent:hover {
+            background: linear-gradient(135deg, var(--blue-dark), var(--purple));
+            color: #fff;
+            border-color: transparent;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(59,130,246,0.3);
+        }
+        .toolbar-divider {
+            width: 1px;
+            height: 32px;
+            background: var(--border-color);
+            margin: 0 4px;
+        }
+
+        /* ─── THUMBNAIL GRID ─── */
+        .thumb-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+        @media (max-width: 900px) { .thumb-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 640px) { .thumb-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 400px) { .thumb-grid { grid-template-columns: 1fr; } }
+
+        .thumb-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+            position: relative;
+        }
+        .thumb-card:hover {
+            box-shadow: var(--shadow-lg);
+            border-color: var(--blue);
+        }
+        .thumb-canvas-wrap {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 210 / 297;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        [data-theme="dark"] .thumb-canvas-wrap { background: #0f172a; }
+
+        .thumb-canvas-wrap canvas {
+            max-width: 92%;
+            max-height: 92%;
+            object-fit: contain;
+            transition: transform 0.4s cubic-bezier(.4,0,.2,1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        /* Overlay controls */
+        .thumb-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .thumb-card:hover .thumb-overlay { opacity: 1; }
+
+        .overlay-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255,255,255,0.95);
+            color: #1f2937;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        .overlay-btn:hover {
+            background: var(--blue);
+            color: #fff;
+            transform: scale(1.12);
+        }
+
+        .thumb-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            border-top: 1px solid var(--border-color);
+        }
+        .thumb-page-num {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .thumb-rotation {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            background: var(--hover-gray);
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
+
+        /* ─── DOWNLOAD SECTION ─── */
+        .download-section {
+            display: none;
+            margin-top: 32px;
+            text-align: center;
+        }
+        .download-section.show { display: block; }
+
+        .download-actions {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 32px;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            color: #fff;
+            background: linear-gradient(135deg, var(--blue), var(--blue-dark));
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 14px rgba(59,130,246,0.35);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(59,130,246,0.45);
+        }
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .btn-primary .spinner {
+            display: none;
+            width: 18px; height: 18px;
+            border: 2.5px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        .btn-primary.loading .spinner { display: inline-block; }
+        .btn-primary.loading .btn-label { display: none; }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .btn-ghost {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 28px;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            background: transparent;
+            border: 1.5px solid var(--border-color);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-ghost:hover {
+            border-color: var(--red);
+            color: var(--red);
+            background: var(--btn-action-bg);
+        }
+
+        /* ─── LOADING OVERLAY ─── */
+        .page-loader {
+            display: none;
+            text-align: center;
+            padding: 60px 20px;
+        }
+        .page-loader.show { display: block; }
+        .page-loader .loader-spinner {
+            width: 48px; height: 48px;
+            border: 4px solid var(--border-color);
+            border-top-color: var(--blue);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 16px;
+        }
+        .page-loader p { font-size: 14px; color: var(--text-secondary); font-weight: 500; }
+
+        /* ─── FOOTER ─── */
+        .footer {
+            background: var(--footer-bg);
+            padding: 30px 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #94a3b8;
+            margin-top: auto;
+            transition: background-color 0.3s ease;
+        }
+
+        /* ─── ANIMATIONS ─── */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in-up { animation: fadeInUp 0.5s ease forwards; }
+
+        /* ─── TOAST ─── */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 14px 24px;
+            background: var(--green);
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.4s ease;
+            pointer-events: none;
+        }
+        .toast.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+
+        /* ─── SCROLLBAR ─── */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-color); }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-inner">
+            <a href="#" onclick="event.preventDefault();" class="logo">
+                <span class="passion">Passion</span><span class="tools">Tools</span>
+            </a>
+            <div class="header-actions">
+                <a href="index.html" class="back-link">
+                    <i class="fas fa-arrow-left"></i> Back to Tools
+                </a>
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">☀️</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN -->
+    <main class="main-content">
+        <!-- Tool Header -->
+        <div class="tool-header fade-in-up">
+            <h1>Rotate PDF</h1>
+            <p>Rotate individual pages or your entire PDF document instantly. 100% private in-browser processing.</p>
+        </div>
+
+        <!-- State 1: Upload -->
+        <div id="uploadSection" class="fade-in-up">
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">
+                    <i class="fas fa-file-pdf"></i>
+                </div>
+                <h3>Click or Drag & Drop PDF here</h3>
+                <p class="upload-sub">Select a PDF file from your device</p>
+                <span class="file-types">.PDF supported</span>
+            </div>
+            <input type="file" id="fileInput" accept=".pdf,application/pdf">
+        </div>
+
+        <!-- File Info Bar -->
+        <div class="file-info-bar" id="fileInfoBar">
+            <div class="fi-icon"><i class="fas fa-file-pdf"></i></div>
+            <div class="fi-details">
+                <div class="fi-name" id="fileName">-</div>
+                <div class="fi-meta" id="fileMeta">-</div>
+            </div>
+        </div>
+
+        <!-- Loading -->
+        <div class="page-loader" id="pageLoader">
+            <div class="loader-spinner"></div>
+            <p>Rendering PDF pages…</p>
+        </div>
+
+        <!-- State 2: Workspace -->
+        <div class="workspace" id="workspace">
+            <div class="global-toolbar">
+                <button class="toolbar-btn" id="rotateAllLeft" title="Rotate all pages 90° left">
+                    <i class="fas fa-rotate-left"></i> Rotate Left
+                </button>
+                <button class="toolbar-btn" id="rotateAllRight" title="Rotate all pages 90° right">
+                    <i class="fas fa-rotate-right"></i> Rotate Right
+                </button>
+                <div class="toolbar-divider"></div>
+                <button class="toolbar-btn toolbar-btn-accent" id="rotateAll180" title="Rotate all pages 180°">
+                    <i class="fas fa-arrows-rotate"></i> Rotate All 180°
+                </button>
+            </div>
+            <div class="thumb-grid" id="thumbGrid"></div>
+        </div>
+
+        <!-- State 3: Download -->
+        <div class="download-section" id="downloadSection">
+            <div class="download-actions">
+                <button class="btn-primary" id="downloadBtn">
+                    <span class="spinner"></span>
+                    <span class="btn-label"><i class="fas fa-download"></i> Save & Download PDF</span>
+                </button>
+                <button class="btn-ghost" id="startOverBtn">
+                    <i class="fas fa-arrow-rotate-left"></i> Start Over
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        © 2026 Passion Tools. Secure client-side processing.
+    </footer>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ─── PDF.JS WORKER SETUP ───
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        // ─── STATE ───
+        let pdfArrayBuffer = null;
+        let pdfDoc = null;
+        let pageRotations = []; // array of 0/90/180/270 per page
+        let totalPages = 0;
+        let originalFileName = 'document.pdf';
+
+        // ─── DOM REFS ───
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const uploadSection = document.getElementById('uploadSection');
+        const fileInfoBar = document.getElementById('fileInfoBar');
+        const pageLoader = document.getElementById('pageLoader');
+        const workspace = document.getElementById('workspace');
+        const thumbGrid = document.getElementById('thumbGrid');
+        const downloadSection = document.getElementById('downloadSection');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const startOverBtn = document.getElementById('startOverBtn');
+        const rotateAllLeft = document.getElementById('rotateAllLeft');
+        const rotateAllRight = document.getElementById('rotateAllRight');
+        const toast = document.getElementById('toast');
+
+        // ─── THEME TOGGLE ───
+        const themeToggle = document.getElementById('themeToggle');
+        function setTheme(dark) {
+            document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+            themeToggle.textContent = dark ? '☀️' : '🌙';
+            localStorage.setItem('pt-theme', dark ? 'dark' : 'light');
+        }
+        (function initTheme() {
+            const saved = localStorage.getItem('pt-theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            setTheme(saved ? saved === 'dark' : prefersDark);
+        })();
+        themeToggle.addEventListener('click', () => {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            setTheme(!isDark);
+        });
+
+        // ─── UPLOAD INTERACTIONS ───
+        uploadArea.addEventListener('click', () => fileInput.click());
+        uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('drag-over'); });
+        uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('drag-over'));
+        uploadArea.addEventListener('drop', e => {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type === 'application/pdf') handleFile(file);
+        });
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files[0]) handleFile(fileInput.files[0]);
+        });
+
+        // ─── HANDLE FILE ───
+        async function handleFile(file) {
+            originalFileName = file.name.replace(/\.pdf$/i, '');
+            pdfArrayBuffer = await file.arrayBuffer();
+
+            // Show file info
+            document.getElementById('fileName').textContent = file.name;
+            document.getElementById('fileMeta').textContent = formatBytes(file.size);
+
+            uploadSection.style.display = 'none';
+            fileInfoBar.classList.add('show');
+            pageLoader.classList.add('show');
+
+            try {
+                pdfDoc = await pdfjsLib.getDocument({ data: pdfArrayBuffer.slice(0) }).promise;
+                totalPages = pdfDoc.numPages;
+                document.getElementById('fileMeta').textContent = `${formatBytes(file.size)} · ${totalPages} page${totalPages > 1 ? 's' : ''}`;
+                pageRotations = new Array(totalPages).fill(0);
+                await renderThumbnails();
+                pageLoader.classList.remove('show');
+                workspace.classList.add('show');
+                downloadSection.classList.add('show');
+            } catch (err) {
+                console.error(err);
+                showToast('Failed to load PDF. Please try another file.', true);
+                resetAll();
+            }
+        }
+
+        // ─── RENDER THUMBNAILS ───
+        async function renderThumbnails() {
+            thumbGrid.innerHTML = '';
+            for (let i = 0; i < totalPages; i++) {
+                const page = await pdfDoc.getPage(i + 1);
+                const viewport = page.getViewport({ scale: 0.6 });
+
+                const canvas = document.createElement('canvas');
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+                const ctx = canvas.getContext('2d');
+                await page.render({ canvasContext: ctx, viewport }).promise;
+
+                const card = document.createElement('div');
+                card.className = 'thumb-card fade-in-up';
+                card.style.animationDelay = `${i * 0.04}s`;
+
+                card.innerHTML = `
+                    <div class="thumb-canvas-wrap" data-page="${i}">
+                        <div class="thumb-overlay">
+                            <button class="overlay-btn" data-action="left" data-page="${i}" title="Rotate left">
+                                <i class="fas fa-rotate-left"></i>
+                            </button>
+                            <button class="overlay-btn" data-action="right" data-page="${i}" title="Rotate right">
+                                <i class="fas fa-rotate-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="thumb-footer">
+                        <span class="thumb-page-num">Page ${i + 1}</span>
+                        <span class="thumb-rotation" data-rot-label="${i}">0°</span>
+                    </div>
+                `;
+
+                const wrap = card.querySelector('.thumb-canvas-wrap');
+                wrap.insertBefore(canvas, wrap.firstChild);
+
+                // Overlay button events
+                card.querySelectorAll('.overlay-btn').forEach(btn => {
+                    btn.addEventListener('click', e => {
+                        e.stopPropagation();
+                        const pg = parseInt(btn.dataset.page);
+                        const dir = btn.dataset.action === 'left' ? -90 : 90;
+                        rotatePage(pg, dir);
+                    });
+                });
+
+                thumbGrid.appendChild(card);
+            }
+        }
+
+        // ─── ROTATE PAGE ───
+        function rotatePage(pageIndex, delta) {
+            pageRotations[pageIndex] = (pageRotations[pageIndex] + delta + 360) % 360;
+            updatePageVisual(pageIndex);
+        }
+
+        function updatePageVisual(pageIndex) {
+            const wrap = thumbGrid.querySelectorAll('.thumb-canvas-wrap')[pageIndex];
+            if (!wrap) return;
+            const canvas = wrap.querySelector('canvas');
+            const angle = pageRotations[pageIndex];
+            canvas.style.transform = `rotate(${angle}deg)`;
+
+            // Adjust scale for 90/270 so it fits
+            if (angle === 90 || angle === 270) {
+                const ratio = canvas.height / canvas.width;
+                if (ratio > 1) {
+                    canvas.style.maxWidth = `${92 / ratio}%`;
+                    canvas.style.maxHeight = '92%';
+                } else {
+                    canvas.style.maxWidth = '92%';
+                    canvas.style.maxHeight = `${92 * ratio}%`;
+                }
+            } else {
+                canvas.style.maxWidth = '92%';
+                canvas.style.maxHeight = '92%';
+            }
+
+            const label = thumbGrid.querySelector(`[data-rot-label="${pageIndex}"]`);
+            if (label) label.textContent = `${angle}°`;
+        }
+
+        // ─── ROTATE ALL ───
+        rotateAllLeft.addEventListener('click', () => {
+            for (let i = 0; i < totalPages; i++) rotatePage(i, -90);
+            showToast('All pages rotated left 90°');
+        });
+        rotateAllRight.addEventListener('click', () => {
+            for (let i = 0; i < totalPages; i++) rotatePage(i, 90);
+            showToast('All pages rotated right 90°');
+        });
+        const rotateAll180 = document.getElementById('rotateAll180');
+        rotateAll180.addEventListener('click', () => {
+            for (let i = 0; i < totalPages; i++) rotatePage(i, 180);
+            showToast('All pages rotated 180°');
+        });
+
+        // ─── DOWNLOAD ───
+        downloadBtn.addEventListener('click', async () => {
+            downloadBtn.classList.add('loading');
+            downloadBtn.disabled = true;
+            try {
+                const pdfLibDoc = await PDFLib.PDFDocument.load(pdfArrayBuffer);
+                const pages = pdfLibDoc.getPages();
+                for (let i = 0; i < pages.length; i++) {
+                    const current = pages[i].getRotation().angle;
+                    const target = (current + pageRotations[i]) % 360;
+                    pages[i].setRotation(PDFLib.degrees(target));
+                }
+                const pdfBytes = await pdfLibDoc.save();
+                const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${originalFileName}_rotated.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showToast('PDF downloaded successfully!');
+            } catch (err) {
+                console.error(err);
+                showToast('Error generating PDF.', true);
+            } finally {
+                downloadBtn.classList.remove('loading');
+                downloadBtn.disabled = false;
+            }
+        });
+
+        // ─── START OVER ───
+        startOverBtn.addEventListener('click', resetAll);
+        function resetAll() {
+            pdfArrayBuffer = null;
+            pdfDoc = null;
+            pageRotations = [];
+            totalPages = 0;
+            fileInput.value = '';
+            thumbGrid.innerHTML = '';
+            workspace.classList.remove('show');
+            downloadSection.classList.remove('show');
+            fileInfoBar.classList.remove('show');
+            pageLoader.classList.remove('show');
+            uploadSection.style.display = '';
+        }
+
+        // ─── TOAST ───
+        function showToast(msg, isError) {
+            toast.textContent = msg;
+            toast.style.background = isError ? 'var(--red)' : 'var(--green)';
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // ─── HELPERS ───
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        }
+    </script>
+</body>
+</html>
