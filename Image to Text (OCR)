@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image to Text (OCR) — PassionTools</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --red: #ef4444;
+            --purple: #a855f7;
+            --blue: #3b82f6;
+            --blue-dark: #2563eb;
+            --green: #22c55e;
+            --bg-color: #f9fafb;
+            --card-bg: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --hover-gray: #f3f4f6;
+            --btn-action-bg: #fef2f2;
+            --logo-passion: #000000;
+            --header-glass-bg: rgba(255, 255, 255, 0.75);
+            --header-glass-border: rgba(229, 231, 235, 0.5);
+            --progress-track: #e5e7eb;
+            --textarea-bg: #ffffff;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.05);
+            --footer-bg: #111827;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #020617;
+            --card-bg: #111827;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border-color: #1e293b;
+            --hover-gray: #1e293b;
+            --btn-action-bg: #450a0a;
+            --logo-passion: #ffffff;
+            --header-glass-bg: rgba(2, 6, 23, 0.75);
+            --header-glass-border: rgba(30, 41, 59, 0.5);
+            --progress-track: #1e293b;
+            --textarea-bg: #0f172a;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.4), 0 2px 4px -2px rgba(0,0,0,0.3);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.5), 0 4px 6px -4px rgba(0,0,0,0.3);
+            --footer-bg: #020617;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            line-height: 1.6;
+        }
+
+        /* ============ HEADER ============ */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--header-glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--header-glass-border);
+            padding: 0 24px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+        }
+
+        .logo-link {
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            background: none;
+            border: none;
+            outline: none;
+        }
+
+        .logo-passion {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--logo-passion);
+            letter-spacing: -0.5px;
+            transition: color 0.3s ease;
+        }
+
+        .logo-tools {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--red), var(--purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .back-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.3s ease;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+
+        .back-link:hover {
+            color: var(--red);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            background: var(--hover-gray);
+            border-color: var(--text-secondary);
+        }
+
+        /* ============ MAIN CONTENT ============ */
+        .main-content {
+            flex: 1;
+            max-width: 820px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 40px 20px 60px;
+        }
+
+        /* Tool Header */
+        .tool-header {
+            text-align: center;
+            margin-bottom: 36px;
+        }
+
+        .tool-title {
+            font-size: 30px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        .tool-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+            max-width: 560px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        /* Card Container */
+        .tool-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+        }
+
+        /* ============ UPLOAD AREA ============ */
+        .upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 14px;
+            padding: 52px 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-area::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(59,130,246,0.03), rgba(168,85,247,0.03));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .upload-area:hover,
+        .upload-area.drag-over {
+            border-color: var(--blue);
+            background: rgba(59, 130, 246, 0.03);
+        }
+
+        .upload-area:hover::before,
+        .upload-area.drag-over::before {
+            opacity: 1;
+        }
+
+        .upload-icon {
+            font-size: 44px;
+            color: var(--blue);
+            margin-bottom: 16px;
+            transition: transform 0.3s ease;
+        }
+
+        .upload-area:hover .upload-icon {
+            transform: scale(1.08) translateY(-2px);
+        }
+
+        .upload-text-primary {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .upload-text-secondary {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .upload-text-secondary span {
+            color: var(--blue);
+            font-weight: 600;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        /* ============ PROCESSING STATE ============ */
+        .processing-state {
+            display: none;
+            text-align: center;
+            padding: 40px 10px;
+        }
+
+        .processing-spinner {
+            width: 52px;
+            height: 52px;
+            border: 4px solid var(--progress-track);
+            border-top-color: var(--blue);
+            border-radius: 50%;
+            animation: spin 0.9s linear infinite;
+            margin: 0 auto 24px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .processing-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .processing-status {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 22px;
+            min-height: 20px;
+        }
+
+        .progress-bar-track {
+            width: 100%;
+            max-width: 420px;
+            height: 10px;
+            background: var(--progress-track);
+            border-radius: 99px;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--blue), var(--purple));
+            border-radius: 99px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-percent {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--blue);
+            margin-top: 10px;
+        }
+
+        /* ============ RESULT STATE ============ */
+        .result-state {
+            display: none;
+        }
+
+        .result-preview-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+            padding: 14px;
+            background: var(--hover-gray);
+            border-radius: 12px;
+            transition: background 0.3s ease;
+        }
+
+        .result-thumbnail {
+            width: 64px;
+            height: 64px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+
+        .result-file-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .result-file-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .result-file-meta {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .result-success-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 12px;
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--green);
+            border-radius: 99px;
+            font-size: 12px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .textarea-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .result-textarea {
+            width: 100%;
+            min-height: 260px;
+            padding: 18px;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            background: var(--textarea-bg);
+            color: var(--text-primary);
+            font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+            font-size: 14px;
+            line-height: 1.75;
+            resize: vertical;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .result-textarea:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+        }
+
+        .char-count {
+            text-align: right;
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 6px;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 11px 22px;
+            border-radius: 11px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            outline: none;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background: var(--blue);
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: var(--blue-dark);
+            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .btn-primary.copied {
+            background: var(--green);
+            box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-ghost:hover {
+            background: var(--hover-gray);
+            border-color: var(--text-secondary);
+            transform: translateY(-1px);
+        }
+
+        .btn-danger-ghost {
+            background: transparent;
+            color: var(--red);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-danger-ghost:hover {
+            background: var(--btn-action-bg);
+            border-color: var(--red);
+            transform: translateY(-1px);
+        }
+
+        /* ============ FOOTER ============ */
+        .footer {
+            text-align: center;
+            padding: 30px 20px;
+            background: var(--footer-bg);
+            font-size: 14px;
+            color: #94a3b8;
+            transition: background 0.3s ease;
+        }
+
+
+        /* ============ ANIMATIONS ============ */
+        .fade-in {
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide-up {
+            animation: slideUp 0.5s ease forwards;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ============ RESPONSIVE ============ */
+        @media (max-width: 640px) {
+            .main-content {
+                padding: 28px 14px 48px;
+            }
+
+            .tool-card {
+                padding: 22px 16px;
+            }
+
+            .tool-title {
+                font-size: 24px;
+            }
+
+            .tool-subtitle {
+                font-size: 14px;
+            }
+
+            .upload-area {
+                padding: 38px 16px;
+            }
+
+            .upload-icon {
+                font-size: 36px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .action-buttons .btn {
+                width: 100%;
+            }
+
+            .result-preview-row {
+                flex-wrap: wrap;
+            }
+
+            .result-success-badge {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .header {
+                padding: 0 14px;
+            }
+
+            .back-link span.back-text {
+                display: none;
+            }
+
+
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============ HEADER ============ -->
+    <header class="header">
+        <a href="#" onclick="event.preventDefault();" class="logo-link">
+            <span class="logo-passion">Passion</span><span class="logo-tools">Tools</span>
+        </a>
+        <div class="header-actions">
+            <a href="index.html" class="back-link">
+                <i class="fas fa-arrow-left"></i>
+                <span class="back-text">Back to Tools</span>
+            </a>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">☀️</button>
+        </div>
+    </header>
+
+    <!-- ============ MAIN ============ -->
+    <main class="main-content">
+        <!-- Tool Header -->
+        <div class="tool-header fade-in">
+            <h1 class="tool-title">Image to Text (OCR)</h1>
+            <p class="tool-subtitle">Extract editable text from images, screenshots, and scanned documents instantly. 100% private in-browser processing.</p>
+        </div>
+
+        <!-- Tool Card -->
+        <div class="tool-card slide-up">
+
+            <!-- State 1: Upload -->
+            <div id="uploadState">
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">
+                        <i class="fas fa-camera-retro"></i>
+                    </div>
+                    <p class="upload-text-primary">Click or Drag & Drop Image here</p>
+                    <p class="upload-text-secondary">Supports <span>PNG, JPG, JPEG, WEBP</span></p>
+                </div>
+                <input type="file" id="fileInput" accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp">
+            </div>
+
+            <!-- State 2: Processing -->
+            <div id="processingState" class="processing-state">
+                <div class="processing-spinner"></div>
+                <p class="processing-title">Processing your image…</p>
+                <p class="processing-status" id="statusText">Initializing OCR engine…</p>
+                <div class="progress-bar-track">
+                    <div class="progress-bar-fill" id="progressBarFill"></div>
+                </div>
+                <p class="progress-percent" id="progressPercent">0%</p>
+            </div>
+
+            <!-- State 3: Result -->
+            <div id="resultState" class="result-state">
+                <div class="result-preview-row">
+                    <img id="resultThumbnail" class="result-thumbnail" src="" alt="Uploaded image preview">
+                    <div class="result-file-info">
+                        <p class="result-file-name" id="resultFileName">image.png</p>
+                        <p class="result-file-meta" id="resultFileMeta">—</p>
+                    </div>
+                    <div class="result-success-badge">
+                        <i class="fas fa-circle-check"></i>
+                        Extracted
+                    </div>
+                </div>
+
+                <label class="textarea-label">
+                    <i class="fas fa-align-left"></i>
+                    Extracted Text
+                </label>
+                <textarea class="result-textarea" id="resultTextarea" placeholder="No text detected…"></textarea>
+                <p class="char-count" id="charCount">0 characters</p>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="copyBtn" onclick="copyText()">
+                        <i class="fas fa-copy"></i>
+                        Copy Text
+                    </button>
+                    <button class="btn btn-ghost" onclick="downloadTxt()">
+                        <i class="fas fa-download"></i>
+                        Download as .txt
+                    </button>
+                    <button class="btn btn-danger-ghost" onclick="resetTool()">
+                        <i class="fas fa-rotate-right"></i>
+                        Extract Another Image
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- ============ FOOTER ============ -->
+    <footer class="footer">
+        <p>© 2026 PassionTools. Secure client-side processing.</p>
+    </footer>
+
+    <!-- ============ JAVASCRIPT ============ -->
+    <script>
+        // ---- Theme Toggle ----
+        const themeToggle = document.getElementById('themeToggle');
+        const storedTheme = localStorage.getItem('pt-theme');
+
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            themeToggle.textContent = theme === 'dark' ? '🌙' : '☀️';
+            localStorage.setItem('pt-theme', theme);
+        }
+
+        if (storedTheme) {
+            applyTheme(storedTheme);
+        } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            applyTheme('dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const current = document.documentElement.getAttribute('data-theme');
+            applyTheme(current === 'dark' ? 'light' : 'dark');
+        });
+
+        // ---- DOM References ----
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const uploadState = document.getElementById('uploadState');
+        const processingState = document.getElementById('processingState');
+        const resultState = document.getElementById('resultState');
+        const statusText = document.getElementById('statusText');
+        const progressBarFill = document.getElementById('progressBarFill');
+        const progressPercent = document.getElementById('progressPercent');
+        const resultThumbnail = document.getElementById('resultThumbnail');
+        const resultFileName = document.getElementById('resultFileName');
+        const resultFileMeta = document.getElementById('resultFileMeta');
+        const resultTextarea = document.getElementById('resultTextarea');
+        const charCount = document.getElementById('charCount');
+
+        // ---- Upload Interactions ----
+        uploadArea.addEventListener('click', () => fileInput.click());
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('drag-over');
+        });
+
+        uploadArea.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) handleFile(files[0]);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) handleFile(e.target.files[0]);
+        });
+
+        // ---- Character count update ----
+        resultTextarea.addEventListener('input', () => {
+            updateCharCount();
+        });
+
+        function updateCharCount() {
+            const len = resultTextarea.value.length;
+            charCount.textContent = `${len.toLocaleString()} character${len !== 1 ? 's' : ''}`;
+        }
+
+        // ---- File Handling ----
+        function handleFile(file) {
+            const validTypes = ['image/png', 'image/jpeg', 'image/webp'];
+            if (!validTypes.includes(file.type)) {
+                alert('Unsupported format. Please upload a PNG, JPG, JPEG, or WEBP image.');
+                return;
+            }
+
+            // Show processing state
+            showState('processing');
+
+            // Create thumbnail URL
+            const objectURL = URL.createObjectURL(file);
+            resultThumbnail.src = objectURL;
+            resultFileName.textContent = file.name;
+            const sizeKB = (file.size / 1024).toFixed(1);
+            const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+            resultFileMeta.textContent = file.size > 1048576 ? `${sizeMB} MB` : `${sizeKB} KB`;
+
+            // Run OCR
+            runOCR(file);
+        }
+
+        // ---- OCR Processing ----
+        async function runOCR(file) {
+            const lang = 'eng';
+
+            try {
+                progressBarFill.style.width = '0%';
+                progressPercent.textContent = '0%';
+                statusText.textContent = 'Initializing OCR engine…';
+
+                const result = await Tesseract.recognize(file, lang, {
+                    logger: (m) => {
+                        if (m.status) {
+                            let statusMsg = m.status;
+                            // Friendly messages
+                            if (statusMsg.includes('loading tesseract core')) {
+                                statusMsg = 'Loading OCR core engine…';
+                            } else if (statusMsg.includes('initializing tesseract')) {
+                                statusMsg = 'Initializing Tesseract…';
+                            } else if (statusMsg.includes('loading language traineddata')) {
+                                statusMsg = `Loading language data (${lang})…`;
+                            } else if (statusMsg.includes('initializing api')) {
+                                statusMsg = 'Preparing recognition API…';
+                            } else if (statusMsg.includes('recognizing text')) {
+                                statusMsg = 'Recognizing text…';
+                            }
+
+                            statusText.textContent = statusMsg;
+
+                            if (typeof m.progress === 'number') {
+                                const pct = Math.round(m.progress * 100);
+                                progressBarFill.style.width = pct + '%';
+                                progressPercent.textContent = pct + '%';
+
+                                if (statusMsg === 'Recognizing text…') {
+                                    statusText.textContent = `Recognizing text: ${pct}%`;
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Clean text and format into proper paragraphs
+                let text = result.data.text || '';
+
+                // Step 1: Normalize line endings and trim trailing spaces per line
+                text = text.replace(/\r\n/g, '\n').replace(/[ \t]+$/gm, '');
+
+                // Step 2: Split into raw lines
+                const rawLines = text.split('\n');
+
+                // Step 3: Group lines into paragraphs
+                // A paragraph break is detected when there's an empty line,
+                // or when the previous line ends with sentence-ending punctuation
+                // and the next line starts with an uppercase letter (new paragraph).
+                let paragraphs = [];
+                let currentParagraph = [];
+
+                for (let i = 0; i < rawLines.length; i++) {
+                    const line = rawLines[i].trim();
+
+                    if (line === '') {
+                        // Empty line = paragraph break
+                        if (currentParagraph.length > 0) {
+                            paragraphs.push(currentParagraph.join(' '));
+                            currentParagraph = [];
+                        }
+                        continue;
+                    }
+
+                    if (currentParagraph.length > 0) {
+                        const prevText = currentParagraph[currentParagraph.length - 1];
+                        const endsWithPunctuation = /[.!?:;]$/.test(prevText);
+                        const startsWithUpper = /^[A-Z\u00C0-\u024F"'\u201C\u201D\u2018\u2019(]/.test(line);
+                        const prevIsShort = prevText.length < 60;
+
+                        // Detect new paragraph: previous line ends with punctuation
+                        // AND current line starts with uppercase AND previous line is relatively short
+                        // (suggesting it was a deliberate line end, not word-wrap)
+                        if (endsWithPunctuation && startsWithUpper && prevIsShort) {
+                            paragraphs.push(currentParagraph.join(' '));
+                            currentParagraph = [line];
+                            continue;
+                        }
+                    }
+
+                    currentParagraph.push(line);
+                }
+
+                // Push last paragraph
+                if (currentParagraph.length > 0) {
+                    paragraphs.push(currentParagraph.join(' '));
+                }
+
+                // Step 4: Clean up each paragraph - fix double spaces, trim
+                paragraphs = paragraphs.map(p => p.replace(/\s{2,}/g, ' ').trim()).filter(p => p.length > 0);
+
+                // Step 5: Join paragraphs with double newlines
+                text = paragraphs.join('\n\n').trim();
+
+                resultTextarea.value = text;
+                updateCharCount();
+
+                showState('result');
+
+            } catch (err) {
+                console.error('OCR Error:', err);
+                alert('OCR processing failed. Please try a different image or check the console for details.');
+                showState('upload');
+            }
+        }
+
+        // ---- State Management ----
+        function showState(state) {
+            uploadState.style.display = state === 'upload' ? 'block' : 'none';
+            processingState.style.display = state === 'processing' ? 'block' : 'none';
+            resultState.style.display = state === 'result' ? 'block' : 'none';
+
+            if (state === 'result') {
+                resultState.classList.add('fade-in');
+            }
+        }
+
+        // ---- Copy Text ----
+        function copyText() {
+            const text = resultTextarea.value;
+            if (!text) return;
+
+            const copyBtn = document.getElementById('copyBtn');
+
+            navigator.clipboard.writeText(text).then(() => {
+                copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                copyBtn.classList.add('copied');
+                setTimeout(() => {
+                    copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copy Text';
+                    copyBtn.classList.remove('copied');
+                }, 2000);
+            }).catch(() => {
+                // Fallback
+                resultTextarea.select();
+                document.execCommand('copy');
+                copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                copyBtn.classList.add('copied');
+                setTimeout(() => {
+                    copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copy Text';
+                    copyBtn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        // ---- Download as .txt ----
+        function downloadTxt() {
+            const text = resultTextarea.value;
+            if (!text) return;
+
+            const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+
+            // Derive filename from original
+            const origName = resultFileName.textContent || 'extracted';
+            const baseName = origName.replace(/\.[^/.]+$/, '');
+            a.download = baseName + '_extracted.txt';
+
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // ---- Reset Tool ----
+        function resetTool() {
+            fileInput.value = '';
+            resultTextarea.value = '';
+            progressBarFill.style.width = '0%';
+            progressPercent.textContent = '0%';
+            statusText.textContent = 'Initializing OCR engine…';
+            charCount.textContent = '0 characters';
+
+            if (resultThumbnail.src) {
+                URL.revokeObjectURL(resultThumbnail.src);
+                resultThumbnail.src = '';
+            }
+
+            showState('upload');
+        }
+    </script>
+</body>
+</html>
