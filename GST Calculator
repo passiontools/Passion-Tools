@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GST Calculator | PassionTools</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
         :root {
             /* Brand Colors */
@@ -60,7 +67,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
         }
 
         body {
@@ -75,12 +82,18 @@
 
         /* --- Header --- */
         header {
-            background-color: var(--bg-card);
+            background-color: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--border-color);
             position: sticky;
             top: 0;
             z-index: 100;
             transition: var(--transition);
+        }
+
+        [data-theme="dark"] header {
+            background-color: rgba(30, 41, 59, 0.75);
         }
 
         .container {
@@ -101,13 +114,32 @@
             font-size: 24px;
             font-weight: 800;
             text-decoration: none;
-            color: var(--text-main);
             letter-spacing: -0.5px;
             display: flex;
             align-items: center;
+            background: transparent;
+            border: none;
+            padding: 0;
         }
 
-        .logo span {
+        .logo-passion {
+            color: #000000;
+            transition: none;
+        }
+
+        [data-theme="dark"] .logo-passion {
+            color: #ffffff;
+        }
+
+        .logo:hover .logo-passion {
+            color: #000000; 
+        }
+        
+        [data-theme="dark"] .logo:hover .logo-passion {
+            color: #ffffff;
+        }
+
+        .logo-tools {
             background: var(--brand-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -127,33 +159,31 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            transition: var(--transition);
+            background: transparent;
+            border: none;
+            padding: 0;
+            transition: color 0.3s ease;
         }
 
-        .btn-back:hover { color: var(--brand-red); }
-        .btn-back svg { width: 16px; height: 16px; fill: currentColor; }
-
-        .header-divider {
-            width: 1px;
-            height: 20px;
-            background-color: var(--border-color);
+        .btn-back:hover,
+        .btn-back:hover i {
+            color: var(--brand-red);
         }
 
         .theme-toggle {
             background: transparent;
             border: none;
-            color: var(--text-muted);
+            font-size: 20px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: var(--transition);
-            padding: 4px;
+            transition: transform 0.3s ease;
         }
 
-        .theme-toggle svg { width: 20px; height: 20px; fill: currentColor; }
-        .theme-toggle:hover { color: var(--text-main); transform: scale(1.1); }
-        [data-theme="dark"] .theme-toggle { color: #fbbf24; }
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
 
         /* --- Main App Layout --- */
         main {
@@ -331,8 +361,6 @@
             border: none;
         }
 
-        .btn svg { width: 18px; height: 18px; fill: currentColor; }
-
         .btn-primary {
             background: var(--primary-blue);
             color: white;
@@ -378,7 +406,6 @@
         }
 
         .error-message.show { opacity: 1; height: auto; padding: 10px; margin-bottom: 16px; }
-        .error-message svg { width: 16px; height: 16px; fill: currentColor; }
         .error-shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
 
         @keyframes shake {
@@ -423,7 +450,6 @@
             color: var(--text-muted); cursor: pointer; transition: var(--transition);
         }
         .icon-btn:hover { background: var(--bg-card); color: var(--primary-blue); border-color: var(--primary-blue); }
-        .icon-btn svg { width: 16px; height: 16px; fill: currentColor; }
 
         /* Breakdown Grid */
         .summary-grid {
@@ -498,7 +524,7 @@
             opacity: 0; z-index: 2000;
         }
         .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-        .toast svg { width: 16px; height: 16px; fill: var(--success-color); }
+        .toast i { color: var(--success-color); font-size: 16px; }
 
         /* --- Footer --- */
         footer {
@@ -537,15 +563,13 @@
     <header>
         <div class="container">
             <div class="header-content">
-                <a href="index.html" class="logo">Passion<span>Tools</span></a>
+                <a href="#" onclick="event.preventDefault();" class="logo"><span class="logo-passion">Passion</span><span class="logo-tools">Tools</span></a>
                 <div class="header-actions">
                     <a href="index.html" class="btn-back">
-                        <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
-                        Back to Tools
+                        <i class="fas fa-arrow-left"></i> Back to Tools
                     </a>
-                    <div class="header-divider"></div>
                     <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
-                        <svg viewBox="0 0 24 24" id="iconLightbulb"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7zm2.85 11.1l-.85.6V16h-4v-2.3l-.85-.6C7.8 12.16 7 10.63 7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.63-.8 3.16-2.15 4.1z"/></svg>
+                        🌙
                     </button>
                 </div>
             </div>
@@ -569,7 +593,7 @@
                     </div>
 
                     <div class="error-message" id="errorMsg">
-                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                        <i class="fas fa-exclamation-circle"></i>
                         <span id="errorText">Please enter valid values.</span>
                     </div>
 
@@ -601,12 +625,10 @@
 
                     <div class="action-buttons">
                         <button class="btn btn-secondary" id="btnReset">
-                            <svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
-                            Reset
+                            <i class="fas fa-undo"></i> Reset
                         </button>
                         <button class="btn btn-primary" id="btnCalculate">
-                            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 9h-2V7h-2v5H6v2h2v5h2v-5h2v-2z"/></svg>
-                            Calculate Tax
+                            <i class="fas fa-calculator"></i> Calculate Tax
                         </button>
                     </div>
 
@@ -620,10 +642,10 @@
                         <h3>Tax Invoice Summary</h3>
                         <div class="action-icons">
                             <button class="icon-btn" id="btnCopy" title="Copy Details">
-                                <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                                <i class="far fa-copy"></i>
                             </button>
                             <button class="icon-btn" id="btnPrint" title="Print / Save PDF">
-                                <svg viewBox="0 0 24 24"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/></svg>
+                                <i class="fas fa-print"></i>
                             </button>
                         </div>
                     </div>
@@ -680,7 +702,7 @@
     </footer>
 
     <div class="toast" id="toast">
-        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+        <i class="fas fa-check-circle"></i>
         <span id="toastMsg">Action successful</span>
     </div>
 
@@ -692,7 +714,6 @@
         const DOM = {
             // Theme
             themeToggle: document.getElementById('themeToggle'),
-            iconLightbulb: document.getElementById('iconLightbulb'),
             
             // Mode Toggles
             btnAddGst: document.getElementById('btnAddGst'),
@@ -741,23 +762,36 @@
         let currentResult = {};
 
         // --- Theme Management ---
-        function checkThemePreference() {
-            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        function setTheme(isDark) {
+            if (isDark) {
                 document.body.setAttribute('data-theme', 'dark');
-                DOM.iconLightbulb.innerHTML = '<path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7zm2.85 11.1l-.85.6V16h-4v-2.3l-.85-.6C7.8 12.16 7 10.63 7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.63-.8 3.16-2.15 4.1z"/>';
+                DOM.themeToggle.textContent = '☀️';
+                localStorage.setItem('passionToolsTheme', 'dark');
             } else {
-                DOM.iconLightbulb.innerHTML = '<path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7zm2.85 11.1l-.85.6V16h-4v-2.3l-.85-.6C7.8 12.16 7 10.63 7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.63-.8 3.16-2.15 4.1z"/>'; // Same path, relies on CSS color
+                document.body.removeAttribute('data-theme');
+                DOM.themeToggle.textContent = '🌙';
+                localStorage.setItem('passionToolsTheme', 'light');
+            }
+        }
+
+        function checkThemePreference() {
+            const savedTheme = localStorage.getItem('passionToolsTheme');
+            if (savedTheme === 'dark') {
+                setTheme(true);
+            } else if (savedTheme === 'light') {
+                setTheme(false);
+            } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                setTheme(true);
+            } else {
+                setTheme(false);
             }
         }
 
         DOM.themeToggle.addEventListener('click', () => {
             const isDark = document.body.getAttribute('data-theme') === 'dark';
-            if (isDark) {
-                document.body.removeAttribute('data-theme');
-            } else {
-                document.body.setAttribute('data-theme', 'dark');
-            }
+            setTheme(!isDark);
         });
+        
         checkThemePreference();
 
         // --- Mode Toggling (Add/Remove) ---
