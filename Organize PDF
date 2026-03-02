@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organize PDF - PassionTools</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --red: #ef4444;
+            --purple: #a855f7;
+            --blue: #3b82f6;
+            --blue-dark: #2563eb;
+            --green: #22c55e;
+            --bg-color: #f9fafb;
+            --card-bg: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --hover-gray: #f3f4f6;
+            --btn-action-bg: #fef2f2;
+            --footer-bg: #111827;
+            --logo-passion: #000000;
+            --header-bg: rgba(255, 255, 255, 0.8);
+            --shadow: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-lg: 0 10px 40px rgba(0,0,0,0.08);
+            --thumb-bg: #f3f4f6;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #020617;
+            --card-bg: #111827;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border-color: #1e293b;
+            --hover-gray: #1e293b;
+            --btn-action-bg: #450a0a;
+            --footer-bg: #020617;
+            --logo-passion: #ffffff;
+            --header-bg: rgba(2, 6, 23, 0.8);
+            --shadow: 0 1px 3px rgba(0,0,0,0.3);
+            --shadow-lg: 0 10px 40px rgba(0,0,0,0.3);
+            --thumb-bg: #1e293b;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Header */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--header-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            text-decoration: none;
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .logo-passion {
+            color: var(--logo-passion);
+            transition: color 0.3s ease;
+        }
+
+        .logo-tools {
+            background: linear-gradient(135deg, var(--red), var(--purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .back-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: var(--red);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            background: var(--hover-gray);
+            border-color: var(--text-secondary);
+        }
+
+        /* Main */
+        .main {
+            flex: 1;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 40px 24px 60px;
+        }
+
+        /* Tool Header */
+        .tool-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .tool-icon {
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, var(--blue), var(--purple));
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.25);
+        }
+
+        .tool-icon svg {
+            width: 40px;
+            height: 40px;
+        }
+
+        .tool-header h1 {
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        .tool-header p {
+            font-size: 16px;
+            color: var(--text-secondary);
+            max-width: 520px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Card Container */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        /* Upload Area */
+        .upload-area {
+            padding: 60px 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 2px dashed var(--border-color);
+            border-radius: 16px;
+            background: var(--card-bg);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .upload-area:hover,
+        .upload-area.drag-over {
+            border-color: var(--blue);
+            background: rgba(59, 130, 246, 0.04);
+        }
+
+        .upload-area.drag-over {
+            transform: scale(1.01);
+        }
+
+        .upload-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(59,130,246,0.1), rgba(168,85,247,0.1));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .upload-area:hover .upload-icon {
+            transform: scale(1.05);
+        }
+
+        .upload-icon i {
+            font-size: 28px;
+            background: linear-gradient(135deg, var(--blue), var(--purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .upload-text-primary {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .upload-text-secondary {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .upload-input {
+            display: none;
+        }
+
+        /* Workspace */
+        .workspace {
+            display: none;
+        }
+
+        .workspace.active {
+            display: block;
+        }
+
+        .workspace-toolbar {
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .page-count {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .page-count .badge {
+            background: linear-gradient(135deg, var(--blue), var(--purple));
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 2px 10px;
+            border-radius: 20px;
+        }
+
+        .toolbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-toolbar {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            font-size: 13px;
+            font-weight: 500;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-secondary);
+            background: var(--hover-gray);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-toolbar:hover {
+            color: var(--text-primary);
+            border-color: var(--text-secondary);
+            background: var(--card-bg);
+        }
+
+        .btn-toolbar i {
+            font-size: 13px;
+        }
+
+        /* Page Grid */
+        .page-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 20px;
+            padding: 24px;
+        }
+
+        .page-thumb {
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: grab;
+            border: 2px solid var(--border-color);
+            background: var(--thumb-bg);
+            transition: all 0.3s ease;
+            aspect-ratio: 3/4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .page-thumb:hover {
+            border-color: var(--blue);
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .page-thumb:active {
+            cursor: grabbing;
+        }
+
+        .page-thumb canvas {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        .page-badge {
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 6px;
+            z-index: 2;
+            backdrop-filter: blur(4px);
+        }
+
+        .page-drag-handle {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 26px;
+            height: 26px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 2;
+        }
+
+        .page-thumb:hover .page-drag-handle {
+            opacity: 1;
+        }
+
+        .page-drag-handle i {
+            color: #fff;
+            font-size: 12px;
+        }
+
+        /* SortableJS ghost/chosen styles */
+        .sortable-ghost {
+            opacity: 0.3;
+            border-color: var(--blue) !important;
+        }
+
+        .sortable-chosen {
+            box-shadow: 0 8px 30px rgba(59, 130, 246, 0.3) !important;
+            border-color: var(--blue) !important;
+            transform: scale(1.04) rotate(1deg);
+            z-index: 10;
+        }
+
+        .sortable-drag {
+            opacity: 1 !important;
+        }
+
+        /* Action Bar */
+        .action-bar {
+            padding: 20px 24px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 28px;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            color: #ffffff;
+            background: linear-gradient(135deg, var(--blue), var(--blue-dark));
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-ghost {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 28px;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-secondary);
+            background: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-ghost:hover {
+            color: var(--text-primary);
+            border-color: var(--text-secondary);
+            background: var(--hover-gray);
+        }
+
+        /* Spinner */
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            display: none;
+        }
+
+        .btn-primary.loading .spinner {
+            display: block;
+        }
+
+        .btn-primary.loading .btn-label {
+            display: none;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Success State */
+        .download-state {
+            display: none;
+            text-align: center;
+            padding: 48px 24px;
+        }
+
+        .download-state.active {
+            display: block;
+        }
+
+        .success-banner {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: var(--green);
+            font-size: 15px;
+            font-weight: 600;
+            padding: 14px 28px;
+            border-radius: 12px;
+            margin-bottom: 28px;
+        }
+
+        .success-banner i {
+            font-size: 20px;
+        }
+
+        .download-actions {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(4px);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-box {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 40px 48px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        }
+
+        .loading-box .big-spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--border-color);
+            border-top-color: var(--blue);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        .loading-box p {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--footer-bg);
+            text-align: center;
+            padding: 30px 20px;
+        }
+
+        .footer p {
+            font-size: 14px;
+            color: #94a3b8;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .page-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 16px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .page-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 14px;
+                padding: 16px;
+            }
+
+            .tool-header h1 {
+                font-size: 26px;
+            }
+
+            .tool-header p {
+                font-size: 14px;
+            }
+
+            .workspace-toolbar {
+                padding: 12px 16px;
+            }
+
+            .action-bar {
+                flex-direction: column;
+                padding: 16px;
+            }
+
+            .btn-primary, .btn-ghost {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .download-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .download-actions .btn-primary,
+            .download-actions .btn-ghost {
+                width: 100%;
+            }
+
+            .header-inner {
+                padding: 12px 16px;
+            }
+
+            .back-link span {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .page-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+                padding: 12px;
+            }
+
+            .upload-area {
+                padding: 40px 20px;
+            }
+
+            .main {
+                padding: 24px 16px 40px;
+            }
+        }
+
+        /* Page thumb loading state */
+        .page-thumb-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .page-thumb-loading::after {
+            content: '';
+            width: 24px;
+            height: 24px;
+            border: 3px solid var(--border-color);
+            border-top-color: var(--blue);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        /* Fade-in animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.4s ease forwards;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-inner">
+            <a href="#" class="logo" onclick="event.preventDefault();">
+                <span class="logo-passion">Passion</span><span class="logo-tools">Tools</span>
+            </a>
+            <div class="header-actions">
+                <a href="index.html" class="back-link">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Back to Tools</span>
+                </a>
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">☀️</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Tool Header -->
+        <div class="tool-header fade-in-up">
+            <h1>Organize PDF</h1>
+            <p>Rearrange pages in your PDF documents. Drag and drop to reorder. 100% private in-browser processing.</p>
+        </div>
+
+        <!-- State 1: Upload -->
+        <div id="uploadState">
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">
+                    <i class="fas fa-cloud-arrow-up"></i>
+                </div>
+                <div class="upload-text-primary">Click or Drag & Drop PDF here</div>
+                <div class="upload-text-secondary">Supports .pdf files</div>
+                <input type="file" id="fileInput" class="upload-input" accept=".pdf,application/pdf">
+            </div>
+        </div>
+
+        <!-- State 2: Workspace -->
+        <div id="workspaceState" class="workspace">
+            <div class="card">
+                <div class="workspace-toolbar">
+                    <div class="page-count">
+                        <i class="fas fa-file-lines"></i>
+                        <span id="pageCountText">0 Pages</span>
+                        <span class="badge" id="pageCountBadge">0</span>
+                    </div>
+                    <div class="toolbar-actions">
+                        <button class="btn-toolbar" id="btnReverse" title="Reverse page order">
+                            <i class="fas fa-arrow-down-up-across-line"></i>
+                            Reverse Order
+                        </button>
+                        <button class="btn-toolbar" id="btnReset" title="Reset to original order">
+                            <i class="fas fa-arrow-up-1-9"></i>
+                            Sort Ascending
+                        </button>
+                    </div>
+                </div>
+                <div class="page-grid" id="pageGrid"></div>
+                <div class="action-bar">
+                    <button class="btn-primary" id="btnApply">
+                        <span class="btn-label"><i class="fas fa-download"></i> Apply Changes & Download</span>
+                        <span class="spinner"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- State 3: Download -->
+        <div id="downloadState" class="download-state">
+            <div class="card" style="padding: 48px 24px;">
+                <div class="success-banner">
+                    <i class="fas fa-circle-check"></i>
+                    PDF successfully reorganized!
+                </div>
+                <div class="download-actions">
+                    <button class="btn-primary" id="btnDownload">
+                        <i class="fas fa-download"></i>
+                        Download Organized PDF
+                    </button>
+                    <button class="btn-ghost" id="btnStartOver">
+                        <i class="fas fa-rotate-left"></i>
+                        Start Over
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-box">
+            <div class="big-spinner"></div>
+            <p id="loadingText">Processing your PDF...</p>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>© 2026 Passion Tools. Secure client-side processing.</p>
+    </footer>
+
+    <script>
+        // Configure pdf.js worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        // ========== STATE ==========
+        let originalArrayBuffer = null;
+        let pdfDoc = null;
+        let totalPages = 0;
+        let sortableInstance = null;
+        let generatedBlob = null;
+        let originalFileName = 'document';
+
+        // ========== THEME ==========
+        const themeToggle = document.getElementById('themeToggle');
+        const savedTheme = localStorage.getItem('passion-tools-theme');
+
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            themeToggle.textContent = theme === 'dark' ? '🌙' : '☀️';
+            localStorage.setItem('passion-tools-theme', theme);
+        }
+
+        if (savedTheme) {
+            applyTheme(savedTheme);
+        } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            applyTheme('dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const current = document.documentElement.getAttribute('data-theme');
+            applyTheme(current === 'dark' ? 'light' : 'dark');
+        });
+
+        // ========== DOM REFS ==========
+        const uploadState = document.getElementById('uploadState');
+        const workspaceState = document.getElementById('workspaceState');
+        const downloadState = document.getElementById('downloadState');
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const pageGrid = document.getElementById('pageGrid');
+        const pageCountText = document.getElementById('pageCountText');
+        const pageCountBadge = document.getElementById('pageCountBadge');
+        const btnReverse = document.getElementById('btnReverse');
+        const btnReset = document.getElementById('btnReset');
+        const btnApply = document.getElementById('btnApply');
+        const btnDownload = document.getElementById('btnDownload');
+        const btnStartOver = document.getElementById('btnStartOver');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const loadingText = document.getElementById('loadingText');
+
+        // ========== SHOW STATE ==========
+        function showState(state) {
+            uploadState.style.display = state === 'upload' ? 'block' : 'none';
+            workspaceState.classList.toggle('active', state === 'workspace');
+            downloadState.classList.toggle('active', state === 'download');
+        }
+
+        // ========== UPLOAD HANDLING ==========
+        uploadArea.addEventListener('click', () => fileInput.click());
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('drag-over');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('drag-over');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
+            const files = e.dataTransfer.files;
+            if (files.length > 0 && files[0].type === 'application/pdf') {
+                handleFile(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        async function handleFile(file) {
+            originalFileName = file.name.replace(/\.pdf$/i, '');
+            loadingText.textContent = 'Reading your PDF...';
+            loadingOverlay.classList.add('active');
+
+            try {
+                originalArrayBuffer = await file.arrayBuffer();
+                pdfDoc = await pdfjsLib.getDocument({ data: originalArrayBuffer.slice(0) }).promise;
+                totalPages = pdfDoc.numPages;
+
+                pageCountText.textContent = `${totalPages} Page${totalPages !== 1 ? 's' : ''}`;
+                pageCountBadge.textContent = totalPages;
+
+                await renderThumbnails();
+                initSortable();
+                showState('workspace');
+            } catch (err) {
+                alert('Error reading PDF. Please make sure it\'s a valid PDF file.');
+                console.error(err);
+            } finally {
+                loadingOverlay.classList.remove('active');
+            }
+        }
+
+        // ========== RENDER THUMBNAILS ==========
+        async function renderThumbnails(order) {
+            pageGrid.innerHTML = '';
+            const pageOrder = order || Array.from({ length: totalPages }, (_, i) => i + 1);
+
+            for (let i = 0; i < pageOrder.length; i++) {
+                const pageNum = pageOrder[i];
+                const wrapper = document.createElement('div');
+                wrapper.className = 'page-thumb page-thumb-loading fade-in-up';
+                wrapper.setAttribute('data-original-page', pageNum);
+                wrapper.style.animationDelay = `${i * 0.03}s`;
+
+                const badge = document.createElement('div');
+                badge.className = 'page-badge';
+                badge.textContent = pageNum;
+
+                const handle = document.createElement('div');
+                handle.className = 'page-drag-handle';
+                handle.innerHTML = '<i class="fas fa-grip-vertical"></i>';
+
+                wrapper.appendChild(badge);
+                wrapper.appendChild(handle);
+                pageGrid.appendChild(wrapper);
+            }
+
+            // Render canvases asynchronously
+            const thumbs = pageGrid.querySelectorAll('.page-thumb');
+            for (let i = 0; i < thumbs.length; i++) {
+                const thumb = thumbs[i];
+                const pageNum = parseInt(thumb.getAttribute('data-original-page'));
+                try {
+                    const page = await pdfDoc.getPage(pageNum);
+                    const viewport = page.getViewport({ scale: 0.5 });
+                    const canvas = document.createElement('canvas');
+                    canvas.width = viewport.width;
+                    canvas.height = viewport.height;
+                    const ctx = canvas.getContext('2d');
+                    await page.render({ canvasContext: ctx, viewport }).promise;
+                    thumb.classList.remove('page-thumb-loading');
+                    thumb.insertBefore(canvas, thumb.firstChild);
+                } catch (e) {
+                    console.error(`Error rendering page ${pageNum}:`, e);
+                    thumb.classList.remove('page-thumb-loading');
+                }
+            }
+        }
+
+        // ========== SORTABLE ==========
+        function initSortable() {
+            if (sortableInstance) {
+                sortableInstance.destroy();
+            }
+            sortableInstance = Sortable.create(pageGrid, {
+                animation: 250,
+                easing: 'cubic-bezier(0.25, 1, 0.5, 1)',
+                ghostClass: 'sortable-ghost',
+                chosenClass: 'sortable-chosen',
+                dragClass: 'sortable-drag',
+                delay: 150,
+                delayOnTouchOnly: true,
+                touchStartThreshold: 5,
+                forceFallback: false,
+            });
+        }
+
+        // ========== GET CURRENT ORDER ==========
+        function getCurrentOrder() {
+            const thumbs = pageGrid.querySelectorAll('.page-thumb');
+            return Array.from(thumbs).map(t => parseInt(t.getAttribute('data-original-page')));
+        }
+
+        // ========== TOOLBAR ACTIONS ==========
+        btnReverse.addEventListener('click', async () => {
+            const current = getCurrentOrder();
+            current.reverse();
+            loadingText.textContent = 'Reordering pages...';
+            loadingOverlay.classList.add('active');
+            await renderThumbnails(current);
+            initSortable();
+            loadingOverlay.classList.remove('active');
+        });
+
+        btnReset.addEventListener('click', async () => {
+            const sorted = Array.from({ length: totalPages }, (_, i) => i + 1);
+            loadingText.textContent = 'Resetting page order...';
+            loadingOverlay.classList.add('active');
+            await renderThumbnails(sorted);
+            initSortable();
+            loadingOverlay.classList.remove('active');
+        });
+
+        // ========== APPLY & BUILD PDF ==========
+        btnApply.addEventListener('click', async () => {
+            const order = getCurrentOrder();
+            btnApply.classList.add('loading');
+            btnApply.disabled = true;
+            loadingText.textContent = 'Building your reorganized PDF...';
+            loadingOverlay.classList.add('active');
+
+            try {
+                const { PDFDocument } = PDFLib;
+                const srcDoc = await PDFDocument.load(originalArrayBuffer.slice(0));
+                const newDoc = await PDFDocument.create();
+
+                for (let i = 0; i < order.length; i++) {
+                    const pageIndex = order[i] - 1; // Convert 1-based to 0-based
+                    const [copiedPage] = await newDoc.copyPages(srcDoc, [pageIndex]);
+                    newDoc.addPage(copiedPage);
+                }
+
+                const pdfBytes = await newDoc.save();
+                generatedBlob = new Blob([pdfBytes], { type: 'application/pdf' });
+
+                showState('download');
+            } catch (err) {
+                alert('Error building PDF. Please try again.');
+                console.error(err);
+            } finally {
+                btnApply.classList.remove('loading');
+                btnApply.disabled = false;
+                loadingOverlay.classList.remove('active');
+            }
+        });
+
+        // ========== DOWNLOAD ==========
+        btnDownload.addEventListener('click', () => {
+            if (!generatedBlob) return;
+            const url = URL.createObjectURL(generatedBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${originalFileName}_organized.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 5000);
+        });
+
+        // ========== START OVER ==========
+        btnStartOver.addEventListener('click', () => {
+            originalArrayBuffer = null;
+            pdfDoc = null;
+            totalPages = 0;
+            generatedBlob = null;
+            originalFileName = 'document';
+            pageGrid.innerHTML = '';
+            fileInput.value = '';
+            if (sortableInstance) {
+                sortableInstance.destroy();
+                sortableInstance = null;
+            }
+            showState('upload');
+        });
+
+        // Init
+        showState('upload');
+    </script>
+</body>
+</html>
