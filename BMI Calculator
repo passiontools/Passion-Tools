@@ -20,13 +20,13 @@
             --brand-gradient: linear-gradient(135deg, #ef4444, #a855f7);
             --midnight-black: #111827;
             
-            /* Light Theme UI Colors */
-            --bg-body: #f8fafc;
+            /* Light Theme UI Colors - Blue Background for BMI Tool */
+            --bg-body: #eff6ff; 
             --bg-card: #ffffff;
-            --bg-soft: #f1f5f9;
-            --border-color: #e2e8f0;
+            --bg-soft: #dbeafe; 
+            --border-color: #bfdbfe;
             --text-main: #0f172a;
-            --text-muted: #64748b;
+            --text-muted: #475569;
             --primary-blue: #3b82f6;
             --primary-blue-hover: #2563eb;
             --error-color: #ef4444;
@@ -49,15 +49,15 @@
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Dark Theme Variables */
+        /* Dark Theme Variables - Deep Blue */
         [data-theme="dark"] {
-            --bg-body: #0f172a;
-            --bg-card: #1e293b;
-            --bg-soft: #334155;
-            --border-color: #334155;
+            --bg-body: #081229; 
+            --bg-card: #111c3a;
+            --bg-soft: #1e2b4d;
+            --border-color: #1e2b4d;
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
-            --midnight-black: #020617;
+            --midnight-black: #040914;
             --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
             --shadow-lg: 0 10px 25px -5px rgba(0,0,0,0.5);
         }
@@ -103,17 +103,28 @@
             height: 70px;
         }
 
+        /* --- Logo Styling --- */
         .logo {
             font-size: 24px;
             font-weight: 800;
             text-decoration: none;
-            color: var(--text-main);
             letter-spacing: -0.5px;
             display: flex;
             align-items: center;
+            background: transparent;
+            border: none;
+            padding: 0;
         }
 
-        .logo span {
+        .logo-passion {
+            color: #000000;
+        }
+
+        [data-theme="dark"] .logo-passion {
+            color: #ffffff;
+        }
+
+        .logo-tools {
             background: var(--brand-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -125,6 +136,7 @@
             gap: 16px;
         }
 
+        /* --- Clean Back Link --- */
         .btn-back {
             text-decoration: none;
             color: var(--text-muted);
@@ -133,24 +145,21 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            background: transparent;
+            border: none;
+            padding: 0;
             transition: var(--transition);
         }
 
-        .btn-back:hover {
+        .btn-back:hover,
+        .btn-back:hover i {
             color: var(--brand-red);
-        }
-
-        .header-divider {
-            width: 1px;
-            height: 20px;
-            background-color: var(--border-color);
         }
 
         .theme-toggle {
             background: transparent;
             border: none;
-            color: var(--text-muted);
-            font-size: 18px;
+            font-size: 20px;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -159,7 +168,6 @@
         }
 
         .theme-toggle:hover {
-            color: var(--text-main);
             transform: scale(1.1);
         }
 
@@ -316,28 +324,21 @@
             border: none;
         }
 
+        /* --- Updated Blue Primary Button --- */
         .btn-primary {
-            background: var(--brand-gradient);
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-hover));
             color: white;
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
         }
 
         .btn-primary:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(239, 68, 68, 0.3);
+            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
             opacity: 0.95;
         }
 
         .btn-primary:active:not(:disabled) {
             transform: translateY(0);
-        }
-
-        .btn-primary:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            background: var(--text-muted);
-            box-shadow: none;
-            background-image: none;
         }
 
         .btn-secondary {
@@ -471,7 +472,7 @@
             width: 4px;
             background: var(--text-main);
             border-radius: 2px;
-            left: 0%; /* Adjusted via JS */
+            left: 0%; 
             transition: left 1s cubic-bezier(0.34, 1.56, 0.64, 1);
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
             z-index: 10;
@@ -573,14 +574,14 @@
     <header>
         <div class="container">
             <div class="header-content">
-                <a href="index.html" class="logo">Passion<span>Tools</span></a>
+                <a href="#" onclick="event.preventDefault();" class="logo"><span class="logo-passion">Passion</span><span class="logo-tools">Tools</span></a>
+                
                 <div class="header-actions">
                     <a href="index.html" class="btn-back">
                         <i class="fas fa-arrow-left"></i> Back to Tools
                     </a>
-                    <div class="header-divider"></div>
                     <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
-                        <i class="far fa-lightbulb"></i>
+                        🌙
                     </button>
                 </div>
             </div>
@@ -715,32 +716,21 @@
          */
 
         const DOM = {
-            // Theme
             themeToggle: document.getElementById('themeToggle'),
-            
-            // Toggles & Sections
             btnMetric: document.getElementById('btnMetric'),
             btnImperial: document.getElementById('btnImperial'),
             metricInputs: document.getElementById('metricInputs'),
             imperialInputs: document.getElementById('imperialInputs'),
-            
-            // Inputs
             heightCm: document.getElementById('heightCm'),
             weightKg: document.getElementById('weightKg'),
             heightFt: document.getElementById('heightFt'),
             heightIn: document.getElementById('heightIn'),
             weightLbs: document.getElementById('weightLbs'),
-            
-            // Buttons
             btnCalculate: document.getElementById('btnCalculate'),
             btnReset: document.getElementById('btnReset'),
-            
-            // Error
             errorMsg: document.getElementById('errorMsg'),
             errorText: document.getElementById('errorText'),
             calculatorCard: document.getElementById('calculatorCard'),
-            
-            // Results
             resultsWrapper: document.getElementById('resultsWrapper'),
             bmiScore: document.getElementById('bmiScore'),
             bmiLabel: document.getElementById('bmiLabel'),
@@ -751,30 +741,34 @@
 
         let isMetric = true;
 
-        // --- Theme Management ---
         function checkThemePreference() {
-            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            const savedTheme = localStorage.getItem('passionToolsTheme');
+            const systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
                 document.body.setAttribute('data-theme', 'dark');
-                DOM.themeToggle.innerHTML = '<i class="fas fa-lightbulb" style="color: #fbbf24;"></i>';
+                DOM.themeToggle.innerHTML = '☀️';
             } else {
-                DOM.themeToggle.innerHTML = '<i class="far fa-lightbulb"></i>';
+                DOM.themeToggle.innerHTML = '🌙';
             }
         }
 
         DOM.themeToggle.addEventListener('click', () => {
             const isDark = document.body.getAttribute('data-theme') === 'dark';
+            
             if (isDark) {
                 document.body.removeAttribute('data-theme');
-                DOM.themeToggle.innerHTML = '<i class="far fa-lightbulb"></i>';
+                DOM.themeToggle.innerHTML = '🌙';
+                localStorage.setItem('passionToolsTheme', 'light');
             } else {
                 document.body.setAttribute('data-theme', 'dark');
-                DOM.themeToggle.innerHTML = '<i class="fas fa-lightbulb" style="color: #fbbf24;"></i>';
+                DOM.themeToggle.innerHTML = '☀️';
+                localStorage.setItem('passionToolsTheme', 'dark');
             }
         });
 
         checkThemePreference();
 
-        // --- Unit Toggling ---
         DOM.btnMetric.addEventListener('click', () => {
             isMetric = true;
             DOM.btnMetric.classList.add('active');
@@ -793,7 +787,6 @@
             hideError();
         });
 
-        // --- Enter Key Support ---
         const inputs = [DOM.heightCm, DOM.weightKg, DOM.heightFt, DOM.heightIn, DOM.weightLbs];
         inputs.forEach(input => {
             input.addEventListener('keypress', (e) => {
@@ -801,16 +794,13 @@
             });
         });
 
-        // --- Event Listeners ---
         DOM.btnCalculate.addEventListener('click', handleCalculate);
         DOM.btnReset.addEventListener('click', handleReset);
 
-        // --- Logic ---
         function handleCalculate() {
             hideError();
             let heightMeters = 0;
             let weightKg = 0;
-            let heightStr = ""; // for ideal weight display
 
             if (isMetric) {
                 const cm = parseFloat(DOM.heightCm.value);
@@ -823,11 +813,10 @@
                 
                 heightMeters = cm / 100;
                 weightKg = kg;
-                heightStr = "kg";
 
             } else {
                 const ft = parseFloat(DOM.heightFt.value);
-                const inch = parseFloat(DOM.heightIn.value) || 0; // Allow 0 inches
+                const inch = parseFloat(DOM.heightIn.value) || 0; 
                 const lbs = parseFloat(DOM.weightLbs.value);
 
                 if (isNaN(ft) || isNaN(lbs) || ft < 1 || ft > 9 || inch < 0 || inch >= 12 || lbs <= 5 || lbs >= 1000) {
@@ -836,15 +825,12 @@
                 }
 
                 const totalInches = (ft * 12) + inch;
-                heightMeters = totalInches * 0.0254; // Convert inches to meters
-                weightKg = lbs * 0.453592; // Convert lbs to kg
-                heightStr = "lbs";
+                heightMeters = totalInches * 0.0254; 
+                weightKg = lbs * 0.453592; 
             }
 
-            // BMI Formula: kg / m^2
             const bmi = weightKg / (heightMeters * heightMeters);
             
-            // Calculate Ideal Weight (Normal BMI is 18.5 - 24.9)
             const minIdealKg = 18.5 * (heightMeters * heightMeters);
             const maxIdealKg = 24.9 * (heightMeters * heightMeters);
 
@@ -864,7 +850,6 @@
             DOM.resultsWrapper.style.display = 'block';
             DOM.idealWeightRange.textContent = idealText;
 
-            // Determine Category
             let category = "";
             let color = "";
             let message = "";
@@ -887,43 +872,32 @@
                 message = "Your BMI falls into the obese category. It is highly recommended to consult a doctor or a dietitian for a personalized health plan.";
             }
 
-            // Update UI
             DOM.bmiLabel.textContent = category;
             DOM.bmiLabel.style.backgroundColor = color;
             DOM.bmiLabel.style.color = "#fff";
             DOM.bmiScore.style.color = color;
             DOM.healthMsg.textContent = message;
 
-            // Animate Number
             animateValue(DOM.bmiScore, 0, bmi, 1000);
 
-            // Animate Gauge Marker
-            // Scale mapping: 15 to 40+ mapped to 0% to 100%
             let percent = ((bmi - 15) / (40 - 15)) * 100;
-            // Clamp
             if (percent < 0) percent = 0;
             if (percent > 100) percent = 100;
 
             setTimeout(() => {
                 DOM.gaugeMarker.style.left = `${percent}%`;
-            }, 100); // small delay for CSS transition to catch
+            }, 100); 
 
-            // Scroll to results
             setTimeout(() => {
                 DOM.resultsWrapper.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }, 150);
         }
 
         function handleReset() {
-            // Clear inputs
             inputs.forEach(input => input.value = '');
-            
-            // Hide elements
             DOM.resultsWrapper.style.display = 'none';
             DOM.gaugeMarker.style.left = '0%';
             hideError();
-            
-            // Scroll top
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -942,13 +916,11 @@
             DOM.errorMsg.classList.remove('show');
         }
 
-        // Animate counter function
         function animateValue(obj, start, end, duration) {
             let startTimestamp = null;
             const step = (timestamp) => {
                 if (!startTimestamp) startTimestamp = timestamp;
                 const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-                // ease out
                 const easeOut = progress * (2 - progress); 
                 const currentVal = (easeOut * (end - start) + start).toFixed(2);
                 obj.innerHTML = currentVal;
