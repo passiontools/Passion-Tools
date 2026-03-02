@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Page Numbers - PassionTools</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <style>
+        :root {
+            --red: #ef4444;
+            --purple: #a855f7;
+            --blue: #3b82f6;
+            --blue-dark: #2563eb;
+            --green: #22c55e;
+            --bg-color: #f9fafb;
+            --card-bg: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --hover-gray: #f3f4f6;
+            --btn-action-bg: #fef2f2;
+            --logo-passion: #000000;
+            --footer-bg: #111827;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.04);
+            --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.08), 0 8px 10px -6px rgba(0,0,0,0.04);
+        }
+
+        html.dark {
+            --bg-color: #020617;
+            --card-bg: #111827;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border-color: #1e293b;
+            --hover-gray: #1e293b;
+            --btn-action-bg: #450a0a;
+            --logo-passion: #ffffff;
+            --footer-bg: #020617;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.4), 0 2px 4px -2px rgba(0,0,0,0.3);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.5), 0 4px 6px -4px rgba(0,0,0,0.3);
+            --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.5), 0 8px 10px -6px rgba(0,0,0,0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            line-height: 1.6;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.72);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        html.dark .header {
+            background: rgba(2, 6, 23, 0.78);
+        }
+
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            text-decoration: none;
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .logo-passion {
+            color: var(--logo-passion);
+            transition: color 0.3s ease;
+        }
+
+        .logo-tools {
+            background: linear-gradient(135deg, var(--red), var(--purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .back-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: var(--red);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border-color);
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            background: var(--hover-gray);
+            border-color: var(--text-secondary);
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            flex: 1;
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 40px 24px 60px;
+        }
+
+        /* ===== TOOL HEADER ===== */
+        .tool-header {
+            text-align: center;
+            margin-bottom: 36px;
+        }
+
+        .tool-title {
+            font-size: 30px;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+        }
+
+        .tool-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+            max-width: 500px;
+            margin: 0 auto;
+            font-weight: 400;
+        }
+
+        /* ===== CARD ===== */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .card-body {
+            padding: 32px;
+        }
+
+        /* ===== UPLOAD AREA ===== */
+        .upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 52px 32px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .upload-area:hover,
+        .upload-area.drag-over {
+            border-color: var(--blue);
+            background: rgba(59, 130, 246, 0.04);
+        }
+
+        html.dark .upload-area:hover,
+        html.dark .upload-area.drag-over {
+            background: rgba(59, 130, 246, 0.08);
+        }
+
+        .upload-area input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .upload-icon {
+            font-size: 44px;
+            color: var(--blue);
+            margin-bottom: 16px;
+        }
+
+        .upload-primary-text {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .upload-primary-text span {
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        .upload-secondary-text {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* ===== WORKSPACE ===== */
+        .workspace { display: none; }
+        .workspace.active { display: block; }
+
+        .file-info-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 18px;
+            background: var(--hover-gray);
+            border-radius: 10px;
+            margin-bottom: 28px;
+            transition: all 0.3s ease;
+        }
+
+        .file-info-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--red), var(--purple));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .file-info-details {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .file-info-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .file-info-meta {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .file-remove-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 16px;
+            padding: 4px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .file-remove-btn:hover {
+            color: var(--red);
+            background: var(--btn-action-bg);
+        }
+
+        /* Config Panel */
+        .config-section {
+            margin-bottom: 24px;
+        }
+
+        .config-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .config-label i {
+            color: var(--blue);
+            font-size: 14px;
+        }
+
+        /* Position Grid */
+        .position-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .position-cell {
+            padding: 12px 8px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+            background: transparent;
+        }
+
+        .position-cell:hover {
+            border-color: var(--blue);
+            color: var(--blue);
+            background: rgba(59, 130, 246, 0.04);
+        }
+
+        .position-cell.active {
+            border-color: var(--blue);
+            background: rgba(59, 130, 246, 0.08);
+            color: var(--blue);
+            font-weight: 700;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+        }
+
+        html.dark .position-cell:hover {
+            background: rgba(59, 130, 246, 0.12);
+        }
+
+        html.dark .position-cell.active {
+            background: rgba(59, 130, 246, 0.18);
+        }
+
+        /* Form Controls */
+        .config-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .form-select,
+        .form-input {
+            padding: 10px 14px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            color: var(--text-primary);
+            background: var(--card-bg);
+            transition: all 0.3s ease;
+            outline: none;
+            appearance: auto;
+        }
+
+        .form-select:focus,
+        .form-input:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+        }
+
+        /* Page Range */
+        .page-range-group {
+            margin-top: 0;
+        }
+
+        .range-options {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .range-option {
+            padding: 8px 16px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            background: transparent;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .range-option:hover {
+            border-color: var(--blue);
+            color: var(--blue);
+        }
+
+        .range-option.active {
+            border-color: var(--blue);
+            background: rgba(59, 130, 246, 0.08);
+            color: var(--blue);
+            font-weight: 700;
+        }
+
+        .start-number-inline {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .start-number-inline label {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+
+        .start-number-inline .form-input {
+            width: 80px;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 13px 28px;
+            border-radius: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--blue), var(--blue-dark));
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.45);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--green), #16a34a);
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(34, 197, 94, 0.35);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(34, 197, 94, 0.45);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1.5px solid var(--border-color);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--blue);
+            color: var(--blue);
+            background: rgba(59, 130, 246, 0.04);
+        }
+
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 28px;
+        }
+
+        /* Spinner */
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2.5px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ===== SUCCESS STATE ===== */
+        .success-state { display: none; }
+        .success-state.active { display: block; }
+
+        .success-banner {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(34, 197, 94, 0.04));
+            border: 1.5px solid rgba(34, 197, 94, 0.3);
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        html.dark .success-banner {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.12), rgba(34, 197, 94, 0.05));
+        }
+
+        .success-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--green);
+            color: #fff;
+            font-size: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 14px;
+            animation: scaleIn 0.4s ease;
+        }
+
+        @keyframes scaleIn {
+            0% { transform: scale(0); opacity: 0; }
+            60% { transform: scale(1.15); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .success-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .success-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* ===== UPLOAD STATE ===== */
+        .upload-state { display: block; }
+        .upload-state.hidden { display: none; }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            background: var(--footer-bg);
+            text-align: center;
+            padding: 30px 20px;
+            margin-top: auto;
+        }
+
+        .footer-text {
+            font-size: 14px;
+            color: #94a3b8;
+        }
+
+        .footer-text i {
+            margin-right: 4px;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 640px) {
+            .main-content {
+                padding: 28px 16px 48px;
+            }
+
+            .card-body {
+                padding: 24px 20px;
+            }
+
+            .tool-title {
+                font-size: 24px;
+            }
+
+            .tool-subtitle {
+                font-size: 14px;
+            }
+
+            .config-row {
+                grid-template-columns: 1fr;
+            }
+
+            .upload-area {
+                padding: 40px 20px;
+            }
+
+            .header-inner {
+                padding: 0 16px;
+            }
+
+            .position-cell {
+                padding: 10px 6px;
+                font-size: 11px;
+            }
+
+            .btn {
+                padding: 12px 20px;
+                font-size: 14px;
+            }
+
+
+        }
+
+        /* ===== COLOR PICKER ===== */
+        .color-picker-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 14px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 10px;
+            background: var(--card-bg);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .color-picker-wrapper:hover {
+            border-color: var(--blue);
+        }
+
+        .color-picker-wrapper:focus-within {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+        }
+
+        .color-picker-input {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            width: 32px;
+            height: 32px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            padding: 0;
+            background: none;
+            flex-shrink: 0;
+        }
+
+        .color-picker-input::-webkit-color-swatch-wrapper {
+            padding: 2px;
+        }
+
+        .color-picker-input::-webkit-color-swatch {
+            border: none;
+            border-radius: 5px;
+        }
+
+        .color-picker-input::-moz-color-swatch {
+            border: none;
+            border-radius: 5px;
+        }
+
+        .color-picker-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-family: 'Inter', monospace;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .color-presets {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .color-preset {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 0;
+        }
+
+        .color-preset:hover {
+            transform: scale(1.15);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .color-preset.active {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+            transform: scale(1.1);
+        }
+
+        .color-presets-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== DIVIDER ===== */
+        .config-divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: 24px 0;
+            transition: background 0.3s ease;
+        }
+
+        /* ===== PREVIEW INDICATOR ===== */
+        .position-preview {
+            width: 100%;
+            max-width: 180px;
+            height: 240px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            margin: 0 auto;
+            position: relative;
+            background: var(--hover-gray);
+            transition: all 0.3s ease;
+        }
+
+        .preview-number {
+            position: absolute;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--blue);
+            padding: 6px;
+            transition: all 0.3s ease;
+        }
+
+        /* position mapping */
+        .preview-number.top-left { top: 4px; left: 6px; }
+        .preview-number.top-center { top: 4px; left: 50%; transform: translateX(-50%); }
+        .preview-number.top-right { top: 4px; right: 6px; }
+        .preview-number.bottom-left { bottom: 4px; left: 6px; }
+        .preview-number.bottom-center { bottom: 4px; left: 50%; transform: translateX(-50%); }
+        .preview-number.bottom-right { bottom: 4px; right: 6px; }
+
+        .preview-line {
+            position: absolute;
+            left: 20px;
+            right: 20px;
+            height: 4px;
+            background: var(--border-color);
+            border-radius: 2px;
+        }
+
+        .preview-line:nth-child(2) { top: 55px; }
+        .preview-line:nth-child(3) { top: 70px; right: 40px; }
+        .preview-line:nth-child(4) { top: 85px; }
+        .preview-line:nth-child(5) { top: 100px; right: 30px; }
+        .preview-line:nth-child(6) { top: 120px; }
+        .preview-line:nth-child(7) { top: 135px; right: 50px; }
+        .preview-line:nth-child(8) { top: 155px; }
+        .preview-line:nth-child(9) { top: 170px; right: 35px; }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-inner">
+            <a href="#" class="logo" onclick="event.preventDefault();">
+                <span class="logo-passion">Passion</span><span class="logo-tools">Tools</span>
+            </a>
+            <div class="header-actions">
+                <a href="index.html" class="back-link">
+                    <i class="fas fa-arrow-left"></i> Back to Tools
+                </a>
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">☀️</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN -->
+    <main class="main-content">
+
+        <!-- Tool Header -->
+        <div class="tool-header">
+            <h1 class="tool-title">Add Page Numbers</h1>
+            <p class="tool-subtitle">Insert page numbers into your PDF documents instantly. 100% private in-browser processing.</p>
+        </div>
+
+        <!-- Card -->
+        <div class="card">
+            <div class="card-body">
+
+                <!-- State 1: Upload -->
+                <div class="upload-state" id="uploadState">
+                    <div class="upload-area" id="uploadArea">
+                        <input type="file" id="fileInput" accept=".pdf,application/pdf">
+                        <div class="upload-icon">
+                            <i class="fas fa-file-pdf"></i>
+                        </div>
+                        <p class="upload-primary-text"><span>Click</span> or Drag & Drop PDF here</p>
+                        <p class="upload-secondary-text">Supports PDF files up to 100MB</p>
+                    </div>
+                </div>
+
+                <!-- State 2: Workspace -->
+                <div class="workspace" id="workspaceState">
+
+                    <!-- File Info -->
+                    <div class="file-info-bar">
+                        <div class="file-info-icon"><i class="fas fa-file-pdf"></i></div>
+                        <div class="file-info-details">
+                            <div class="file-info-name" id="fileName">document.pdf</div>
+                            <div class="file-info-meta" id="fileMeta">0 pages • 0 KB</div>
+                        </div>
+                        <button class="file-remove-btn" id="removeFileBtn" title="Remove file"><i class="fas fa-xmark"></i></button>
+                    </div>
+
+                    <!-- Position -->
+                    <div class="config-section">
+                        <div class="config-label"><i class="fas fa-crosshairs"></i> Position</div>
+                        <div style="display:flex;gap:24px;align-items:center;flex-wrap:wrap;">
+                            <div style="flex:1;min-width:200px;">
+                                <div class="position-grid" id="positionGrid">
+                                    <button class="position-cell" data-pos="top-left">Top Left</button>
+                                    <button class="position-cell" data-pos="top-center">Top Center</button>
+                                    <button class="position-cell" data-pos="top-right">Top Right</button>
+                                    <button class="position-cell" data-pos="bottom-left">Bottom Left</button>
+                                    <button class="position-cell active" data-pos="bottom-center">Bottom Center</button>
+                                    <button class="position-cell" data-pos="bottom-right">Bottom Right</button>
+                                </div>
+                            </div>
+                            <div class="position-preview" id="posPreview">
+                                <span class="preview-number bottom-center" id="previewNum">1</span>
+                                <div class="preview-line"></div>
+                                <div class="preview-line"></div>
+                                <div class="preview-line"></div>
+                                <div class="preview-line"></div>
+                                <div class="preview-line"></div>
+                                <div class="preview-line"></div>
+                                <div class="preview-line"></div>
+                                <div class="preview-line"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="config-divider"></div>
+
+                    <!-- Format & Typography -->
+                    <div class="config-section">
+                        <div class="config-label"><i class="fas fa-sliders"></i> Format & Typography</div>
+                        <div class="config-row">
+                            <div class="form-group">
+                                <label>Number Format</label>
+                                <select class="form-select" id="formatSelect">
+                                    <option value="plain">1</option>
+                                    <option value="page">Page 1</option>
+                                    <option value="of" selected>1 of 5</option>
+                                    <option value="page-of">Page 1 of 5</option>
+                                    <option value="dash">- 1 -</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Font Size (pt)</label>
+                                <input type="number" class="form-input" id="fontSizeInput" value="12" min="6" max="36" step="1">
+                            </div>
+                        </div>
+                        <div class="config-row" style="margin-top:14px;">
+                            <div class="form-group">
+                                <label>Margin from Edge (pt)</label>
+                                <input type="number" class="form-input" id="marginInput" value="36" min="10" max="120" step="1">
+                            </div>
+                            <div class="form-group">
+                                <label>Start Number</label>
+                                <input type="number" class="form-input" id="startNumber" value="1" min="0" max="9999" step="1">
+                            </div>
+                        </div>
+                        <div class="config-row" style="margin-top:14px;">
+                            <div class="form-group">
+                                <label>Font Color</label>
+                                <div class="color-picker-wrapper">
+                                    <input type="color" class="color-picker-input" id="fontColorInput" value="#000000">
+                                    <span class="color-picker-label" id="fontColorLabel">#000000</span>
+                                </div>
+                            </div>
+                            <div class="form-group color-presets-group">
+                                <label>Quick Colors</label>
+                                <div class="color-presets">
+                                    <button class="color-preset active" data-color="#000000" style="background:#000000;" title="Black"></button>
+                                    <button class="color-preset" data-color="#ef4444" style="background:#ef4444;" title="Red"></button>
+                                    <button class="color-preset" data-color="#3b82f6" style="background:#3b82f6;" title="Blue"></button>
+                                    <button class="color-preset" data-color="#22c55e" style="background:#22c55e;" title="Green"></button>
+                                    <button class="color-preset" data-color="#a855f7" style="background:#a855f7;" title="Purple"></button>
+                                    <button class="color-preset" data-color="#6b7280" style="background:#6b7280;" title="Gray"></button>
+                                    <button class="color-preset" data-color="#f97316" style="background:#f97316;" title="Orange"></button>
+                                    <button class="color-preset" data-color="#ffffff" style="background:#ffffff;border:1.5px solid #d1d5db;" title="White"></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="config-divider"></div>
+
+                    <!-- Page Range -->
+                    <div class="config-section page-range-group">
+                        <div class="config-label"><i class="fas fa-layer-group"></i> Page Range</div>
+                        <div class="range-options">
+                            <button class="range-option active" data-range="all">All Pages</button>
+                            <button class="range-option" data-range="odd">Odd Only</button>
+                            <button class="range-option" data-range="even">Even Only</button>
+                        </div>
+                    </div>
+
+                    <!-- Action Button -->
+                    <div class="btn-group">
+                        <button class="btn btn-primary" id="processBtn">
+                            <i class="fas fa-hashtag"></i> Add Page Numbers
+                        </button>
+                    </div>
+
+                </div>
+
+                <!-- State 3: Success -->
+                <div class="success-state" id="successState">
+                    <div class="success-banner">
+                        <div class="success-icon"><i class="fas fa-check"></i></div>
+                        <div class="success-title">Page Numbers Added!</div>
+                        <div class="success-subtitle" id="successInfo">Your PDF has been numbered successfully.</div>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-success" id="downloadBtn">
+                            <i class="fas fa-download"></i> Download Numbered PDF
+                        </button>
+                        <button class="btn btn-outline" id="resetBtn">
+                            <i class="fas fa-rotate-left"></i> Process Another File
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <p class="footer-text">© 2026 Passion Tools. Secure client-side processing.</p>
+    </footer>
+
+    <script>
+        // ===== THEME =====
+        const themeToggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+
+        function applyTheme(dark) {
+            if (dark) {
+                html.classList.add('dark');
+                themeToggle.textContent = '🌙';
+            } else {
+                html.classList.remove('dark');
+                themeToggle.textContent = '☀️';
+            }
+        }
+
+        (function initTheme() {
+            const stored = localStorage.getItem('passion-tools-theme');
+            if (stored === 'dark') applyTheme(true);
+            else if (stored === 'light') applyTheme(false);
+            else applyTheme(window.matchMedia('(prefers-color-scheme: dark)').matches);
+        })();
+
+        themeToggle.addEventListener('click', () => {
+            const isDark = html.classList.contains('dark');
+            applyTheme(!isDark);
+            localStorage.setItem('passion-tools-theme', isDark ? 'light' : 'dark');
+        });
+
+        // ===== STATE MANAGEMENT =====
+        const uploadState = document.getElementById('uploadState');
+        const workspaceState = document.getElementById('workspaceState');
+        const successState = document.getElementById('successState');
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const fileNameEl = document.getElementById('fileName');
+        const fileMetaEl = document.getElementById('fileMeta');
+        const removeFileBtn = document.getElementById('removeFileBtn');
+        const processBtn = document.getElementById('processBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const positionGrid = document.getElementById('positionGrid');
+        const previewNum = document.getElementById('previewNum');
+        const formatSelect = document.getElementById('formatSelect');
+        const fontSizeInput = document.getElementById('fontSizeInput');
+        const marginInput = document.getElementById('marginInput');
+        const startNumber = document.getElementById('startNumber');
+        const successInfo = document.getElementById('successInfo');
+
+        const fontColorInput = document.getElementById('fontColorInput');
+        const fontColorLabel = document.getElementById('fontColorLabel');
+
+        let uploadedFile = null;
+        let fileBuffer = null;
+        let resultBlob = null;
+        let resultFileName = '';
+        let selectedPosition = 'bottom-center';
+        let selectedRange = 'all';
+        let selectedFontColor = '#000000';
+
+        function showState(state) {
+            uploadState.classList.toggle('hidden', state !== 'upload');
+            uploadState.style.display = state === 'upload' ? 'block' : 'none';
+            workspaceState.classList.toggle('active', state === 'workspace');
+            successState.classList.toggle('active', state === 'success');
+        }
+
+        // ===== FILE HANDLING =====
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('drag-over');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('drag-over');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
+            const files = e.dataTransfer.files;
+            if (files.length && files[0].type === 'application/pdf') {
+                handleFile(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) handleFile(e.target.files[0]);
+        });
+
+        async function handleFile(file) {
+            uploadedFile = file;
+            fileBuffer = await file.arrayBuffer();
+
+            // Get page count
+            let pageCount = '?';
+            try {
+                const pdfDoc = await PDFLib.PDFDocument.load(fileBuffer, { ignoreEncryption: true });
+                pageCount = pdfDoc.getPageCount();
+            } catch (err) {
+                // fallback
+            }
+
+            const sizeKB = (file.size / 1024).toFixed(1);
+            const sizeStr = file.size > 1048576 ? (file.size / 1048576).toFixed(2) + ' MB' : sizeKB + ' KB';
+
+            fileNameEl.textContent = file.name;
+            fileMetaEl.textContent = `${pageCount} page${pageCount !== 1 ? 's' : ''} • ${sizeStr}`;
+
+            showState('workspace');
+        }
+
+        removeFileBtn.addEventListener('click', resetAll);
+        resetBtn.addEventListener('click', resetAll);
+
+        function resetAll() {
+            uploadedFile = null;
+            fileBuffer = null;
+            resultBlob = null;
+            resultFileName = '';
+            fileInput.value = '';
+            showState('upload');
+        }
+
+        // ===== POSITION GRID =====
+        positionGrid.addEventListener('click', (e) => {
+            const cell = e.target.closest('.position-cell');
+            if (!cell) return;
+            positionGrid.querySelectorAll('.position-cell').forEach(c => c.classList.remove('active'));
+            cell.classList.add('active');
+            selectedPosition = cell.dataset.pos;
+
+            // Update preview
+            previewNum.className = 'preview-number ' + selectedPosition;
+        });
+
+        // ===== RANGE OPTIONS =====
+        document.querySelectorAll('.range-option').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.range-option').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                selectedRange = btn.dataset.range;
+            });
+        });
+
+        // ===== FONT COLOR =====
+        fontColorInput.addEventListener('input', (e) => {
+            selectedFontColor = e.target.value;
+            fontColorLabel.textContent = selectedFontColor;
+            previewNum.style.color = selectedFontColor;
+            // Update preset active state
+            document.querySelectorAll('.color-preset').forEach(p => {
+                p.classList.toggle('active', p.dataset.color.toLowerCase() === selectedFontColor.toLowerCase());
+            });
+        });
+
+        document.querySelectorAll('.color-preset').forEach(btn => {
+            btn.addEventListener('click', () => {
+                selectedFontColor = btn.dataset.color;
+                fontColorInput.value = selectedFontColor;
+                fontColorLabel.textContent = selectedFontColor;
+                previewNum.style.color = selectedFontColor;
+                document.querySelectorAll('.color-preset').forEach(p => p.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+
+        // ===== FORMAT PREVIEW =====
+        formatSelect.addEventListener('change', updatePreviewText);
+        function updatePreviewText() {
+            const fmt = formatSelect.value;
+            const n = parseInt(startNumber.value) || 1;
+            const t = 5;
+            switch(fmt) {
+                case 'plain': previewNum.textContent = n; break;
+                case 'page': previewNum.textContent = 'Page ' + n; break;
+                case 'of': previewNum.textContent = n + ' of ' + t; break;
+                case 'page-of': previewNum.textContent = 'Page ' + n + ' of ' + t; break;
+                case 'dash': previewNum.textContent = '- ' + n + ' -'; break;
+            }
+        }
+        startNumber.addEventListener('input', updatePreviewText);
+
+        // ===== PROCESS PDF =====
+        processBtn.addEventListener('click', async () => {
+            if (!fileBuffer) return;
+
+            // Show spinner
+            processBtn.disabled = true;
+            processBtn.innerHTML = '<div class="spinner"></div> Processing...';
+
+            try {
+                await new Promise(r => setTimeout(r, 100)); // let UI update
+
+                const pdfDoc = await PDFLib.PDFDocument.load(fileBuffer);
+                const font = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
+                const pages = pdfDoc.getPages();
+                const totalPages = pages.length;
+                const fontSize = parseInt(fontSizeInput.value) || 12;
+                const margin = parseInt(marginInput.value) || 36;
+                const start = parseInt(startNumber.value) || 1;
+                const format = formatSelect.value;
+
+                for (let i = 0; i < totalPages; i++) {
+                    // Page range filter
+                    const pageNum = i + 1;
+                    if (selectedRange === 'odd' && pageNum % 2 === 0) continue;
+                    if (selectedRange === 'even' && pageNum % 2 !== 0) continue;
+
+                    const page = pages[i];
+                    const { width, height } = page.getSize();
+                    const currentNum = start + i;
+
+                    // Build text string
+                    let text = '';
+                    switch (format) {
+                        case 'plain': text = String(currentNum); break;
+                        case 'page': text = 'Page ' + currentNum; break;
+                        case 'of': text = currentNum + ' of ' + (start + totalPages - 1); break;
+                        case 'page-of': text = 'Page ' + currentNum + ' of ' + (start + totalPages - 1); break;
+                        case 'dash': text = '- ' + currentNum + ' -'; break;
+                    }
+
+                    const textWidth = font.widthOfTextAtSize(text, fontSize);
+                    const textHeight = font.heightAtSize(fontSize);
+
+                    // Calculate coordinates
+                    let x, y;
+
+                    // Y position
+                    if (selectedPosition.startsWith('top')) {
+                        y = height - margin - textHeight;
+                    } else {
+                        y = margin;
+                    }
+
+                    // X position
+                    if (selectedPosition.endsWith('left')) {
+                        x = margin;
+                    } else if (selectedPosition.endsWith('center')) {
+                        x = (width - textWidth) / 2;
+                    } else {
+                        x = width - margin - textWidth;
+                    }
+
+                    // Parse selected font color hex to RGB
+                    const hexToRgb = (hex) => {
+                        const r = parseInt(hex.slice(1, 3), 16) / 255;
+                        const g = parseInt(hex.slice(3, 5), 16) / 255;
+                        const b = parseInt(hex.slice(5, 7), 16) / 255;
+                        return { r, g, b };
+                    };
+                    const rgb = hexToRgb(selectedFontColor);
+
+                    page.drawText(text, {
+                        x: x,
+                        y: y,
+                        size: fontSize,
+                        font: font,
+                        color: PDFLib.rgb(rgb.r, rgb.g, rgb.b),
+                    });
+                }
+
+                const pdfBytes = await pdfDoc.save();
+                resultBlob = new Blob([pdfBytes], { type: 'application/pdf' });
+
+                // Build filename
+                const baseName = uploadedFile.name.replace(/\.pdf$/i, '');
+                resultFileName = baseName + '-numbered.pdf';
+
+                successInfo.textContent = `Added numbers to ${totalPages} page${totalPages > 1 ? 's' : ''} • ${resultFileName}`;
+                showState('success');
+
+            } catch (err) {
+                console.error(err);
+                alert('Error processing PDF: ' + err.message);
+            } finally {
+                processBtn.disabled = false;
+                processBtn.innerHTML = '<i class="fas fa-hashtag"></i> Add Page Numbers';
+            }
+        });
+
+        // ===== DOWNLOAD =====
+        downloadBtn.addEventListener('click', () => {
+            if (!resultBlob) return;
+            const url = URL.createObjectURL(resultBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = resultFileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 5000);
+        });
+    </script>
+
+</body>
+</html>
