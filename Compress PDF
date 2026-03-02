@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compress PDF - PassionTools</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --red: #ef4444;
+            --purple: #a855f7;
+            --blue: #3b82f6;
+            --blue-dark: #2563eb;
+            --green: #22c55e;
+            --bg-color: #f9fafb;
+            --card-bg: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --hover-gray: #f3f4f6;
+            --btn-action-bg: #fef2f2;
+            --logo-passion: #000000;
+            --footer-bg: #111827;
+            --header-bg: rgba(255, 255, 255, 0.8);
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #020617;
+            --card-bg: #111827;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border-color: #1e293b;
+            --hover-gray: #1e293b;
+            --btn-action-bg: #450a0a;
+            --logo-passion: #ffffff;
+            --footer-bg: #020617;
+            --header-bg: rgba(2, 6, 23, 0.8);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Header */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--header-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo-link {
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .logo-passion {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--logo-passion);
+            transition: none;
+        }
+
+        .logo-passion:hover {
+            color: var(--logo-passion) !important;
+        }
+
+        .logo-tools {
+            font-size: 22px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--red), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .back-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.3s ease;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+
+        .back-link:hover {
+            color: var(--red);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            font-size: 18px;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            background: var(--hover-gray);
+        }
+
+        /* Main Content */
+        .main {
+            flex: 1;
+            max-width: 720px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 48px 24px 64px;
+        }
+
+        /* Tool Header */
+        .tool-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .tool-header h1 {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        .tool-header p {
+            font-size: 16px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            max-width: 520px;
+            margin: 0 auto;
+        }
+
+        /* Card */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 32px;
+            transition: all 0.3s ease;
+        }
+
+        /* Upload Area */
+        .upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 48px 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .upload-area:hover,
+        .upload-area.drag-over {
+            border-color: var(--blue);
+            background: rgba(59, 130, 246, 0.04);
+        }
+
+        .upload-area input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .upload-icon {
+            font-size: 40px;
+            color: var(--blue);
+            margin-bottom: 16px;
+        }
+
+        .upload-text-primary {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .upload-text-secondary {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Workspace */
+        .workspace {
+            display: none;
+        }
+
+        .workspace.active {
+            display: block;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px;
+            background: var(--hover-gray);
+            border-radius: 12px;
+            margin-bottom: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .file-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 10px;
+            background: var(--btn-action-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--red);
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .file-details {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .file-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .file-size {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .file-remove {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 16px;
+            padding: 4px;
+            transition: color 0.3s ease;
+        }
+
+        .file-remove:hover {
+            color: var(--red);
+        }
+
+        /* Settings */
+        .settings-section {
+            margin-bottom: 24px;
+        }
+
+        .settings-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+
+        .compression-options {
+            display: flex;
+            gap: 10px;
+        }
+
+        .compression-option {
+            flex: 1;
+            padding: 14px 12px 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+            background: var(--card-bg);
+            position: relative;
+        }
+
+        .compression-option:hover {
+            border-color: var(--blue);
+        }
+
+        .compression-option.selected {
+            border-color: var(--blue);
+            background: rgba(59, 130, 246, 0.06);
+        }
+
+        .compression-option.selected .compression-option-icon {
+            color: var(--blue);
+        }
+
+        .compression-option-icon {
+            font-size: 20px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            transition: color 0.3s ease;
+        }
+
+        .compression-option-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 3px;
+        }
+
+        .compression-option-subtitle {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 2px;
+        }
+
+        .compression-option-desc {
+            font-size: 11px;
+            color: var(--text-secondary);
+            opacity: 0.75;
+        }
+
+        .compression-option-badge {
+            position: absolute;
+            top: -9px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--blue);
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 10px;
+            border-radius: 100px;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            width: 100%;
+            padding: 14px 24px;
+            background: var(--blue);
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            background: var(--blue-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-ghost {
+            width: 100%;
+            padding: 14px 24px;
+            background: transparent;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .btn-ghost:hover {
+            background: var(--hover-gray);
+            border-color: var(--text-secondary);
+        }
+
+        /* Spinner */
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2.5px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Progress */
+        .progress-section {
+            display: none;
+            margin-bottom: 24px;
+        }
+
+        .progress-section.active {
+            display: block;
+        }
+
+        .progress-bar-track {
+            width: 100%;
+            height: 6px;
+            background: var(--hover-gray);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--blue), var(--purple));
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .progress-text {
+            font-size: 13px;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        /* Success */
+        .success-section {
+            display: none;
+        }
+
+        .success-section.active {
+            display: block;
+        }
+
+        .success-banner {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(34, 197, 94, 0.05));
+            border: 1px solid rgba(34, 197, 94, 0.25);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .success-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--green);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 22px;
+            margin-bottom: 12px;
+        }
+
+        .success-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--green);
+            margin-bottom: 4px;
+        }
+
+        .success-subtitle {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Savings */
+        .savings-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .size-box {
+            text-align: center;
+            padding: 16px 20px;
+            border-radius: 12px;
+            background: var(--hover-gray);
+            flex: 1;
+            min-width: 120px;
+            transition: all 0.3s ease;
+        }
+
+        .size-box-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .size-box-value {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+
+        .size-arrow {
+            font-size: 22px;
+            color: var(--text-secondary);
+            flex-shrink: 0;
+        }
+
+        .savings-percentage {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .savings-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 18px;
+            background: rgba(34, 197, 94, 0.12);
+            color: var(--green);
+            border-radius: 100px;
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--footer-bg);
+            text-align: center;
+            padding: 30px 20px;
+        }
+
+        .footer-text {
+            font-size: 14px;
+            color: #94a3b8;
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .main {
+                padding: 32px 16px 48px;
+            }
+
+            .card {
+                padding: 24px 18px;
+            }
+
+            .tool-header h1 {
+                font-size: 26px;
+            }
+
+            .tool-header p {
+                font-size: 14px;
+            }
+
+            .compression-options {
+                flex-direction: column;
+            }
+
+            .savings-display {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .size-arrow {
+                transform: rotate(90deg);
+            }
+
+            .size-box {
+                width: 100%;
+            }
+
+            .btn-primary, .btn-ghost {
+                font-size: 14px;
+                padding: 13px 20px;
+            }
+
+            .header-inner {
+                padding: 12px 16px;
+            }
+
+            .upload-area {
+                padding: 36px 16px;
+            }
+        }
+
+        /* Fade in animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-in {
+            animation: fadeInUp 0.4s ease forwards;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="header-inner">
+            <a href="#" class="logo-link" onclick="event.preventDefault();">
+                <span class="logo-passion">Passion</span><span class="logo-tools">Tools</span>
+            </a>
+            <div class="header-actions">
+                <a href="index.html" class="back-link">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Tools
+                </a>
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">☀️</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="tool-header animate-in">
+            <h1>Compress PDF</h1>
+            <p>Reduce your PDF file size for easier sharing and faster uploading. 100% private in-browser optimization.</p>
+        </div>
+
+        <div class="card animate-in" style="animation-delay: 0.1s;">
+
+            <div id="uploadState">
+                <div class="upload-area" id="uploadArea">
+                    <input type="file" id="fileInput" accept=".pdf,application/pdf">
+                    <div class="upload-icon">
+                        <svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M14 34 C8 34 4 30 4 25 C4 20 8 16.5 12.5 16 C13 11 17.5 7 23 7 C27.5 7 31.5 9.5 33.5 13 C34.2 12.8 35 12.7 36 12.7 C41 12.7 45 16.7 45 21.7 C45 22.5 44.9 23.2 44.7 23.9 C47 25 48.5 27.3 48.5 30 C48.5 33.5 45.7 36.5 42 36.5 L38 36.5" stroke="var(--blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.35"/>
+                            <path d="M26 44 L26 28" stroke="var(--blue)" stroke-width="2.5" stroke-linecap="round"/>
+                            <path d="M20 33 L26 27 L32 33" stroke="var(--blue)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                            <rect x="14" y="38" width="24" height="12" rx="3" fill="var(--blue)" opacity="0.12"/>
+                            <text x="26" y="47" text-anchor="middle" fill="var(--blue)" font-family="Inter, sans-serif" font-size="7" font-weight="700">PDF</text>
+                        </svg>
+                    </div>
+                    <div class="upload-text-primary">Click or Drag & Drop PDF here</div>
+                    <div class="upload-text-secondary">Supports .pdf files up to 100MB</div>
+                </div>
+            </div>
+
+            <div id="workspaceState" class="workspace">
+                <div class="file-info">
+                    <div class="file-icon">
+                        <i class="fas fa-file-pdf"></i>
+                    </div>
+                    <div class="file-details">
+                        <div class="file-name" id="fileName">document.pdf</div>
+                        <div class="file-size" id="fileSize">2.4 MB</div>
+                    </div>
+                    <button class="file-remove" id="removeFile" aria-label="Remove file">
+                        <i class="fas fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div class="settings-section">
+                    <div class="settings-label">Compression Level</div>
+                    <div class="compression-options">
+                        <div class="compression-option" data-level="low" id="optLow">
+                            <div class="compression-option-icon"><i class="fas fa-feather"></i></div>
+                            <div class="compression-option-title">Low</div>
+                            <div class="compression-option-subtitle">Better Quality</div>
+                            <div class="compression-option-desc">Less Compression</div>
+                        </div>
+                        <div class="compression-option selected" data-level="medium" id="optMedium">
+                            <div class="compression-option-badge">Recommended</div>
+                            <div class="compression-option-icon"><i class="fas fa-sliders"></i></div>
+                            <div class="compression-option-title">Medium</div>
+                            <div class="compression-option-subtitle">Balanced</div>
+                            <div class="compression-option-desc">Good for Documents</div>
+                        </div>
+                        <div class="compression-option" data-level="high" id="optHigh">
+                            <div class="compression-option-icon"><i class="fas fa-compress"></i></div>
+                            <div class="compression-option-title">High</div>
+                            <div class="compression-option-subtitle">Smallest Size</div>
+                            <div class="compression-option-desc">Lower Quality</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="progress-section" id="progressSection">
+                    <div class="progress-bar-track">
+                        <div class="progress-bar-fill" id="progressBarFill"></div>
+                    </div>
+                    <div class="progress-text" id="progressText">Preparing document...</div>
+                </div>
+
+                <button class="btn-primary" id="compressBtn">
+                    <i class="fas fa-compress"></i>
+                    Compress PDF
+                </button>
+            </div>
+
+            <div id="successState" class="success-section">
+                <div class="success-banner">
+                    <div class="success-icon">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div class="success-title">Compression Complete!</div>
+                    <div class="success-subtitle">Your PDF has been optimized successfully.</div>
+                </div>
+
+                <div class="savings-display">
+                    <div class="size-box">
+                        <div class="size-box-label">Original Size</div>
+                        <div class="size-box-value" id="originalSizeDisplay">0 MB</div>
+                    </div>
+                    <div class="size-arrow">➔</div>
+                    <div class="size-box">
+                        <div class="size-box-label">New Size</div>
+                        <div class="size-box-value" id="newSizeDisplay">0 MB</div>
+                    </div>
+                </div>
+
+                <div class="savings-percentage">
+                    <div class="savings-badge" id="savingsBadge">
+                        <i class="fas fa-arrow-down"></i>
+                        <span id="savingsPercent">You saved 0%!</span>
+                    </div>
+                </div>
+
+                <button class="btn-primary" id="downloadBtn">
+                    <i class="fas fa-download"></i>
+                    Download Compressed PDF
+                </button>
+                <button class="btn-ghost" id="compressAnotherBtn">
+                    <i class="fas fa-rotate"></i>
+                    Compress Another File
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-text">© 2026 Passion Tools. Secure client-side processing.</div>
+    </footer>
+
+    <canvas id="renderCanvas" style="display:none;"></canvas>
+
+    <script>
+        // Set PDF.js worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+
+        function applyTheme(theme) {
+            html.setAttribute('data-theme', theme);
+            themeToggle.textContent = theme === 'dark' ? '🌙' : '☀️';
+            localStorage.setItem('passiontools-theme', theme);
+        }
+
+        const savedTheme = localStorage.getItem('passiontools-theme') || 'light';
+        applyTheme(savedTheme);
+
+        themeToggle.addEventListener('click', () => {
+            const current = html.getAttribute('data-theme');
+            applyTheme(current === 'dark' ? 'light' : 'dark');
+        });
+
+        // State management
+        let uploadedFile = null;
+        let originalBytes = null;
+        let compressedBytes = null;
+        let compressionLevel = 'medium';
+
+        const uploadState = document.getElementById('uploadState');
+        const workspaceState = document.getElementById('workspaceState');
+        const successState = document.getElementById('successState');
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const fileNameEl = document.getElementById('fileName');
+        const fileSizeEl = document.getElementById('fileSize');
+        const removeFileBtn = document.getElementById('removeFile');
+        const compressBtn = document.getElementById('compressBtn');
+        const progressSection = document.getElementById('progressSection');
+        const progressBarFill = document.getElementById('progressBarFill');
+        const progressText = document.getElementById('progressText');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const compressAnotherBtn = document.getElementById('compressAnotherBtn');
+        const compressionOptions = document.querySelectorAll('.compression-option');
+        const renderCanvas = document.getElementById('renderCanvas');
+
+        // Format file size
+        function formatSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+        }
+
+        // Show a specific state
+        function showState(state) {
+            uploadState.style.display = state === 'upload' ? 'block' : 'none';
+            workspaceState.classList.toggle('active', state === 'workspace');
+            successState.classList.toggle('active', state === 'success');
+        }
+
+        // Drag & Drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('drag-over');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('drag-over');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
+            const files = e.dataTransfer.files;
+            if (files.length > 0 && files[0].type === 'application/pdf') {
+                handleFile(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        function handleFile(file) {
+            uploadedFile = file;
+            fileNameEl.textContent = file.name;
+            fileSizeEl.textContent = formatSize(file.size);
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                originalBytes = new Uint8Array(e.target.result);
+                showState('workspace');
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        // Remove file
+        removeFileBtn.addEventListener('click', () => {
+            uploadedFile = null;
+            originalBytes = null;
+            compressedBytes = null;
+            fileInput.value = '';
+            progressSection.classList.remove('active');
+            progressBarFill.style.width = '0%';
+            compressBtn.disabled = false;
+            compressBtn.innerHTML = '<i class="fas fa-compress"></i> Compress PDF';
+            showState('upload');
+        });
+
+        // Compression level selection
+        compressionOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                compressionOptions.forEach(o => o.classList.remove('selected'));
+                option.classList.add('selected');
+                compressionLevel = option.dataset.level;
+            });
+        });
+
+        // Update progress
+        function updateProgress(percent, text) {
+            progressText.textContent = text;
+            progressBarFill.style.width = percent + '%';
+        }
+
+        // Small delay for UI updates
+        function tick(ms) {
+            return new Promise(r => setTimeout(r, ms || 50));
+        }
+
+        // Get compression settings based on level
+        function getCompressionSettings() {
+            switch (compressionLevel) {
+                case 'low':
+                    return { scale: 2.0, quality: 0.85, format: 'image/jpeg' };
+                case 'medium':
+                    return { scale: 1.5, quality: 0.65, format: 'image/jpeg' };
+                case 'high':
+                    return { scale: 1.0, quality: 0.40, format: 'image/jpeg' };
+                default:
+                    return { scale: 1.5, quality: 0.65, format: 'image/jpeg' };
+            }
+        }
+
+        // REAL COMPRESSION: Render each page to canvas, re-encode as JPEG, rebuild PDF
+        compressBtn.addEventListener('click', async () => {
+            if (!originalBytes) return;
+
+            compressBtn.disabled = true;
+            compressBtn.innerHTML = '<div class="spinner"></div> Compressing...';
+            progressSection.classList.add('active');
+
+            try {
+                const settings = getCompressionSettings();
+                
+                updateProgress(5, 'Loading PDF document...');
+                await tick(100);
+
+                // Load with PDF.js for rendering
+                const loadingTask = pdfjsLib.getDocument({ data: originalBytes.slice() });
+                const pdfDoc = await loadingTask.promise;
+                const totalPages = pdfDoc.numPages;
+
+                updateProgress(10, `Found ${totalPages} page${totalPages > 1 ? 's' : ''}. Starting compression...`);
+                await tick(100);
+
+                // Create new PDF with pdf-lib
+                const { PDFDocument } = PDFLib;
+                const newPdf = await PDFDocument.create();
+
+                const ctx = renderCanvas.getContext('2d');
+
+                for (let i = 1; i <= totalPages; i++) {
+                    const progressPercent = 10 + Math.round((i / totalPages) * 80);
+                    updateProgress(progressPercent, `Compressing page ${i} of ${totalPages}...`);
+                    await tick(30);
+
+                    // Get the page from PDF.js
+                    const page = await pdfDoc.getPage(i);
+                    const viewport = page.getViewport({ scale: settings.scale });
+
+                    // Set canvas dimensions
+                    renderCanvas.width = viewport.width;
+                    renderCanvas.height = viewport.height;
+
+                    // Clear canvas
+                    ctx.clearRect(0, 0, renderCanvas.width, renderCanvas.height);
+
+                    // Fill white background (important for JPEG - no transparency)
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.fillRect(0, 0, renderCanvas.width, renderCanvas.height);
+
+                    // Render page to canvas
+                    const renderContext = {
+                        canvasContext: ctx,
+                        viewport: viewport,
+                    };
+                    await page.render(renderContext).promise;
+
+                    // Convert canvas to JPEG blob
+                    const jpegDataUrl = renderCanvas.toDataURL(settings.format, settings.quality);
+
+                    // Convert data URL to bytes
+                    const base64 = jpegDataUrl.split(',')[1];
+                    const imgBytes = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
+
+                    // Embed image in new PDF
+                    const jpgImage = await newPdf.embedJpg(imgBytes);
+
+                    // Get original page dimensions (in PDF points at scale 1)
+                    const origViewport = page.getViewport({ scale: 1.0 });
+                    const pageWidth = origViewport.width;
+                    const pageHeight = origViewport.height;
+
+                    // Add page with original dimensions and draw compressed image
+                    const newPage = newPdf.addPage([pageWidth, pageHeight]);
+                    newPage.drawImage(jpgImage, {
+                        x: 0,
+                        y: 0,
+                        width: pageWidth,
+                        height: pageHeight,
+                    });
+                }
+
+                updateProgress(92, 'Serializing optimized PDF...');
+                await tick(100);
+
+                // Save the new compressed PDF
+                compressedBytes = await newPdf.save({
+                    useObjectStreams: true,
+                    addDefaultPage: false,
+                });
+
+                updateProgress(100, 'Compression complete!');
+                await tick(300);
+
+                // Calculate savings
+                const originalSize = originalBytes.length;
+                const newSize = compressedBytes.length;
+                const saved = Math.max(0, ((originalSize - newSize) / originalSize) * 100);
+
+                document.getElementById('originalSizeDisplay').textContent = formatSize(originalSize);
+                document.getElementById('newSizeDisplay').textContent = formatSize(newSize);
+
+                if (newSize < originalSize) {
+                    document.getElementById('savingsPercent').textContent = `You saved ${saved.toFixed(1)}%!`;
+                    document.getElementById('savingsBadge').style.background = 'rgba(34, 197, 94, 0.12)';
+                    document.getElementById('savingsBadge').style.color = 'var(--green)';
+                } else {
+                    document.getElementById('savingsPercent').textContent = 'File is already highly optimized';
+                    document.getElementById('savingsBadge').style.background = 'rgba(59, 130, 246, 0.12)';
+                    document.getElementById('savingsBadge').style.color = 'var(--blue)';
+                }
+
+                setTimeout(() => {
+                    showState('success');
+                }, 300);
+
+            } catch (err) {
+                console.error('Compression error:', err);
+                progressText.textContent = 'Error: Could not process this PDF. It may be encrypted or corrupted.';
+                progressBarFill.style.width = '0%';
+                compressBtn.disabled = false;
+                compressBtn.innerHTML = '<i class="fas fa-compress"></i> Try Again';
+            }
+        });
+
+        // Download
+        downloadBtn.addEventListener('click', () => {
+            if (!compressedBytes) return;
+
+            const originalName = uploadedFile.name.replace(/\.pdf$/i, '');
+            const newFileName = originalName + '-compressed.pdf';
+
+            const blob = new Blob([compressedBytes], { type: 'application/pdf' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = newFileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+
+        // Compress Another
+        compressAnotherBtn.addEventListener('click', () => {
+            uploadedFile = null;
+            originalBytes = null;
+            compressedBytes = null;
+            fileInput.value = '';
+            progressSection.classList.remove('active');
+            progressBarFill.style.width = '0%';
+            compressBtn.disabled = false;
+            compressBtn.innerHTML = '<i class="fas fa-compress"></i> Compress PDF';
+            showState('upload');
+        });
+
+        // Init
+        showState('upload');
+    </script>
+</body>
+</html>
