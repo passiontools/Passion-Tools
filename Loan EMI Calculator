@@ -81,12 +81,18 @@
 
         /* --- Header --- */
         header {
-            background-color: var(--bg-card);
+            background-color: rgba(255, 255, 255, 0.75); /* Light mode glass */
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--border-color);
             position: sticky;
             top: 0;
             z-index: 100;
             transition: var(--transition);
+        }
+
+        [data-theme="dark"] header {
+            background-color: rgba(30, 41, 59, 0.75); /* Dark mode glass */
         }
 
         .container {
@@ -107,13 +113,33 @@
             font-size: 24px;
             font-weight: 800;
             text-decoration: none;
-            color: var(--text-main);
             letter-spacing: -0.5px;
             display: flex;
             align-items: center;
+            background: transparent;
+            border: none;
+            padding: 0;
         }
 
-        .logo span {
+        .logo-passion {
+            color: #000000;
+            transition: none; /* Disables hover effects strictly on 'Passion' */
+        }
+
+        [data-theme="dark"] .logo-passion {
+            color: #ffffff;
+        }
+
+        /* Enforce NO hover effect on "Passion" */
+        .logo:hover .logo-passion {
+            color: #000000; 
+        }
+        
+        [data-theme="dark"] .logo:hover .logo-passion {
+            color: #ffffff;
+        }
+
+        .logo-tools {
             background: var(--brand-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -133,33 +159,29 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            transition: var(--transition);
+            background: transparent;
+            border: none;
+            padding: 0;
+            transition: color 0.3s ease;
         }
 
-        .btn-back:hover {
+        .btn-back:hover,
+        .btn-back:hover i {
             color: var(--brand-red);
-        }
-
-        .header-divider {
-            width: 1px;
-            height: 20px;
-            background-color: var(--border-color);
         }
 
         .theme-toggle {
             background: transparent;
             border: none;
-            color: var(--text-muted);
-            font-size: 18px;
+            font-size: 20px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: var(--transition);
+            transition: transform 0.3s ease;
         }
 
         .theme-toggle:hover {
-            color: var(--text-main);
             transform: scale(1.1);
         }
 
@@ -634,14 +656,13 @@
     <header>
         <div class="container">
             <div class="header-content">
-                <a href="index.html" class="logo">Passion<span>Tools</span></a>
+                <a href="#" onclick="event.preventDefault();" class="logo"><span class="logo-passion">Passion</span><span class="logo-tools">Tools</span></a>
                 <div class="header-actions">
                     <a href="index.html" class="btn-back">
                         <i class="fas fa-arrow-left"></i> Back to Tools
                     </a>
-                    <div class="header-divider"></div>
                     <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
-                        <i class="far fa-lightbulb"></i>
+                        🌙
                     </button>
                 </div>
             </div>
@@ -852,25 +873,36 @@
         };
 
         // --- Theme Management ---
-        function checkThemePreference() {
-            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        function setTheme(isDark) {
+            if (isDark) {
                 document.body.setAttribute('data-theme', 'dark');
-                DOM.themeToggle.innerHTML = '<i class="fas fa-lightbulb" style="color: #fbbf24;"></i>';
+                DOM.themeToggle.textContent = '☀️';
+                localStorage.setItem('passionToolsTheme', 'dark');
             } else {
-                DOM.themeToggle.innerHTML = '<i class="far fa-lightbulb"></i>';
+                document.body.removeAttribute('data-theme');
+                DOM.themeToggle.textContent = '🌙';
+                localStorage.setItem('passionToolsTheme', 'light');
+            }
+        }
+
+        function checkThemePreference() {
+            const savedTheme = localStorage.getItem('passionToolsTheme');
+            if (savedTheme === 'dark') {
+                setTheme(true);
+            } else if (savedTheme === 'light') {
+                setTheme(false);
+            } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                setTheme(true);
+            } else {
+                setTheme(false);
             }
         }
 
         DOM.themeToggle.addEventListener('click', () => {
             const isDark = document.body.getAttribute('data-theme') === 'dark';
-            if (isDark) {
-                document.body.removeAttribute('data-theme');
-                DOM.themeToggle.innerHTML = '<i class="far fa-lightbulb"></i>';
-            } else {
-                document.body.setAttribute('data-theme', 'dark');
-                DOM.themeToggle.innerHTML = '<i class="fas fa-lightbulb" style="color: #fbbf24;"></i>';
-            }
+            setTheme(!isDark);
         });
+        
         checkThemePreference();
 
         // --- Synchronization (Input <-> Slider) ---
