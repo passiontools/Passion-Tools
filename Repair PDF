@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Repair PDF — PassionTools</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <style>
+        :root {
+            --red: #ef4444;
+            --purple: #a855f7;
+            --blue: #3b82f6;
+            --blue-dark: #2563eb;
+            --green: #22c55e;
+            --bg-color: #f9fafb;
+            --card-bg: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --hover-gray: #f3f4f6;
+            --btn-action-bg: #fef2f2;
+            --footer-bg: #111827;
+            --logo-passion: #000000;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #020617;
+            --card-bg: #111827;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border-color: #1e293b;
+            --hover-gray: #1e293b;
+            --btn-action-bg: #450a0a;
+            --footer-bg: #020617;
+            --logo-passion: #ffffff;
+        }
+
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Header */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            background: rgba(255, 255, 255, 0.72);
+            border-bottom: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        [data-theme="dark"] .header {
+            background: rgba(2, 6, 23, 0.72);
+        }
+
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            text-decoration: none;
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .logo-passion {
+            color: var(--logo-passion);
+            transition: color 0.3s ease;
+        }
+
+        .logo-tools {
+            background: linear-gradient(135deg, var(--red), var(--purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .back-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.3s ease;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+
+        .back-link:hover {
+            color: var(--red);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 4px;
+            line-height: 1;
+            transition: transform 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.15);
+        }
+
+        /* Main */
+        .main {
+            flex: 1;
+            max-width: 720px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 48px 24px 64px;
+        }
+
+        /* Tool Header */
+        .tool-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .tool-title {
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 10px;
+        }
+
+        .tool-subtitle {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            max-width: 520px;
+            margin: 0 auto;
+        }
+
+        /* Card */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 32px;
+            transition: all 0.3s ease;
+        }
+
+        /* Upload Area */
+        .upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 56px 32px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .upload-area:hover,
+        .upload-area.drag-over {
+            border-color: var(--blue);
+            background: rgba(59, 130, 246, 0.04);
+        }
+
+        [data-theme="dark"] .upload-area:hover,
+        [data-theme="dark"] .upload-area.drag-over {
+            background: rgba(59, 130, 246, 0.08);
+        }
+
+        .upload-area input[type="file"] {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .upload-icon {
+            font-size: 40px;
+            color: var(--blue);
+            margin-bottom: 16px;
+        }
+
+        .upload-text-primary {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-primary);
+        }
+
+        .upload-text-secondary {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* State containers */
+        .state-hidden {
+            display: none !important;
+        }
+
+        /* Workspace */
+        .workspace {
+            display: none;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: var(--hover-gray);
+            border-radius: 10px;
+            margin-bottom: 24px;
+            transition: background 0.3s ease;
+        }
+
+        .file-info-icon {
+            font-size: 28px;
+            color: var(--red);
+            flex-shrink: 0;
+        }
+
+        .file-info-details {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .file-info-name {
+            font-size: 14px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .file-info-size {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .file-info-remove {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 16px;
+            padding: 4px;
+            transition: color 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .file-info-remove:hover {
+            color: var(--red);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            padding: 12px 28px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .btn-blue {
+            background: var(--blue);
+            color: #ffffff;
+        }
+
+        .btn-blue:hover:not(:disabled) {
+            background: var(--blue-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
+        }
+
+        .btn-blue:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-ghost:hover {
+            border-color: var(--blue);
+            color: var(--blue);
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .btn .btn-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2.5px solid rgba(255,255,255,0.3);
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            flex-shrink: 0;
+        }
+
+        /* Progress */
+        .progress-area {
+            display: none;
+            text-align: center;
+            padding: 16px 0 4px;
+        }
+
+        .progress-bar-track {
+            width: 100%;
+            height: 6px;
+            background: var(--hover-gray);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 14px;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--blue), var(--purple));
+            border-radius: 3px;
+            transition: width 0.4s ease;
+        }
+
+        .progress-text {
+            font-size: 13px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .progress-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2.5px solid var(--border-color);
+            border-top-color: var(--blue);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            flex-shrink: 0;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Repair details log */
+        .repair-log {
+            margin-top: 16px;
+            padding: 14px 16px;
+            background: var(--hover-gray);
+            border-radius: 10px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            font-family: 'Inter', monospace;
+            max-height: 140px;
+            overflow-y: auto;
+        }
+
+        .repair-log-entry {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+
+        .repair-log-entry .log-icon {
+            flex-shrink: 0;
+            font-size: 10px;
+        }
+
+        .log-success { color: var(--green); }
+        .log-info { color: var(--blue); }
+        .log-warn { color: #f59e0b; }
+
+        /* Result Banners */
+        .result-area {
+            display: none;
+        }
+
+        .banner {
+            padding: 20px;
+            border-radius: 12px;
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            margin-bottom: 8px;
+        }
+
+        .banner-icon {
+            font-size: 22px;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .banner-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .banner-text-title {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .banner-text-desc {
+            font-size: 13px;
+            line-height: 1.55;
+        }
+
+        .banner-success {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.25);
+        }
+
+        .banner-success .banner-icon { color: var(--green); }
+        .banner-success .banner-text-title { color: var(--green); }
+        .banner-success .banner-text-desc { color: var(--text-secondary); }
+
+        .banner-error {
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .banner-error .banner-icon { color: var(--red); }
+        .banner-error .banner-text-title { color: var(--red); }
+        .banner-error .banner-text-desc { color: var(--text-secondary); }
+
+        .banner-warning {
+            background: rgba(245, 158, 11, 0.08);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        .banner-warning .banner-icon { color: #f59e0b; }
+        .banner-warning .banner-text-title { color: #f59e0b; }
+        .banner-warning .banner-text-desc { color: var(--text-secondary); }
+
+        .repair-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 12px 8px;
+            background: var(--hover-gray);
+            border-radius: 8px;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--footer-bg);
+            text-align: center;
+            padding: 30px 20px;
+            font-size: 14px;
+            color: #94a3b8;
+            transition: background 0.3s ease;
+        }
+
+        /* Invalid file banner */
+        .invalid-file-msg {
+            display: none;
+            margin-top: 16px;
+            padding: 12px 16px;
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            border-radius: 10px;
+            font-size: 13px;
+            color: var(--red);
+            text-align: center;
+            font-weight: 500;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .main {
+                padding: 32px 16px 48px;
+            }
+
+            .card {
+                padding: 24px 18px;
+            }
+
+            .upload-area {
+                padding: 40px 20px;
+            }
+
+            .tool-title {
+                font-size: 26px;
+            }
+
+            .tool-subtitle {
+                font-size: 14px;
+            }
+
+            .btn {
+                font-size: 14px;
+                padding: 12px 20px;
+            }
+
+            .banner {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .repair-stats {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="header-inner">
+            <a href="#" class="logo" onclick="event.preventDefault();">
+                <span class="logo-passion">Passion</span><span class="logo-tools">Tools</span>
+            </a>
+            <div class="header-actions">
+                <a href="index.html" class="back-link">
+                    <i class="fas fa-arrow-left"></i> Back to Tools
+                </a>
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">☀️</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="tool-header">
+            <h1 class="tool-title">Repair PDF</h1>
+            <p class="tool-subtitle">Fix corrupted or damaged PDF files by rebuilding their internal structure. 100% private in-browser processing.</p>
+        </div>
+
+        <div class="card">
+
+            <div id="uploadState">
+                <div class="upload-area" id="uploadArea">
+                    <input type="file" id="fileInput" accept=".pdf,application/pdf">
+                    <div class="upload-icon">
+                        <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="12" y="12" width="40" height="40" rx="20" fill="var(--blue)" opacity="0.1"/>
+                            <path d="M22 42C17.5817 42 14 38.4183 14 34C14 29.5817 17.5817 26 22 26C23.3807 18.2683 30.9818 13.9164 38.3312 16.0734C42.6622 17.3444 46 21.3378 46 26C50.4183 26 54 29.5817 54 34C54 38.4183 50.4183 42 46 42H22Z" stroke="var(--blue)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M34 36V24M34 24L28 30M34 24L40 30" stroke="var(--blue)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="upload-text-primary">Click or Drag & Drop damaged PDF here</div>
+                    <div class="upload-text-secondary">Supports .pdf files</div>
+                </div>
+                <div class="invalid-file-msg" id="invalidFileMsg">
+                    <i class="fas fa-triangle-exclamation"></i> Please select a valid PDF file.
+                </div>
+            </div>
+
+            <div class="workspace" id="workspaceState">
+                <div class="file-info" id="fileInfoBar">
+                    <i class="fas fa-file-pdf file-info-icon"></i>
+                    <div class="file-info-details">
+                        <div class="file-info-name" id="fileName">document.pdf</div>
+                        <div class="file-info-size" id="fileSize">0 KB</div>
+                    </div>
+                    <button class="file-info-remove" id="removeFileBtn" aria-label="Remove file"><i class="fas fa-xmark"></i></button>
+                </div>
+
+                <button class="btn btn-blue" id="repairBtn">
+                    <i class="fas fa-wrench"></i> Attempt Repair
+                </button>
+
+                <div class="progress-area" id="progressArea">
+                    <div class="progress-bar-track">
+                        <div class="progress-bar-fill" id="progressBarFill"></div>
+                    </div>
+                    <div class="progress-text">
+                        <span class="progress-spinner" id="progressSpinner"></span>
+                        <span id="progressText">Analyzing structure...</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="result-area" id="resultState">
+
+                <div id="successResult" style="display:none;">
+                    <div class="banner banner-success">
+                        <i class="fas fa-circle-check banner-icon"></i>
+                        <div class="banner-content">
+                            <div class="banner-text-title">Document successfully rebuilt!</div>
+                            <div class="banner-text-desc" id="successMessage">The PDF structure has been repaired. Cross-reference tables and internal objects have been reconstructed.</div>
+                        </div>
+                    </div>
+                    <div class="repair-stats" id="repairStats">
+                        <div class="stat-item">
+                            <div class="stat-value" id="statPages">0</div>
+                            <div class="stat-label">Pages Recovered</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="statOrigSize">0</div>
+                            <div class="stat-label">Original Size</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="statNewSize">0</div>
+                            <div class="stat-label">Repaired Size</div>
+                        </div>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-blue" id="downloadBtn">
+                            <i class="fas fa-download"></i> Download Repaired PDF
+                        </button>
+                        <button class="btn btn-ghost" id="repairAnotherBtn">
+                            <i class="fas fa-rotate-left"></i> Repair Another File
+                        </button>
+                    </div>
+                </div>
+
+                <div id="errorResult" style="display:none;">
+                    <div class="banner banner-error">
+                        <i class="fas fa-circle-xmark banner-icon"></i>
+                        <div class="banner-content">
+                            <div class="banner-text-title">Repair Failed</div>
+                            <div class="banner-text-desc" id="errorMessage">This file is too severely corrupted to be repaired in the browser. The core data is unreadable.</div>
+                        </div>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-ghost" id="tryAnotherBtn">
+                            <i class="fas fa-rotate-left"></i> Try Another File
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="footer">
+        &copy; 2026 Passion Tools. Secure client-side processing.
+    </footer>
+
+    <script>
+        /* ============================================
+           THEME TOGGLE
+        ============================================ */
+        const themeToggle = document.getElementById('themeToggle');
+        const htmlEl = document.documentElement;
+
+        function applyTheme(theme) {
+            htmlEl.setAttribute('data-theme', theme);
+            themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+            localStorage.setItem('pt-theme', theme);
+        }
+
+        applyTheme(localStorage.getItem('pt-theme') || 'light');
+
+        themeToggle.addEventListener('click', function() {
+            var current = htmlEl.getAttribute('data-theme');
+            applyTheme(current === 'dark' ? 'light' : 'dark');
+        });
+
+        /* ============================================
+           DOM REFERENCES
+        ============================================ */
+        var uploadArea     = document.getElementById('uploadArea');
+        var fileInput      = document.getElementById('fileInput');
+        var invalidFileMsg = document.getElementById('invalidFileMsg');
+        var uploadState    = document.getElementById('uploadState');
+        var workspaceState = document.getElementById('workspaceState');
+        var resultState    = document.getElementById('resultState');
+        var successResult  = document.getElementById('successResult');
+        var errorResult    = document.getElementById('errorResult');
+        var fileInfoBar    = document.getElementById('fileInfoBar');
+        var fileNameEl     = document.getElementById('fileName');
+        var fileSizeEl     = document.getElementById('fileSize');
+        var removeFileBtn  = document.getElementById('removeFileBtn');
+        var repairBtn      = document.getElementById('repairBtn');
+        var progressArea   = document.getElementById('progressArea');
+        var progressBarFill= document.getElementById('progressBarFill');
+        var progressSpinner= document.getElementById('progressSpinner');
+        var progressTextEl = document.getElementById('progressText');
+        var downloadBtn    = document.getElementById('downloadBtn');
+        var repairAnotherBtn = document.getElementById('repairAnotherBtn');
+        var tryAnotherBtn  = document.getElementById('tryAnotherBtn');
+        var errorMessage   = document.getElementById('errorMessage');
+        var successMessage = document.getElementById('successMessage');
+        var statPages      = document.getElementById('statPages');
+        var statOrigSize   = document.getElementById('statOrigSize');
+        var statNewSize    = document.getElementById('statNewSize');
+        var repairStats    = document.getElementById('repairStats');
+
+        var uploadedFile   = null;
+        var uploadedBuffer = null;
+        var repairedBytes  = null;
+        var isProcessing   = false;
+
+        /* ============================================
+           UTILITY FUNCTIONS
+        ============================================ */
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            var k = 1024;
+            var sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            var i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        }
+
+        function delay(ms) {
+            return new Promise(function(resolve) { setTimeout(resolve, ms); });
+        }
+
+        /* ============================================
+           STATE MANAGEMENT
+        ============================================ */
+        function showState(state) {
+            uploadState.style.display    = state === 'upload'    ? 'block' : 'none';
+            workspaceState.style.display = state === 'workspace' ? 'block' : 'none';
+            resultState.style.display    = state === 'result'    ? 'block' : 'none';
+
+            if (state !== 'result') {
+                successResult.style.display = 'none';
+                errorResult.style.display   = 'none';
+            }
+        }
+
+        function resetAll() {
+            uploadedFile   = null;
+            uploadedBuffer = null;
+            repairedBytes  = null;
+            isProcessing   = false;
+            fileInput.value = '';
+            invalidFileMsg.style.display = 'none';
+            progressArea.style.display   = 'none';
+            progressBarFill.style.width  = '0%';
+            progressSpinner.style.display = 'inline-block';
+            repairBtn.disabled = false;
+            repairBtn.innerHTML = '<i class="fas fa-wrench"></i> Attempt Repair';
+            fileInfoBar.style.display = 'flex';
+            showState('upload');
+        }
+
+        function setProgress(percent, text) {
+            progressBarFill.style.width = percent + '%';
+            progressTextEl.textContent = text;
+        }
+
+        /* ============================================
+           FILE VALIDATION & HANDLING
+        ============================================ */
+        function isPDFFile(file) {
+            if (!file) return false;
+            var name = file.name.toLowerCase();
+            if (name.endsWith('.pdf')) return true;
+            if (file.type === 'application/pdf') return true;
+            return false;
+        }
+
+        function checkPDFHeader(buffer) {
+            // Check for %PDF magic bytes (may be at offset 0 or within first 1024 bytes)
+            var bytes = new Uint8Array(buffer, 0, Math.min(1024, buffer.byteLength));
+            var header = '';
+            for (var i = 0; i < Math.min(bytes.length, 5); i++) {
+                header += String.fromCharCode(bytes[i]);
+            }
+            if (header.indexOf('%PDF') === 0) return true;
+
+            // Search further in the buffer for %PDF header
+            var searchStr = '';
+            for (var j = 0; j < bytes.length; j++) {
+                searchStr += String.fromCharCode(bytes[j]);
+            }
+            return searchStr.indexOf('%PDF') !== -1;
+        }
+
+        function handleFile(file) {
+            if (!file) return;
+
+            invalidFileMsg.style.display = 'none';
+
+            if (!isPDFFile(file)) {
+                invalidFileMsg.style.display = 'block';
+                fileInput.value = '';
+                return;
+            }
+
+            uploadedFile = file;
+            fileNameEl.textContent = file.name;
+            fileSizeEl.textContent = formatBytes(file.size);
+            showState('workspace');
+        }
+
+        /* ============================================
+           DRAG & DROP (with counter to avoid flicker)
+        ============================================ */
+        var dragCounter = 0;
+
+        uploadArea.addEventListener('dragenter', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dragCounter++;
+            uploadArea.classList.add('drag-over');
+        });
+
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        });
+
+        uploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dragCounter--;
+            if (dragCounter <= 0) {
+                dragCounter = 0;
+                uploadArea.classList.remove('drag-over');
+            }
+        });
+
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dragCounter = 0;
+            uploadArea.classList.remove('drag-over');
+            var files = e.dataTransfer.files;
+            if (files && files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', function(e) {
+            var files = e.target.files;
+            if (files && files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        /* ============================================
+           BUTTON EVENTS
+        ============================================ */
+        removeFileBtn.addEventListener('click', function() {
+            resetAll();
+        });
+
+        repairAnotherBtn.addEventListener('click', function() {
+            resetAll();
+        });
+
+        tryAnotherBtn.addEventListener('click', function() {
+            resetAll();
+        });
+
+        /* ============================================
+           REPAIR ENGINE — MULTI-STRATEGY
+        ============================================ */
+
+        /**
+         * Strategy 1: Standard forgiving load + rebuild
+         * Load the PDF with ignoreEncryption, copy all pages to a fresh document.
+         */
+        async function repairStrategy1(buffer) {
+            var PDFDocument = PDFLib.PDFDocument;
+
+            var srcDoc = await PDFDocument.load(buffer, {
+                ignoreEncryption: true,
+                updateMetadata: false
+            });
+
+            var pageCount = srcDoc.getPageCount();
+            if (pageCount === 0) {
+                throw new Error('Document loaded but contains zero pages.');
+            }
+
+            setProgress(55, 'Rebuilding xref tables...');
+            await delay(400);
+
+            var newDoc = await PDFDocument.create();
+
+            // Try to copy metadata
+            try {
+                var title = srcDoc.getTitle();
+                var author = srcDoc.getAuthor();
+                var subject = srcDoc.getSubject();
+                var creator = srcDoc.getCreator();
+                var producer = srcDoc.getProducer();
+                if (title) newDoc.setTitle(title);
+                if (author) newDoc.setAuthor(author);
+                if (subject) newDoc.setSubject(subject);
+                if (creator) newDoc.setCreator(creator);
+                if (producer) newDoc.setProducer(producer + ' (Repaired by PassionTools)');
+                else newDoc.setProducer('PassionTools PDF Repair');
+            } catch(metaErr) {
+                // Metadata copy failed, not critical
+                newDoc.setProducer('PassionTools PDF Repair');
+            }
+
+            setProgress(65, 'Copying pages to new structure...');
+            await delay(300);
+
+            // Copy pages in batches for large documents
+            var indices = [];
+            for (var i = 0; i < pageCount; i++) {
+                indices.push(i);
+            }
+
+            var copiedPages = await newDoc.copyPages(srcDoc, indices);
+            for (var j = 0; j < copiedPages.length; j++) {
+                newDoc.addPage(copiedPages[j]);
+            }
+
+            setProgress(85, 'Serializing repaired document...');
+            await delay(300);
+
+            var savedBytes = await newDoc.save();
+
+            return {
+                bytes: savedBytes,
+                pageCount: pageCount,
+                strategy: 'Full rebuild'
+            };
+        }
+
+        /**
+         * Strategy 2: Page-by-page recovery
+         * When bulk copy fails, try copying pages one at a time, skipping broken ones.
+         */
+        async function repairStrategy2(buffer) {
+            var PDFDocument = PDFLib.PDFDocument;
+
+            var srcDoc = await PDFDocument.load(buffer, {
+                ignoreEncryption: true,
+                updateMetadata: false
+            });
+
+            var totalPages = srcDoc.getPageCount();
+            if (totalPages === 0) {
+                throw new Error('Document contains zero pages.');
+            }
+
+            setProgress(55, 'Attempting page-by-page recovery...');
+            await delay(300);
+
+            var newDoc = await PDFDocument.create();
+            newDoc.setProducer('PassionTools PDF Repair');
+
+            var recoveredCount = 0;
+            var failedPages = [];
+
+            for (var i = 0; i < totalPages; i++) {
+                try {
+                    var copiedArr = await newDoc.copyPages(srcDoc, [i]);
+                    if (copiedArr && copiedArr.length > 0) {
+                        newDoc.addPage(copiedArr[0]);
+                        recoveredCount++;
+                    }
+                } catch(pageErr) {
+                    failedPages.push(i + 1);
+                }
+
+                var pct = 55 + Math.round((i / totalPages) * 30);
+                setProgress(pct, 'Recovering page ' + (i + 1) + ' of ' + totalPages + '...');
+                await delay(50);
+            }
+
+            if (recoveredCount === 0) {
+                throw new Error('Could not recover any pages from the document.');
+            }
+
+            setProgress(88, 'Serializing recovered document...');
+            await delay(300);
+
+            var savedBytes = await newDoc.save();
+
+            return {
+                bytes: savedBytes,
+                pageCount: recoveredCount,
+                totalPages: totalPages,
+                failedPages: failedPages,
+                strategy: 'Page-by-page recovery'
+            };
+        }
+
+        /**
+         * Strategy 3: Raw byte repair — fix common structural issues
+         * Patches missing EOF, fixes broken headers, then tries to load again.
+         */
+        async function repairStrategy3(buffer) {
+            setProgress(40, 'Attempting raw byte-level repair...');
+            await delay(400);
+
+            var bytes = new Uint8Array(buffer);
+            var text = '';
+            // Only convert what we need — first and last chunks
+            var CHUNK = 4096;
+
+            // Read the beginning
+            var startText = '';
+            for (var s = 0; s < Math.min(CHUNK, bytes.length); s++) {
+                startText += String.fromCharCode(bytes[s]);
+            }
+
+            // Read the end
+            var endStart = Math.max(0, bytes.length - CHUNK);
+            var endText = '';
+            for (var e = endStart; e < bytes.length; e++) {
+                endText += String.fromCharCode(bytes[e]);
+            }
+
+            var patchedBuffer = buffer;
+            var patches = [];
+
+            // Check for missing/corrupt PDF header
+            if (startText.indexOf('%PDF') === -1) {
+                // Prepend a valid PDF header
+                var header = new TextEncoder().encode('%PDF-1.4\n');
+                var merged = new Uint8Array(header.length + bytes.length);
+                merged.set(header, 0);
+                merged.set(bytes, header.length);
+                patchedBuffer = merged.buffer;
+                patches.push('Added missing PDF header');
+            }
+
+            setProgress(50, 'Checking EOF marker...');
+            await delay(200);
+
+            // Check for missing %%EOF
+            if (endText.indexOf('%%EOF') === -1) {
+                var currentBytes = new Uint8Array(patchedBuffer);
+                var eofMarker = new TextEncoder().encode('\n%%EOF\n');
+                var merged2 = new Uint8Array(currentBytes.length + eofMarker.length);
+                merged2.set(currentBytes, 0);
+                merged2.set(eofMarker, currentBytes.length);
+                patchedBuffer = merged2.buffer;
+                patches.push('Added missing %%EOF marker');
+            }
+
+            setProgress(60, 'Re-loading patched document...');
+            await delay(300);
+
+            // Now try to load the patched version
+            var PDFDocument = PDFLib.PDFDocument;
+            var srcDoc = await PDFDocument.load(patchedBuffer, {
+                ignoreEncryption: true,
+                updateMetadata: false
+            });
+
+            var pageCount = srcDoc.getPageCount();
+
+            setProgress(75, 'Rebuilding from patched source...');
+            await delay(300);
+
+            var newDoc = await PDFDocument.create();
+            newDoc.setProducer('PassionTools PDF Repair');
+
+            if (pageCount > 0) {
+                var indices = [];
+                for (var i = 0; i < pageCount; i++) indices.push(i);
+
+                try {
+                    var copiedPages = await newDoc.copyPages(srcDoc, indices);
+                    for (var j = 0; j < copiedPages.length; j++) {
+                        newDoc.addPage(copiedPages[j]);
+                    }
+                } catch(copyErr) {
+                    // Fallback to page by page
+                    var recovered = 0;
+                    for (var k = 0; k < pageCount; k++) {
+                        try {
+                            var cp = await newDoc.copyPages(srcDoc, [k]);
+                            if (cp && cp.length > 0) {
+                                newDoc.addPage(cp[0]);
+                                recovered++;
+                            }
+                        } catch(pe) { /* skip broken page */ }
+                    }
+                    if (recovered === 0) throw new Error('No pages could be recovered.');
+                    pageCount = recovered;
+                }
+            } else {
+                throw new Error('Patched document still contains no pages.');
+            }
+
+            setProgress(90, 'Serializing repaired document...');
+            await delay(200);
+
+            var savedBytes = await newDoc.save();
+
+            return {
+                bytes: savedBytes,
+                pageCount: pageCount,
+                patches: patches,
+                strategy: 'Byte-level repair + rebuild'
+            };
+        }
+
+        /**
+         * Strategy 4: Create minimal placeholder when all else fails
+         * If the file seems to be a PDF but cannot be recovered,
+         * create a placeholder with error info.
+         */
+        async function repairStrategy4(buffer, originalName) {
+            setProgress(70, 'Creating recovery report...');
+            await delay(300);
+
+            var PDFDocument = PDFLib.PDFDocument;
+            var rgb = PDFLib.rgb;
+            var StandardFonts = PDFLib.StandardFonts;
+
+            var newDoc = await PDFDocument.create();
+            var page = newDoc.addPage([595.28, 841.89]); // A4
+            var font = await newDoc.embedFont(StandardFonts.Helvetica);
+            var fontBold = await newDoc.embedFont(StandardFonts.HelveticaBold);
+
+            var y = 780;
+            page.drawText('PDF Repair Report', { x: 50, y: y, size: 24, font: fontBold, color: rgb(0.2, 0.2, 0.2) });
+            y -= 35;
+            page.drawText('Generated by PassionTools', { x: 50, y: y, size: 11, font: font, color: rgb(0.5, 0.5, 0.5) });
+            y -= 40;
+
+            page.drawText('Original File: ' + originalName, { x: 50, y: y, size: 13, font: font, color: rgb(0.2, 0.2, 0.2) });
+            y -= 22;
+            page.drawText('Original Size: ' + formatBytes(buffer.byteLength), { x: 50, y: y, size: 13, font: font, color: rgb(0.2, 0.2, 0.2) });
+            y -= 35;
+
+            page.drawText('Status: The original PDF file was severely corrupted.', { x: 50, y: y, size: 13, font: fontBold, color: rgb(0.9, 0.2, 0.2) });
+            y -= 25;
+            page.drawText('The internal binary data could not be parsed or recovered.', { x: 50, y: y, size: 12, font: font, color: rgb(0.4, 0.4, 0.4) });
+            y -= 22;
+            page.drawText('Cross-reference tables, stream objects, or page tree were', { x: 50, y: y, size: 12, font: font, color: rgb(0.4, 0.4, 0.4) });
+            y -= 22;
+            page.drawText('damaged beyond what client-side repair can recover.', { x: 50, y: y, size: 12, font: font, color: rgb(0.4, 0.4, 0.4) });
+            y -= 35;
+
+            page.drawText('Suggestions:', { x: 50, y: y, size: 14, font: fontBold, color: rgb(0.2, 0.2, 0.2) });
+            y -= 24;
+            var suggestions = [
+                '1. Try re-downloading the original file from its source.',
+                '2. Check if you have an older backup of the file.',
+                '3. Use a desktop PDF repair tool like Adobe Acrobat Pro.',
+                '4. Try opening the file in a different PDF reader (e.g., Foxit).'
+            ];
+            for (var i = 0; i < suggestions.length; i++) {
+                page.drawText(suggestions[i], { x: 60, y: y, size: 11, font: font, color: rgb(0.35, 0.35, 0.35) });
+                y -= 20;
+            }
+
+            newDoc.setProducer('PassionTools PDF Repair');
+            var savedBytes = await newDoc.save();
+
+            return {
+                bytes: savedBytes,
+                pageCount: 1,
+                strategy: 'Recovery report generated',
+                isReport: true
+            };
+        }
+
+
+        /* ============================================
+           MAIN REPAIR HANDLER
+        ============================================ */
+        repairBtn.addEventListener('click', async function() {
+            if (!uploadedFile || isProcessing) return;
+            isProcessing = true;
+
+            // Disable button, show progress
+            repairBtn.disabled = true;
+            repairBtn.innerHTML = '<span class="btn-spinner"></span> Repairing...';
+            progressArea.style.display = 'block';
+            progressSpinner.style.display = 'inline-block';
+            fileInfoBar.style.display = 'none';
+
+            var result = null;
+            var finalError = null;
+
+            try {
+                // Step 1: Read file
+                setProgress(5, 'Reading file data...');
+                await delay(300);
+
+                uploadedBuffer = await uploadedFile.arrayBuffer();
+
+                // Step 2: Validate it looks like a PDF
+                setProgress(10, 'Validating file format...');
+                await delay(200);
+
+                var looksLikePDF = checkPDFHeader(uploadedBuffer);
+
+                if (uploadedBuffer.byteLength < 20) {
+                    throw new Error('FILE_TOO_SMALL');
+                }
+
+                setProgress(20, 'Analyzing document structure...');
+                await delay(400);
+
+                // Strategy 1: Standard forgiving rebuild
+                try {
+                    setProgress(30, 'Loading document (standard mode)...');
+                    await delay(200);
+                    result = await repairStrategy1(uploadedBuffer);
+                } catch(e1) {
+                    console.warn('Strategy 1 failed:', e1.message);
+
+                    // Strategy 2: Page-by-page recovery
+                    try {
+                        setProgress(40, 'Standard load failed. Trying page-by-page recovery...');
+                        await delay(400);
+                        result = await repairStrategy2(uploadedBuffer);
+                    } catch(e2) {
+                        console.warn('Strategy 2 failed:', e2.message);
+
+                        // Strategy 3: Raw byte patching + reload
+                        if (looksLikePDF) {
+                            try {
+                                setProgress(35, 'Page recovery failed. Attempting byte-level repair...');
+                                await delay(400);
+                                result = await repairStrategy3(uploadedBuffer);
+                            } catch(e3) {
+                                console.warn('Strategy 3 failed:', e3.message);
+                                finalError = e3;
+                            }
+                        } else {
+                            finalError = new Error('NOT_A_PDF');
+                        }
+                    }
+                }
+
+                if (!result && !finalError) {
+                    finalError = new Error('ALL_STRATEGIES_FAILED');
+                }
+
+            } catch(outerErr) {
+                console.error('Repair outer error:', outerErr);
+                finalError = outerErr;
+            }
+
+            // ---- SHOW RESULTS ----
+            isProcessing = false;
+
+            if (result && result.bytes) {
+                // SUCCESS
+                repairedBytes = result.bytes;
+
+                setProgress(100, 'Repair complete!');
+                progressSpinner.style.display = 'none';
+                await delay(500);
+
+                showState('result');
+                successResult.style.display = 'block';
+                errorResult.style.display   = 'none';
+
+                // Stats
+                statPages.textContent   = result.pageCount;
+                statOrigSize.textContent = formatBytes(uploadedBuffer.byteLength);
+                statNewSize.textContent  = formatBytes(result.bytes.byteLength);
+
+                // Build success message
+                var msg = 'The PDF structure has been repaired using ' + result.strategy + '. ';
+                msg += result.pageCount + ' page' + (result.pageCount !== 1 ? 's' : '') + ' recovered. ';
+                if (result.failedPages && result.failedPages.length > 0) {
+                    msg += 'Warning: Page(s) ' + result.failedPages.join(', ') + ' could not be recovered. ';
+                }
+                if (result.patches && result.patches.length > 0) {
+                    msg += 'Patches applied: ' + result.patches.join(', ') + '. ';
+                }
+                msg += 'Cross-reference tables and internal objects have been reconstructed.';
+                successMessage.textContent = msg;
+
+                if (result.isReport) {
+                    successMessage.textContent = 'The original PDF was too damaged to recover its content. A recovery report PDF has been generated with suggestions for next steps.';
+                    document.querySelector('#successResult .banner').className = 'banner banner-warning';
+                    document.querySelector('#successResult .banner-text-title').textContent = 'Recovery report generated';
+                    document.querySelector('#successResult .banner-icon').className = 'fas fa-triangle-exclamation banner-icon';
+                } else {
+                    document.querySelector('#successResult .banner').className = 'banner banner-success';
+                    document.querySelector('#successResult .banner-text-title').textContent = 'Document successfully rebuilt!';
+                    document.querySelector('#successResult .banner-icon').className = 'fas fa-circle-check banner-icon';
+                }
+
+            } else {
+                // FAILURE
+                setProgress(100, 'Repair failed.');
+                progressSpinner.style.display = 'none';
+                await delay(400);
+
+                showState('result');
+                errorResult.style.display   = 'block';
+                successResult.style.display = 'none';
+
+                // Determine error message
+                var errMsg = '';
+                if (finalError) {
+                    if (finalError.message === 'NOT_A_PDF' || finalError.message === 'FILE_TOO_SMALL') {
+                        errMsg = 'The selected file does not appear to be a valid PDF document. Please check the file and try again.';
+                    } else if (finalError.message.indexOf('encrypted') !== -1) {
+                        errMsg = 'This PDF is encrypted with a security method that cannot be bypassed in the browser. Try removing the password first with a dedicated tool.';
+                    } else if (finalError.message.indexOf('password') !== -1) {
+                        errMsg = 'This PDF is password-protected. The file needs to be decrypted before it can be repaired.';
+                    } else {
+                        errMsg = 'This file is too severely corrupted to be repaired in the browser. The internal structure (xref tables, stream objects, page tree) is damaged beyond recovery. Try using a desktop tool like Adobe Acrobat Pro for deeper repair.';
+                    }
+                } else {
+                    errMsg = 'An unexpected error occurred during the repair process. The file may be corrupted beyond what browser-based repair can handle.';
+                }
+                errorMessage.textContent = errMsg;
+            }
+        });
+
+        /* ============================================
+           DOWNLOAD HANDLER
+        ============================================ */
+        downloadBtn.addEventListener('click', function() {
+            if (!repairedBytes || !uploadedFile) return;
+
+            try {
+                var blob = new Blob([repairedBytes], { type: 'application/pdf' });
+                var url = URL.createObjectURL(blob);
+                var a = document.createElement('a');
+                var originalName = uploadedFile.name.replace(/\.pdf$/i, '');
+                a.href = url;
+                a.download = originalName + '-repaired.pdf';
+                a.style.display = 'none';
+                document.body.appendChild(a);
+                a.click();
+
+                // Cleanup after a short delay
+                setTimeout(function() {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 500);
+            } catch(dlErr) {
+                console.error('Download failed:', dlErr);
+                alert('Download failed. Please try again.');
+            }
+        });
+    </script>
+
+</body>
+</html>
