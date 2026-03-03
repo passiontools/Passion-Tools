@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML/CSS/JS Minifier - PassionTools</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/terser@5.31.0/dist/bundle.min.js"></script>
+    <style>
+        :root {
+            --red: #ef4444;
+            --purple: #a855f7;
+            --blue: #3b82f6;
+            --blue-dark: #2563eb;
+            --green: #22c55e;
+
+            --bg-color: #f9fafb;
+            --card-bg: #ffffff;
+            --text-primary: #000000;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --hover-gray: #f3f4f6;
+            --btn-action-bg: #fef2f2;
+            --error-bg: #fee2e2;
+            --error-text: #991b1b;
+            --footer-bg: #111827;
+            --logo-passion: #000000;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #020617;
+            --card-bg: #111827;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --border-color: #1e293b;
+            --hover-gray: #1e293b;
+            --btn-action-bg: #450a0a;
+            --error-bg: #7f1d1d;
+            --error-text: #f87171;
+            --footer-bg: #020617;
+            --logo-passion: #ffffff;
+        }
+
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* ─── Header ─── */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            background: rgba(255, 255, 255, 0.72);
+            border-bottom: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        [data-theme="dark"] .header {
+            background: rgba(2, 6, 23, 0.72);
+        }
+
+        .header-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            text-decoration: none;
+            font-size: 22px;
+            font-weight: 700;
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .logo-passion {
+            color: var(--logo-passion);
+            transition: color 0.3s ease;
+        }
+
+        .logo-tools {
+            background: linear-gradient(135deg, var(--red), var(--purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .back-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: var(--red);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            background: var(--hover-gray);
+        }
+
+        /* ─── Main Content ─── */
+        .main {
+            flex: 1;
+            max-width: 1280px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 40px 24px 60px;
+        }
+
+        /* ─── Tool Header ─── */
+        .tool-header {
+            text-align: center;
+            margin-bottom: 36px;
+        }
+
+        .tool-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+            transition: color 0.3s ease;
+        }
+
+        .tool-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+            max-width: 640px;
+            margin: 0 auto;
+            line-height: 1.6;
+            font-weight: 400;
+            transition: color 0.3s ease;
+        }
+
+        /* ─── Workspace Card ─── */
+        .workspace {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        /* ─── Tab Bar ─── */
+        .tab-bar {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 4px;
+            gap: 0;
+            background: var(--card-bg);
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn {
+            position: relative;
+            padding: 14px 24px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: transparent;
+            border-radius: 2px 2px 0 0;
+            transition: background 0.3s ease;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-primary);
+            background: var(--hover-gray);
+        }
+
+        .tab-btn.active {
+            color: var(--blue);
+        }
+
+        .tab-btn.active::after {
+            background: var(--blue);
+        }
+
+        .tab-icon {
+            font-size: 15px;
+        }
+
+        /* ─── Editor Grid ─── */
+        .editor-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            min-height: 420px;
+        }
+
+        .editor-pane {
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .editor-pane + .editor-pane {
+            border-left: 1px solid var(--border-color);
+        }
+
+        .pane-label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--text-secondary);
+            padding: 12px 16px 0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.3s ease;
+        }
+
+        .pane-label i {
+            font-size: 12px;
+        }
+
+        .editor-textarea {
+            flex: 1;
+            width: 100%;
+            padding: 12px 16px 16px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 13px;
+            line-height: 1.7;
+            color: var(--text-primary);
+            background: transparent;
+            border: none;
+            outline: none;
+            resize: none;
+            tab-size: 2;
+            transition: color 0.3s ease;
+        }
+
+        .editor-textarea::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.6;
+        }
+
+        .editor-textarea.error-state {
+            color: var(--error-text);
+            background: var(--error-bg);
+            border-radius: 0 0 8px 0;
+            transition: all 0.3s ease;
+        }
+
+        /* ─── Action Bar ─── */
+        .action-bar {
+            border-top: 1px solid var(--border-color);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .action-buttons {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--blue);
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            background: var(--blue-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
+        }
+
+        .btn-ghost-blue {
+            background: transparent;
+            color: var(--blue);
+            border: 1px solid var(--blue);
+        }
+
+        .btn-ghost-blue:hover {
+            background: rgba(59, 130, 246, 0.08);
+            transform: translateY(-1px);
+        }
+
+        .btn-ghost-red {
+            background: transparent;
+            color: var(--red);
+            border: 1px solid var(--red);
+        }
+
+        .btn-ghost-red:hover {
+            background: var(--btn-action-bg);
+            transform: translateY(-1px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        /* ─── Stats ─── */
+        .stats {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            transition: color 0.3s ease;
+        }
+
+        .stats .saved-value {
+            color: var(--green);
+            font-weight: 700;
+        }
+
+        .stats-divider {
+            color: var(--border-color);
+            margin: 0 2px;
+        }
+
+        /* ─── Toast ─── */
+        .toast {
+            position: fixed;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--card-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ─── Footer ─── */
+        .footer {
+            background: var(--footer-bg);
+            text-align: center;
+            padding: 30px 20px;
+            font-size: 14px;
+            color: #94a3b8;
+            transition: background-color 0.3s ease;
+        }
+
+        /* ─── Responsive ─── */
+        @media (max-width: 768px) {
+            .main {
+                padding: 28px 16px 48px;
+            }
+
+            .tool-title {
+                font-size: 24px;
+            }
+
+            .tool-subtitle {
+                font-size: 14px;
+            }
+
+            .editor-grid {
+                grid-template-columns: 1fr;
+                min-height: auto;
+            }
+
+            .editor-pane + .editor-pane {
+                border-left: none;
+                border-top: 1px solid var(--border-color);
+            }
+
+            .editor-textarea {
+                min-height: 220px;
+            }
+
+            .action-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .action-buttons {
+                justify-content: center;
+            }
+
+            .stats {
+                justify-content: center;
+                text-align: center;
+            }
+
+            .tab-btn {
+                padding: 12px 16px;
+                font-size: 13px;
+            }
+
+            .header-inner {
+                padding: 0 16px;
+            }
+
+            .back-link span {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .action-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ═══ Header ═══ -->
+    <header class="header">
+        <div class="header-inner">
+            <a href="#" onclick="event.preventDefault();" class="logo">
+                <span class="logo-passion">Passion</span><span class="logo-tools">Tools</span>
+            </a>
+            <div class="header-actions">
+                <a href="index.html" class="back-link">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Back to Tools</span>
+                </a>
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">☀️</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ═══ Main ═══ -->
+    <main class="main">
+        <!-- Tool Header -->
+        <div class="tool-header">
+            <h1 class="tool-title">HTML/CSS/JS Minifier</h1>
+            <p class="tool-subtitle">Compress and optimize your code to reduce file sizes and improve website load times. 100% private in-browser processing.</p>
+        </div>
+
+        <!-- Workspace -->
+        <div class="workspace">
+            <!-- Tab Bar -->
+            <div class="tab-bar">
+                <button class="tab-btn active" data-lang="html">
+                    <i class="fa-brands fa-html5 tab-icon"></i> HTML
+                </button>
+                <button class="tab-btn" data-lang="css">
+                    <i class="fa-brands fa-css3-alt tab-icon"></i> CSS
+                </button>
+                <button class="tab-btn" data-lang="js">
+                    <i class="fa-brands fa-js tab-icon"></i> JavaScript
+                </button>
+            </div>
+
+            <!-- Editor Grid -->
+            <div class="editor-grid">
+                <div class="editor-pane">
+                    <div class="pane-label"><i class="fa-solid fa-code"></i> Input</div>
+                    <textarea class="editor-textarea" id="inputEditor" placeholder="Paste your raw code here..." spellcheck="false"></textarea>
+                </div>
+                <div class="editor-pane">
+                    <div class="pane-label"><i class="fa-solid fa-compress"></i> Output</div>
+                    <textarea class="editor-textarea" id="outputEditor" readonly placeholder="Minified output will appear here..." spellcheck="false"></textarea>
+                </div>
+            </div>
+
+            <!-- Action Bar -->
+            <div class="action-bar">
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="btnMinify">
+                        <i class="fa-solid fa-bolt"></i> Minify Code
+                    </button>
+                    <button class="btn btn-ghost-blue" id="btnCopy">
+                        <i class="fa-regular fa-copy"></i> Copy Output
+                    </button>
+                    <button class="btn btn-ghost-red" id="btnClear">
+                        <i class="fa-solid fa-xmark"></i> Clear
+                    </button>
+                </div>
+                <div class="stats" id="statsDisplay">
+                    <span>Original Size: <strong>0 Bytes</strong></span>
+                    <span class="stats-divider">|</span>
+                    <span>Minified Size: <strong>0 Bytes</strong></span>
+                    <span class="stats-divider">|</span>
+                    <span>Saved: <strong class="saved-value">0%</strong></span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ═══ Footer ═══ -->
+    <footer class="footer">
+        © 2026 Passion Tools. Secure client-side processing.
+    </footer>
+
+    <!-- ═══ Toast ═══ -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ─── DOM References ───
+        const inputEditor = document.getElementById('inputEditor');
+        const outputEditor = document.getElementById('outputEditor');
+        const btnMinify = document.getElementById('btnMinify');
+        const btnCopy = document.getElementById('btnCopy');
+        const btnClear = document.getElementById('btnClear');
+        const statsDisplay = document.getElementById('statsDisplay');
+        const themeToggle = document.getElementById('themeToggle');
+        const toastEl = document.getElementById('toast');
+        const tabBtns = document.querySelectorAll('.tab-btn');
+
+        let activeLang = 'html';
+        let toastTimeout;
+
+        // ─── Theme ───
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+            localStorage.setItem('passion-tools-theme', theme);
+        }
+
+        function initTheme() {
+            const saved = localStorage.getItem('passion-tools-theme');
+            if (saved) {
+                applyTheme(saved);
+            } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                applyTheme('dark');
+            }
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const current = document.documentElement.getAttribute('data-theme');
+            applyTheme(current === 'dark' ? 'light' : 'dark');
+        });
+
+        initTheme();
+
+        // ─── Tabs ───
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                tabBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                activeLang = btn.dataset.lang;
+            });
+        });
+
+        // ─── Utility: Byte Size ───
+        function getByteSize(str) {
+            return new Blob([str]).size;
+        }
+
+        // ─── Utility: Format Bytes ───
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            if (bytes < 1024) return bytes + ' Bytes';
+            return (bytes / 1024).toFixed(2) + ' KB';
+        }
+
+        // ─── Update Stats ───
+        function updateStats(original, minified) {
+            const origSize = getByteSize(original);
+            const minSize = getByteSize(minified);
+            const saved = origSize > 0 ? ((1 - minSize / origSize) * 100).toFixed(1) : 0;
+
+            statsDisplay.innerHTML = `
+                <span>Original Size: <strong>${formatBytes(origSize)}</strong></span>
+                <span class="stats-divider">|</span>
+                <span>Minified Size: <strong>${formatBytes(minSize)}</strong></span>
+                <span class="stats-divider">|</span>
+                <span>Saved: <strong class="saved-value">${saved}%</strong></span>
+            `;
+        }
+
+        // ─── Toast ───
+        function showToast(message, icon = 'fa-check') {
+            clearTimeout(toastTimeout);
+            toastEl.innerHTML = `<i class="fa-solid ${icon}"></i> ${message}`;
+            toastEl.classList.add('show');
+            toastTimeout = setTimeout(() => toastEl.classList.remove('show'), 2500);
+        }
+
+        // ─── Minify CSS ───
+        function minifyCSS(code) {
+            let result = code;
+            // Remove comments
+            result = result.replace(/\/\*[\s\S]*?\*\//g, '');
+            // Remove newlines and carriage returns
+            result = result.replace(/[\r\n]+/g, '');
+            // Remove extra spaces around selectors and braces
+            result = result.replace(/\s*{\s*/g, '{');
+            result = result.replace(/\s*}\s*/g, '}');
+            result = result.replace(/\s*;\s*/g, ';');
+            result = result.replace(/\s*:\s*/g, ':');
+            result = result.replace(/\s*,\s*/g, ',');
+            // Remove trailing semicolons before closing braces
+            result = result.replace(/;}/g, '}');
+            // Collapse remaining multiple spaces
+            result = result.replace(/\s{2,}/g, ' ');
+            return result.trim();
+        }
+
+        // ─── Minify HTML ───
+        function minifyHTML(code) {
+            let result = code;
+            // Remove HTML comments
+            result = result.replace(/<!--[\s\S]*?-->/g, '');
+            // Remove newlines and carriage returns
+            result = result.replace(/[\r\n]+/g, '');
+            // Remove spaces between tags
+            result = result.replace(/>\s+</g, '><');
+            // Collapse multiple spaces into one
+            result = result.replace(/\s{2,}/g, ' ');
+            return result.trim();
+        }
+
+        // ─── Minify JS (Terser) ───
+        async function minifyJS(code) {
+            try {
+                const result = await Terser.minify(code);
+                if (result.error) throw result.error;
+                return { success: true, code: result.code };
+            } catch (err) {
+                return { success: false, error: `Syntax Error: ${err.message}` };
+            }
+        }
+
+        // ─── Clear Error State ───
+        function clearErrorState() {
+            outputEditor.classList.remove('error-state');
+        }
+
+        // ─── Minify Handler ───
+        btnMinify.addEventListener('click', async () => {
+            const input = inputEditor.value;
+            clearErrorState();
+
+            if (!input.trim()) {
+                showToast('Please paste some code first.', 'fa-triangle-exclamation');
+                return;
+            }
+
+            let output = '';
+
+            if (activeLang === 'html') {
+                output = minifyHTML(input);
+                outputEditor.value = output;
+                updateStats(input, output);
+                showToast('HTML minified successfully!', 'fa-check');
+            } else if (activeLang === 'css') {
+                output = minifyCSS(input);
+                outputEditor.value = output;
+                updateStats(input, output);
+                showToast('CSS minified successfully!', 'fa-check');
+            } else if (activeLang === 'js') {
+                btnMinify.disabled = true;
+                btnMinify.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Minifying...';
+
+                const result = await minifyJS(input);
+
+                if (result.success) {
+                    outputEditor.value = result.code;
+                    updateStats(input, result.code);
+                    showToast('JavaScript minified successfully!', 'fa-check');
+                } else {
+                    outputEditor.value = result.error;
+                    outputEditor.classList.add('error-state');
+                    updateStats(input, '');
+                    showToast('JavaScript syntax error detected.', 'fa-triangle-exclamation');
+                }
+
+                btnMinify.disabled = false;
+                btnMinify.innerHTML = '<i class="fa-solid fa-bolt"></i> Minify Code';
+            }
+        });
+
+        // ─── Copy ───
+        btnCopy.addEventListener('click', async () => {
+            const output = outputEditor.value;
+            if (!output.trim()) {
+                showToast('Nothing to copy.', 'fa-triangle-exclamation');
+                return;
+            }
+            try {
+                await navigator.clipboard.writeText(output);
+                showToast('Copied to clipboard!', 'fa-copy');
+            } catch {
+                // Fallback
+                outputEditor.select();
+                document.execCommand('copy');
+                showToast('Copied to clipboard!', 'fa-copy');
+            }
+        });
+
+        // ─── Clear ───
+        btnClear.addEventListener('click', () => {
+            inputEditor.value = '';
+            outputEditor.value = '';
+            clearErrorState();
+            statsDisplay.innerHTML = `
+                <span>Original Size: <strong>0 Bytes</strong></span>
+                <span class="stats-divider">|</span>
+                <span>Minified Size: <strong>0 Bytes</strong></span>
+                <span class="stats-divider">|</span>
+                <span>Saved: <strong class="saved-value">0%</strong></span>
+            `;
+            showToast('Workspace cleared.', 'fa-xmark');
+        });
+    </script>
+</body>
+</html>
