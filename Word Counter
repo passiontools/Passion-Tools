@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Counter & Text Analyzer | PassionTools</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ========== CSS Variables ========== */
+        :root {
+            --red: #ef4444;
+            --purple: #a855f7;
+            --blue: #3b82f6;
+            --blue-dark: #2563eb;
+            --green: #22c55e;
+
+            --bg-color: #f9fafb;
+            --card-bg: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --hover-gray: #f3f4f6;
+            --btn-action-bg: #fef2f2;
+            --logo-passion: #000000;
+            --footer-bg: #111827;
+
+            --header-bg: rgba(255, 255, 255, 0.72);
+            --header-border: rgba(229, 231, 235, 0.6);
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #020617;
+            --card-bg: #111827;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border-color: #1e293b;
+            --hover-gray: #1e293b;
+            --btn-action-bg: #450a0a;
+            --logo-passion: #ffffff;
+            --footer-bg: #020617;
+
+            --header-bg: rgba(2, 6, 23, 0.72);
+            --header-border: rgba(30, 41, 59, 0.6);
+        }
+
+        /* ========== Reset & Base ========== */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            line-height: 1.6;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* ========== Header ========== */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: var(--header-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--header-border);
+            padding: 0 24px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+        }
+
+        .logo-link {
+            display: inline-flex;
+            align-items: center;
+            font-size: 1.35rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .logo-passion {
+            color: var(--logo-passion);
+            transition: color 0.3s ease;
+        }
+
+        .logo-tools {
+            background: linear-gradient(135deg, var(--red), var(--purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: color 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: var(--red);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.3rem;
+            line-height: 1;
+            padding: 4px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+        }
+
+        .theme-toggle:hover {
+            background: var(--hover-gray);
+        }
+
+        /* ========== Main Content ========== */
+        .main {
+            flex: 1;
+            width: 100%;
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 40px 20px 60px;
+        }
+
+        /* ========== Tool Header ========== */
+        .tool-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .tool-title {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            transition: color 0.3s ease;
+        }
+
+        .tool-subtitle {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            max-width: 560px;
+            margin: 0 auto;
+            font-weight: 400;
+            line-height: 1.6;
+            transition: color 0.3s ease;
+        }
+
+        /* ========== Stats Dashboard ========== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 18px 14px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--blue), var(--purple));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .stat-card:hover {
+            border-color: var(--blue);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.1);
+        }
+
+        .stat-card:hover::before {
+            opacity: 1;
+        }
+
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            line-height: 1.2;
+            margin-bottom: 4px;
+            transition: color 0.3s ease;
+            letter-spacing: -0.5px;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: color 0.3s ease;
+        }
+
+        /* ========== Editor Area ========== */
+        .editor-wrapper {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            margin-bottom: 16px;
+        }
+
+        .editor-wrapper:focus-within {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+        }
+
+        .text-area {
+            width: 100%;
+            min-height: 300px;
+            padding: 20px 24px;
+            border: none;
+            outline: none;
+            background: transparent;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            line-height: 1.8;
+            resize: vertical;
+            transition: color 0.3s ease;
+        }
+
+        .text-area::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+
+        /* ========== Action Bar ========== */
+        .action-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 22px;
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            line-height: 1;
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+        }
+
+        .btn-primary {
+            background: var(--blue);
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            background: var(--blue-dark);
+            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
+        }
+
+        .btn-primary.copied {
+            background: var(--green);
+        }
+
+        .btn-danger {
+            background: transparent;
+            color: var(--red);
+            border: 1.5px solid var(--red);
+        }
+
+        .btn-danger:hover {
+            background: var(--btn-action-bg);
+        }
+
+        /* ========== Footer ========== */
+        .footer {
+            text-align: center;
+            padding: 30px 20px;
+            font-size: 14px;
+            color: #94a3b8;
+            background: var(--footer-bg);
+            transition: background-color 0.3s ease;
+            margin-top: auto;
+        }
+
+        /* ========== Responsive ========== */
+        @media (max-width: 900px) {
+            .stats-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+            .stat-card {
+                padding: 14px 10px;
+            }
+
+            .stat-value {
+                font-size: 1.4rem;
+            }
+
+            .tool-title {
+                font-size: 1.5rem;
+            }
+
+            .tool-subtitle {
+                font-size: 0.85rem;
+            }
+
+            .main {
+                padding: 28px 14px 48px;
+            }
+
+            .text-area {
+                padding: 16px;
+                font-size: 0.9rem;
+                min-height: 240px;
+            }
+
+            .header {
+                padding: 0 14px;
+            }
+
+            .header-actions {
+                gap: 12px;
+            }
+
+            .back-link span {
+                display: none;
+            }
+
+            .action-bar {
+                flex-direction: column;
+            }
+
+            .action-bar .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* ========== Animations ========== */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .tool-header {
+            animation: fadeInUp 0.5s ease;
+        }
+
+        .stats-grid {
+            animation: fadeInUp 0.5s ease 0.1s both;
+        }
+
+        .editor-wrapper {
+            animation: fadeInUp 0.5s ease 0.2s both;
+        }
+
+        .action-bar {
+            animation: fadeInUp 0.5s ease 0.3s both;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ========== Header ========== -->
+    <header class="header">
+        <a href="#" onclick="event.preventDefault();" class="logo-link">
+            <span class="logo-passion">Passion</span><span class="logo-tools">Tools</span>
+        </a>
+        <div class="header-actions">
+            <a href="index.html" class="back-link">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Back to Tools</span>
+            </a>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                ☀️
+            </button>
+        </div>
+    </header>
+
+    <!-- ========== Main Content ========== -->
+    <main class="main">
+
+        <!-- Tool Header -->
+        <div class="tool-header">
+            <h1 class="tool-title">Word Counter & Text Analyzer</h1>
+            <p class="tool-subtitle">Instantly count words, characters, sentences, and estimate reading time. 100% private in-browser processing.</p>
+        </div>
+
+        <!-- Stats Dashboard -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="statWords">0</div>
+                <div class="stat-label">Words</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statCharsSpaces">0</div>
+                <div class="stat-label">Characters (spaces)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statCharsNoSpaces">0</div>
+                <div class="stat-label">Characters (no spaces)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statSentences">0</div>
+                <div class="stat-label">Sentences</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statParagraphs">0</div>
+                <div class="stat-label">Paragraphs</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statReadingTime">0 min</div>
+                <div class="stat-label">Est. Reading Time</div>
+            </div>
+        </div>
+
+        <!-- Editor Area -->
+        <div class="editor-wrapper">
+            <textarea class="text-area" id="textArea" placeholder="Type or paste your text here to begin analyzing..."></textarea>
+        </div>
+
+        <!-- Action Bar -->
+        <div class="action-bar">
+            <button class="btn btn-primary" id="copyBtn" onclick="copyText()">
+                <i class="fa-regular fa-copy"></i>
+                <span id="copyLabel">Copy Text</span>
+            </button>
+            <button class="btn btn-danger" onclick="clearText()">
+                <i class="fa-regular fa-trash-can"></i>
+                Clear Text
+            </button>
+        </div>
+
+    </main>
+
+    <!-- ========== Footer ========== -->
+    <footer class="footer">
+        © 2026 Passion Tools. Secure client-side processing.
+    </footer>
+
+    <!-- ========== JavaScript ========== -->
+    <script>
+        // DOM Elements
+        const textArea = document.getElementById('textArea');
+        const statWords = document.getElementById('statWords');
+        const statCharsSpaces = document.getElementById('statCharsSpaces');
+        const statCharsNoSpaces = document.getElementById('statCharsNoSpaces');
+        const statSentences = document.getElementById('statSentences');
+        const statParagraphs = document.getElementById('statParagraphs');
+        const statReadingTime = document.getElementById('statReadingTime');
+        const themeToggle = document.getElementById('themeToggle');
+        const copyBtn = document.getElementById('copyBtn');
+        const copyLabel = document.getElementById('copyLabel');
+
+        // ===== Text Analysis =====
+        function analyzeText() {
+            const text = textArea.value;
+
+            // Words
+            const words = text.trim().split(/\s+/).filter(w => w.length > 0);
+            const wordCount = text.trim() === '' ? 0 : words.length;
+
+            // Characters (with spaces)
+            const charsWithSpaces = text.length;
+
+            // Characters (no spaces)
+            const charsNoSpaces = text.replace(/\s/g, '').length;
+
+            // Sentences
+            const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+            const sentenceCount = text.trim() === '' ? 0 : sentences.length;
+
+            // Paragraphs
+            const paragraphs = text.split(/\n+/).filter(p => p.trim().length > 0);
+            const paragraphCount = text.trim() === '' ? 0 : paragraphs.length;
+
+            // Reading Time (225 wpm)
+            const readingTime = wordCount === 0 ? 0 : Math.ceil(wordCount / 225);
+
+            // Update DOM
+            statWords.textContent = wordCount;
+            statCharsSpaces.textContent = charsWithSpaces;
+            statCharsNoSpaces.textContent = charsNoSpaces;
+            statSentences.textContent = sentenceCount;
+            statParagraphs.textContent = paragraphCount;
+            statReadingTime.textContent = readingTime + ' min';
+        }
+
+        textArea.addEventListener('input', analyzeText);
+
+        // ===== Copy Text =====
+        function copyText() {
+            if (!textArea.value.trim()) return;
+
+            navigator.clipboard.writeText(textArea.value).then(() => {
+                copyBtn.classList.add('copied');
+                copyLabel.textContent = 'Copied!';
+                copyBtn.querySelector('i').className = 'fa-solid fa-check';
+
+                setTimeout(() => {
+                    copyBtn.classList.remove('copied');
+                    copyLabel.textContent = 'Copy Text';
+                    copyBtn.querySelector('i').className = 'fa-regular fa-copy';
+                }, 2000);
+            });
+        }
+
+        // ===== Clear Text =====
+        function clearText() {
+            textArea.value = '';
+            analyzeText();
+            textArea.focus();
+        }
+
+        // ===== Theme Toggle =====
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+        }
+
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            applyTheme(next);
+            localStorage.setItem('passion-tools-theme', next);
+        }
+
+        themeToggle.addEventListener('click', toggleTheme);
+
+        // Init theme from localStorage
+        (function initTheme() {
+            const saved = localStorage.getItem('passion-tools-theme');
+            if (saved) {
+                applyTheme(saved);
+            } else {
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                applyTheme(prefersDark ? 'dark' : 'light');
+            }
+        })();
+    </script>
+
+</body>
+</html>
