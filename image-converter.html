@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live UV Index Checker | PassionTools</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --red: #ef4444;
+            --purple: #a855f7;
+            --blue: #3b82f6;
+            --blue-dark: #2563eb;
+            --green: #22c55e;
+
+            --uv-low: #289500;
+            --uv-moderate: #f7e400;
+            --uv-high: #f85900;
+            --uv-very-high: #d8001d;
+            --uv-extreme: #6b49c8;
+
+            --bg-color: #f9fafb;
+            --card-bg: #ffffff;
+            --text-primary: #000000;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --hover-gray: #f3f4f6;
+            --btn-action-bg: #fef2f2;
+            --error-bg: #fee2e2;
+            --error-text: #991b1b;
+            --footer-bg: #111827;
+
+            --header-bg: rgba(255, 255, 255, 0.75);
+            --header-border: rgba(229, 231, 235, 0.6);
+            --logo-passion: #000000;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #020617;
+            --card-bg: #111827;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --border-color: #1e293b;
+            --hover-gray: #1e293b;
+            --btn-action-bg: #450a0a;
+            --error-bg: #7f1d1d;
+            --error-text: #f87171;
+            --footer-bg: #020617;
+
+            --header-bg: rgba(2, 6, 23, 0.75);
+            --header-border: rgba(30, 41, 59, 0.6);
+            --logo-passion: #ffffff;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            line-height: 1.6;
+        }
+
+        /* ========== HEADER ========== */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: var(--header-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--header-border);
+            padding: 0 24px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+        }
+
+        .logo-link {
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            background: none;
+            border: none;
+            outline: none;
+        }
+
+        .logo-text {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            line-height: 1;
+        }
+
+        .logo-passion {
+            color: var(--logo-passion);
+            transition: color 0.3s ease;
+        }
+
+        .logo-tools {
+            background: linear-gradient(135deg, var(--red), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .back-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: var(--red);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--hover-gray);
+        }
+
+        /* ========== MAIN CONTENT ========== */
+        .main-content {
+            flex: 1;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px 60px;
+        }
+
+        /* ========== TOOL HEADER ========== */
+        .tool-header {
+            text-align: center;
+            margin-bottom: 36px;
+        }
+
+        .tool-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+            margin-bottom: 10px;
+            transition: color 0.3s ease;
+        }
+
+        .tool-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+            font-weight: 400;
+            max-width: 520px;
+            margin: 0 auto;
+            transition: color 0.3s ease;
+        }
+
+        /* ========== SEARCH BAR ========== */
+        .search-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px 18px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 12px;
+            background-color: var(--card-bg);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            font-weight: 400;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .search-input:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 22px;
+            border-radius: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background-color: var(--blue);
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--blue-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
+        }
+
+        .btn-ghost {
+            background: none;
+            color: var(--blue);
+            border: 1.5px solid var(--blue);
+        }
+
+        .btn-ghost:hover {
+            background-color: rgba(59, 130, 246, 0.08);
+            transform: translateY(-1px);
+        }
+
+        /* ========== RESULTS AREA ========== */
+        .results-container {
+            transition: all 0.3s ease;
+        }
+
+        /* Initial State */
+        .initial-state {
+            text-align: center;
+            padding: 60px 20px 50px;
+            background-color: var(--card-bg);
+            border: 1.5px solid var(--border-color);
+            border-radius: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .initial-logo-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 28px;
+        }
+
+        .initial-logo-svg {
+            width: 160px;
+            height: 160px;
+        }
+
+        .initial-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            transition: color 0.3s ease;
+        }
+
+        .initial-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+            transition: color 0.3s ease;
+            max-width: 380px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Loading State */
+        .loading-state {
+            text-align: center;
+            padding: 80px 20px;
+            display: none;
+        }
+
+        .spinner {
+            width: 44px;
+            height: 44px;
+            border: 4px solid var(--border-color);
+            border-top-color: var(--blue);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* Error State */
+        .error-state {
+            display: none;
+            text-align: center;
+            padding: 28px 24px;
+            background-color: var(--error-bg);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .error-state i {
+            font-size: 24px;
+            color: var(--error-text);
+            margin-bottom: 10px;
+        }
+
+        .error-text {
+            font-size: 14px;
+            color: var(--error-text);
+            font-weight: 500;
+        }
+
+        /* Dashboard */
+        .dashboard {
+            display: none;
+            animation: fadeUp 0.5s ease;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .location-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+            transition: border-color 0.3s ease;
+        }
+
+        .location-header i {
+            color: var(--red);
+            font-size: 18px;
+        }
+
+        .location-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            transition: color 0.3s ease;
+        }
+
+        .location-coords {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 400;
+            margin-left: auto;
+            transition: color 0.3s ease;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto auto;
+            gap: 20px;
+        }
+
+        /* Primary UV Card */
+        .uv-primary-card {
+            grid-column: 1 / 2;
+            grid-row: 1 / 3;
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            padding: 36px 28px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border: 2px solid var(--border-color);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .uv-primary-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            border-radius: 20px 20px 0 0;
+            transition: background-color 0.3s ease;
+        }
+
+        .uv-label-top {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 12px;
+            transition: color 0.3s ease;
+        }
+
+        .uv-number {
+            font-size: 84px;
+            font-weight: 800;
+            line-height: 1;
+            margin-bottom: 8px;
+            transition: color 0.3s ease;
+        }
+
+        .uv-classification {
+            font-size: 20px;
+            font-weight: 700;
+            padding: 6px 20px;
+            border-radius: 30px;
+            margin-top: 8px;
+            transition: all 0.3s ease;
+        }
+
+        /* Max Daily Card */
+        .uv-max-card {
+            grid-column: 2 / 3;
+            grid-row: 1 / 2;
+            background-color: var(--card-bg);
+            border: 1.5px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .uv-max-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.3s ease;
+        }
+
+        .uv-max-label i {
+            color: var(--red);
+            font-size: 14px;
+        }
+
+        .uv-max-value {
+            font-size: 40px;
+            font-weight: 800;
+            line-height: 1;
+            margin-bottom: 6px;
+            transition: color 0.3s ease;
+        }
+
+        .uv-max-subtext {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 400;
+            transition: color 0.3s ease;
+        }
+
+        /* Advice Card */
+        .uv-advice-card {
+            grid-column: 2 / 3;
+            grid-row: 2 / 3;
+            background-color: var(--card-bg);
+            border: 1.5px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .advice-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.3s ease;
+        }
+
+        .advice-label i {
+            color: var(--blue);
+            font-size: 14px;
+        }
+
+        .advice-text {
+            font-size: 14px;
+            color: var(--text-primary);
+            font-weight: 400;
+            line-height: 1.7;
+            transition: color 0.3s ease;
+        }
+
+        /* ========== FOOTER ========== */
+        .footer {
+            background-color: var(--footer-bg);
+            text-align: center;
+            padding: 30px 20px;
+            font-size: 14px;
+            color: #94a3b8;
+            transition: background-color 0.3s ease;
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 640px) {
+            .tool-title {
+                font-size: 26px;
+            }
+
+            .tool-subtitle {
+                font-size: 14px;
+            }
+
+            .search-container {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto;
+            }
+
+            .uv-primary-card {
+                grid-column: 1 / -1;
+                grid-row: auto;
+            }
+
+            .uv-max-card {
+                grid-column: 1 / -1;
+                grid-row: auto;
+            }
+
+            .uv-advice-card {
+                grid-column: 1 / -1;
+                grid-row: auto;
+            }
+
+            .uv-number {
+                font-size: 64px;
+            }
+
+            .location-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+
+            .location-coords {
+                margin-left: 0;
+            }
+
+            .header {
+                padding: 0 16px;
+            }
+
+            .header-actions {
+                gap: 12px;
+            }
+
+            .back-link span {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ========== HEADER ========== -->
+    <header class="header">
+        <a href="#" onclick="event.preventDefault();" class="logo-link">
+            <span class="logo-text">
+                <span class="logo-passion">Passion</span><span class="logo-tools">Tools</span>
+            </span>
+        </a>
+        <div class="header-actions">
+            <a href="index.html" class="back-link">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Back to Tools</span>
+            </a>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">☀️</button>
+        </div>
+    </header>
+
+    <!-- ========== MAIN ========== -->
+    <main class="main-content">
+
+        <!-- Tool Header -->
+        <div class="tool-header">
+            <h1 class="tool-title">Live UV Index Checker</h1>
+            <p class="tool-subtitle">Check real-time ultraviolet radiation levels and get sun protection advice instantly.</p>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-container">
+            <input
+                type="text"
+                class="search-input"
+                id="cityInput"
+                placeholder="Enter a city name (e.g., Miami, Tokyo, London)..."
+                autocomplete="off"
+            >
+            <button class="btn btn-primary" id="searchBtn" onclick="handleSearch()">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                Search
+            </button>
+            <button class="btn btn-ghost" id="locationBtn" onclick="handleLocation()">
+                <i class="fa-solid fa-crosshairs"></i>
+                Use My Location
+            </button>
+        </div>
+
+        <!-- Results Container -->
+        <div class="results-container">
+
+            <!-- Initial State -->
+            <div class="initial-state" id="initialState">
+                <div class="initial-logo-wrap">
+                    <svg class="initial-logo-svg" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <radialGradient id="sunBody" cx="50%" cy="45%" r="50%">
+                                <stop offset="0%" stop-color="#FFD97A"/>
+                                <stop offset="45%" stop-color="#FFB830"/>
+                                <stop offset="100%" stop-color="#F97316"/>
+                            </radialGradient>
+                            <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
+                                <stop offset="0%" stop-color="#FBBF24" stop-opacity="0.18"/>
+                                <stop offset="100%" stop-color="#FBBF24" stop-opacity="0"/>
+                            </radialGradient>
+                            <linearGradient id="rayGrad" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stop-color="#FBBF24"/>
+                                <stop offset="100%" stop-color="#F97316"/>
+                            </linearGradient>
+                            <linearGradient id="uvBadge" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0%" stop-color="#ef4444"/>
+                                <stop offset="100%" stop-color="#a855f7"/>
+                            </linearGradient>
+                        </defs>
+
+                        <!-- Soft ambient glow -->
+                        <circle cx="80" cy="72" r="72" fill="url(#sunGlow)"/>
+
+                        <!-- Rays — 8 tapered wedges -->
+                        <g opacity="0.8">
+                            <!-- Top -->
+                            <polygon points="80,14 76,30 84,30" fill="url(#rayGrad)"/>
+                            <!-- Top-right -->
+                            <polygon points="121.3,30.7 111,40 117,46" fill="url(#rayGrad)"/>
+                            <!-- Right -->
+                            <polygon points="138,72 122,68 122,76" fill="url(#rayGrad)"/>
+                            <!-- Bottom-right -->
+                            <polygon points="121.3,113.3 117,98 111,104" fill="url(#rayGrad)"/>
+                            <!-- Bottom -->
+                            <polygon points="80,130 84,114 76,114" fill="url(#rayGrad)"/>
+                            <!-- Bottom-left -->
+                            <polygon points="38.7,113.3 43,98 49,104" fill="url(#rayGrad)"/>
+                            <!-- Left -->
+                            <polygon points="22,72 38,68 38,76" fill="url(#rayGrad)"/>
+                            <!-- Top-left -->
+                            <polygon points="38.7,30.7 49,40 43,46" fill="url(#rayGrad)"/>
+                        </g>
+
+                        <!-- Sun body -->
+                        <circle cx="80" cy="72" r="36" fill="url(#sunBody)"/>
+
+                        <!-- Inner specular highlight -->
+                        <ellipse cx="72" cy="60" rx="14" ry="10" fill="white" opacity="0.25"/>
+
+                        <!-- Small secondary highlight -->
+                        <ellipse cx="66" cy="66" rx="5" ry="3.5" fill="white" opacity="0.15"/>
+
+                        <!-- UV badge pill -->
+                        <rect x="59" y="79" rx="10" ry="10" width="42" height="20" fill="url(#uvBadge)" opacity="0.92"/>
+                        <text x="80" y="93" text-anchor="middle" font-family="Inter, sans-serif" font-weight="800" font-size="12" fill="white" letter-spacing="2">UV</text>
+
+                        <!-- Subtle ring around sun -->
+                        <circle cx="80" cy="72" r="36" fill="none" stroke="#F97316" stroke-width="1" opacity="0.18"/>
+
+                        <!-- Bottom tagline arc dots (decorative scale) -->
+                        <circle cx="42" cy="146" r="3.5" fill="#289500" opacity="0.7"/>
+                        <circle cx="58" cy="148" r="3.5" fill="#f7e400" opacity="0.7"/>
+                        <circle cx="74" cy="149" r="3.5" fill="#f85900" opacity="0.7"/>
+                        <circle cx="90" cy="148" r="3.5" fill="#d8001d" opacity="0.7"/>
+                        <circle cx="106" cy="146" r="3.5" fill="#6b49c8" opacity="0.7"/>
+
+                        <!-- Scale connecting line -->
+                        <line x1="46" y1="146" x2="102" y2="146" stroke="var(--border-color)" stroke-width="1" opacity="0.4"/>
+                    </svg>
+                </div>
+                <p class="initial-title">Check the UV Index</p>
+                <p class="initial-subtitle">Search for a city or use your current location to see real-time UV radiation data and protection advice.</p>
+            </div>
+
+            <!-- Loading State -->
+            <div class="loading-state" id="loadingState">
+                <div class="spinner"></div>
+                <p class="loading-text">Fetching UV data...</p>
+            </div>
+
+            <!-- Error State -->
+            <div class="error-state" id="errorState">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <p class="error-text" id="errorText">Something went wrong.</p>
+            </div>
+
+            <!-- Dashboard -->
+            <div class="dashboard" id="dashboard">
+                <div class="location-header">
+                    <i class="fa-solid fa-location-dot"></i>
+                    <span class="location-name" id="locationName">—</span>
+                    <span class="location-coords" id="locationCoords">—</span>
+                </div>
+
+                <div class="dashboard-grid">
+
+                    <!-- Primary UV Card -->
+                    <div class="uv-primary-card" id="uvPrimaryCard">
+                        <span class="uv-label-top">Current UV Index</span>
+                        <div class="uv-number" id="uvNumber">—</div>
+                        <span class="uv-classification" id="uvClassification">—</span>
+                    </div>
+
+                    <!-- Max Daily UV -->
+                    <div class="uv-max-card">
+                        <span class="uv-max-label"><i class="fa-solid fa-arrow-up-right-dots"></i> Today's Peak</span>
+                        <div class="uv-max-value" id="uvMaxValue">—</div>
+                        <span class="uv-max-subtext">Expected maximum UV index today</span>
+                    </div>
+
+                    <!-- Sun Protection Advice -->
+                    <div class="uv-advice-card">
+                        <span class="advice-label"><i class="fa-solid fa-shield-halved"></i> Sun Protection Advice</span>
+                        <p class="advice-text" id="adviceText">—</p>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- ========== FOOTER ========== -->
+    <footer class="footer">
+        © 2026 Passion Tools. Secure client-side processing.
+    </footer>
+
+    <script>
+        // ==========================================
+        // THEME TOGGLE
+        // ==========================================
+        const themeToggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+
+        function applyTheme(theme) {
+            if (theme === 'dark') {
+                html.setAttribute('data-theme', 'dark');
+                themeToggle.textContent = '🌙';
+            } else {
+                html.removeAttribute('data-theme');
+                themeToggle.textContent = '☀️';
+            }
+        }
+
+        const savedTheme = localStorage.getItem('passiontools-theme') || 'light';
+        applyTheme(savedTheme);
+
+        themeToggle.addEventListener('click', () => {
+            const isDark = html.hasAttribute('data-theme');
+            const newTheme = isDark ? 'light' : 'dark';
+            applyTheme(newTheme);
+            localStorage.setItem('passiontools-theme', newTheme);
+        });
+
+        // ==========================================
+        // DOM REFERENCES
+        // ==========================================
+        const cityInput = document.getElementById('cityInput');
+        const initialState = document.getElementById('initialState');
+        const loadingState = document.getElementById('loadingState');
+        const errorState = document.getElementById('errorState');
+        const errorText = document.getElementById('errorText');
+        const dashboard = document.getElementById('dashboard');
+
+        const locationName = document.getElementById('locationName');
+        const locationCoords = document.getElementById('locationCoords');
+        const uvPrimaryCard = document.getElementById('uvPrimaryCard');
+        const uvNumber = document.getElementById('uvNumber');
+        const uvClassification = document.getElementById('uvClassification');
+        const uvMaxValue = document.getElementById('uvMaxValue');
+        const adviceText = document.getElementById('adviceText');
+
+        // ==========================================
+        // STATE MANAGEMENT
+        // ==========================================
+        function showState(state) {
+            initialState.style.display = 'none';
+            loadingState.style.display = 'none';
+            errorState.style.display = 'none';
+            dashboard.style.display = 'none';
+
+            if (state === 'initial') initialState.style.display = 'block';
+            else if (state === 'loading') loadingState.style.display = 'block';
+            else if (state === 'error') errorState.style.display = 'block';
+            else if (state === 'dashboard') dashboard.style.display = 'block';
+        }
+
+        function showError(msg) {
+            errorText.textContent = msg;
+            showState('error');
+        }
+
+        // ==========================================
+        // UV DATA LOGIC
+        // ==========================================
+        function getUvInfo(uv) {
+            const index = Math.round(uv * 10) / 10;
+            if (index <= 2) {
+                return {
+                    label: 'Low',
+                    color: 'var(--uv-low)',
+                    advice: 'No protection needed for most people. Safe to stay outside.'
+                };
+            } else if (index <= 5) {
+                return {
+                    label: 'Moderate',
+                    color: 'var(--uv-moderate)',
+                    advice: 'Some protection is required. Wear sunscreen if outside for long periods.'
+                };
+            } else if (index <= 7) {
+                return {
+                    label: 'High',
+                    color: 'var(--uv-high)',
+                    advice: 'Protection essential. Wear SPF 30+ sunscreen, a hat, and sunglasses. Reduce time in the sun between 10 AM and 4 PM.'
+                };
+            } else if (index <= 10) {
+                return {
+                    label: 'Very High',
+                    color: 'var(--uv-very-high)',
+                    advice: 'Extra protection needed. Avoid the sun between 10 AM and 4 PM. Apply sunscreen generously.'
+                };
+            } else {
+                return {
+                    label: 'Extreme',
+                    color: 'var(--uv-extreme)',
+                    advice: 'Take all precautions. Unprotected skin can burn in minutes. Avoid sun exposure.'
+                };
+            }
+        }
+
+        function getTextColorForBg(uvLabel) {
+            if (uvLabel === 'Moderate') return '#000000';
+            return '#ffffff';
+        }
+
+        // ==========================================
+        // RENDER DASHBOARD
+        // ==========================================
+        function renderDashboard(data, name, lat, lon) {
+            const currentUv = data.current.uv_index;
+            const maxUv = data.daily.uv_index_max[0];
+            const info = getUvInfo(currentUv);
+            const maxInfo = getUvInfo(maxUv);
+            const textColor = getTextColorForBg(info.label);
+
+            locationName.textContent = name;
+            locationCoords.textContent = `${parseFloat(lat).toFixed(2)}°, ${parseFloat(lon).toFixed(2)}°`;
+
+            uvNumber.textContent = currentUv.toFixed(1);
+            uvNumber.style.color = info.color;
+
+            uvClassification.textContent = info.label;
+            uvClassification.style.backgroundColor = info.color;
+            uvClassification.style.color = textColor;
+
+            uvPrimaryCard.style.borderColor = info.color;
+            uvPrimaryCard.querySelector('::before');
+            uvPrimaryCard.style.setProperty('--dynamic-uv-color', info.color);
+            document.documentElement.style.setProperty('--active-uv-bar', info.color);
+
+            uvMaxValue.textContent = maxUv.toFixed(1);
+            uvMaxValue.style.color = maxInfo.color;
+
+            adviceText.textContent = info.advice;
+
+            showState('dashboard');
+        }
+
+        // ==========================================
+        // FETCH UV DATA
+        // ==========================================
+        async function fetchUvData(lat, lon, displayName) {
+            showState('loading');
+
+            try {
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=uv_index&daily=uv_index_max&timezone=auto`;
+                const res = await fetch(url);
+
+                if (!res.ok) throw new Error('Failed to fetch UV data.');
+
+                const data = await res.json();
+
+                if (data.current === undefined || data.current.uv_index === undefined) {
+                    throw new Error('UV data not available for this location.');
+                }
+
+                renderDashboard(data, displayName, lat, lon);
+            } catch (err) {
+                showError(err.message || 'An error occurred while fetching UV data.');
+            }
+        }
+
+        // ==========================================
+        // SEARCH BY CITY
+        // ==========================================
+        async function handleSearch() {
+            const city = cityInput.value.trim();
+            if (!city) {
+                showError('Please enter a city name to search.');
+                return;
+            }
+
+            showState('loading');
+
+            try {
+                const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1`;
+                const geoRes = await fetch(geoUrl);
+
+                if (!geoRes.ok) throw new Error('Geocoding request failed.');
+
+                const geoData = await geoRes.json();
+
+                if (!geoData.results || geoData.results.length === 0) {
+                    showError('City not found. Please try another search.');
+                    return;
+                }
+
+                const place = geoData.results[0];
+                const displayName = [place.name, place.admin1, place.country].filter(Boolean).join(', ');
+
+                await fetchUvData(place.latitude, place.longitude, displayName);
+            } catch (err) {
+                showError(err.message || 'An error occurred while searching for the city.');
+            }
+        }
+
+        // ==========================================
+        // USE MY LOCATION
+        // ==========================================
+        function handleLocation() {
+            if (!navigator.geolocation) {
+                showError('Geolocation is not supported by your browser. Please use the search bar instead.');
+                return;
+            }
+
+            showState('loading');
+
+            navigator.geolocation.getCurrentPosition(
+                async (position) => {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    const displayName = `Your Location (${lat.toFixed(4)}°, ${lon.toFixed(4)}°)`;
+                    await fetchUvData(lat, lon, displayName);
+                },
+                (err) => {
+                    let msg = 'Unable to retrieve your location. Please use the search bar instead.';
+                    if (err.code === 1) {
+                        msg = 'Location access was denied. Please enable location permissions or use the search bar instead.';
+                    }
+                    showError(msg);
+                },
+                {
+                    enableHighAccuracy: false,
+                    timeout: 10000,
+                    maximumAge: 300000
+                }
+            );
+        }
+
+        // ==========================================
+        // ENTER KEY SUPPORT
+        // ==========================================
+        cityInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                handleSearch();
+            }
+        });
+    </script>
+
+</body>
+</html>
