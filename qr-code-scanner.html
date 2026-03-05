@@ -14,6 +14,8 @@
 
         :root {
             /* Global Colors */
+            --red: #ef4444;
+            --purple: #a855f7;
             --bg: #f8fafc;
             --card-bg: #ffffff;
             --text: #0f172a;
@@ -25,12 +27,7 @@
             --shadow-hover: 0 8px 32px rgba(0, 0, 0, 0.1);
             
             /* Header Specific Colors */
-            --logo-passion: #0f172a;
-            --nav-color: #64748b;
-            --nav-hover: #ef4444;
-            --divider-color: #cbd5e1;
-            --bulb-color: #64748b;
-            --bulb-hover: #0f172a;
+            --logo-passion: #000000;
             
             /* Footer */
             --footer-bg: #111827;
@@ -48,11 +45,7 @@
             --shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
             --shadow-hover: 0 8px 32px rgba(0, 0, 0, 0.4);
             
-            --logo-passion: #f8fafc;
-            --nav-color: #94a3b8;
-            --divider-color: #334155;
-            --bulb-color: #f8fafc;
-            --bulb-hover: #fbbf24;
+            --logo-passion: #ffffff;
             
             --footer-bg: #020617;
         }
@@ -98,15 +91,19 @@
             text-decoration: none;
             display: flex;
             align-items: center;
+            background: transparent;
+            border: none;
+            padding: 0;
+            margin: 0;
         }
 
         .logo-passion {
             color: var(--logo-passion);
-            transition: color 0.35s ease;
+            /* Absolutely no hover transition/color change */
         }
 
         .logo-tools {
-            background: linear-gradient(135deg, #ef4444, #a855f7);
+            background: linear-gradient(135deg, var(--red), var(--purple));
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -115,23 +112,27 @@
         .header-right {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 16px; /* Spacing only, absolutely no dividing lines */
         }
 
         .back-link {
             font-size: 15px;
-            font-weight: 500;
-            color: var(--nav-color);
+            font-weight: 600;
+            color: var(--text); /* Default text color */
             text-decoration: none;
-            transition: color 0.25s ease, gap 0.25s ease;
+            transition: gap 0.25s ease, opacity 0.25s ease, color 0.25s ease;
             display: inline-flex;
             align-items: center;
             gap: 6px;
+            background: transparent; /* Clean text link, no bg */
+            border: none; /* Clean text link, no border */
+            padding: 0; /* Clean text link, no padding */
         }
 
         .back-link:hover {
-            color: var(--nav-hover);
+            opacity: 0.8;
             gap: 10px;
+            color: var(--red); /* Turns red on hover */
         }
 
         .back-link svg {
@@ -149,38 +150,21 @@
             transform: translateX(-3px);
         }
 
-        .header-divider {
-            width: 1px;
-            height: 20px;
-            background: var(--divider-color);
-            transition: background 0.35s ease;
-        }
-
         .theme-toggle {
-            background: none;
-            border: none;
+            background: transparent; /* No background */
+            border: none; /* No border dividing elements */
             cursor: pointer;
             padding: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--bulb-color);
-            transition: color 0.25s ease, transform 0.25s ease;
+            font-size: 20px;
+            transition: transform 0.25s ease;
             border-radius: 8px;
         }
 
         .theme-toggle:hover {
-            color: var(--bulb-hover);
             transform: scale(1.1);
-        }
-
-        .theme-toggle svg {
-            width: 20px;
-            height: 20px;
-        }
-
-        [data-theme="dark"] .theme-toggle:hover {
-            filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.5));
         }
 
         /* ========== MAIN ========== */
@@ -221,7 +205,7 @@
             box-shadow: var(--shadow);
             transition: background 0.35s ease, border-color 0.35s ease, box-shadow 0.3s ease, transform 0.3s ease;
             width: 100%;
-            max-width: 500px; /* Slimmer card for scanning */
+            max-width: 500px;
         }
 
         .card:hover {
@@ -703,7 +687,7 @@
 <body>
 
     <header class="header">
-        <a href="index.html" class="logo">
+        <a href="#" class="logo" onclick="event.preventDefault();">
             <span class="logo-passion">Passion</span><span class="logo-tools">Tools</span>
         </a>
         <div class="header-right">
@@ -711,12 +695,7 @@
                 <svg viewBox="0 0 24 24"><path d="M19 12H5m0 0l7 7m-7-7l7-7"/></svg>
                 Back to Tools
             </a>
-            <div class="header-divider"></div>
-            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
-                <svg viewBox="0 0 24 24" id="themeIcon" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M9 21h6M12 3a6 6 0 0 0-4 10.47V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3.53A6 6 0 0 0 12 3z"/>
-                </svg>
-            </button>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode"></button>
         </div>
     </header>
 
@@ -827,17 +806,14 @@
     <canvas id="scanCanvas" style="display:none;"></canvas>
 
     <script>
-        // ===== THEME SYSTEM (Bulb Icon) =====
+        // ===== THEME SYSTEM (Emojis) =====
         const themeToggle = document.getElementById('themeToggle');
-        const themeIcon = document.getElementById('themeIcon');
         const html = document.documentElement;
-        const bulbOff = '<path d="M9 21h6"/><path d="M12 3a6 6 0 0 0-4 10.47V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3.53A6 6 0 0 0 12 3z"/>';
-        const bulbOn = '<path d="M9 21h6" stroke-width="2"/><path d="M12 3a6 6 0 0 0-4 10.47V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3.53A6 6 0 0 0 12 3z" fill="currentColor"/><line x1="12" y1="0" x2="12" y2="1"/><line x1="4.22" y1="4.22" x2="4.93" y2="4.93"/><line x1="0" y1="12" x2="1" y2="12"/><line x1="4.22" y1="19.78" x2="4.93" y2="19.07"/><line x1="19.78" y1="4.22" x2="19.07" y2="4.93"/><line x1="23" y1="12" x2="22" y2="12"/><line x1="19.78" y1="19.78" x2="19.07" y2="19.07"/>';
 
         function setTheme(theme) {
             html.setAttribute('data-theme', theme);
             localStorage.setItem('passiontools-theme', theme);
-            themeIcon.innerHTML = theme === 'dark' ? bulbOn : bulbOff;
+            themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
         }
 
         const savedTheme = localStorage.getItem('passiontools-theme') || 'light';
