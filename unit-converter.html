@@ -7,18 +7,19 @@
     <style>
         /* 🎨 GLOBAL TYPOGRAPHY & THEME VARIABLES */
         :root {
+            /* Branding Colors */
+            --red: #ef4444;
+            --purple: #a855f7;
+
             /* Light Theme */
             --bg-color: #f8fafc;
             --card-bg: #ffffff;
+            --header-glass: rgba(255, 255, 255, 0.85);
             --text-main: #0f172a;
             --text-muted: #64748b;
             --border-color: #e2e8f0;
             --input-bg: #f8fafc;
             --input-border: #1d2227;
-            --accent: #ef4444;
-            --accent-hover: #dc2626;
-            --bulb-hover: #0f172a;
-            --bulb-active: #0f172a;
             
             /* Footer */
             --footer-bg: #111827;
@@ -29,13 +30,12 @@
             /* Dark Theme */
             --bg-color: #020617;
             --card-bg: #111827;
+            --header-glass: rgba(17, 24, 39, 0.85);
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --border-color: #334155;
             --input-bg: #1e293b;
             --input-border: #475569;
-            --bulb-hover: #f8fafc;
-            --bulb-active: #fbbf24;
 
             /* Footer */
             --footer-bg: #020617;
@@ -57,13 +57,15 @@
             min-height: 100vh;
         }
 
-        /* 🔷 HEADER */
+        /* 🔷 HEADER (Sticky & Glassmorphism) */
         header {
             position: sticky;
             top: 0;
             height: 70px;
             width: 100%;
-            background-color: var(--card-bg);
+            background-color: var(--header-glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--border-color);
             z-index: 1000;
             display: flex;
@@ -80,6 +82,16 @@
             align-items: center;
         }
 
+        /* LOGO */
+        .logo-link {
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+
         .logo {
             font-size: 24px;
             font-weight: 800;
@@ -89,16 +101,30 @@
         }
 
         .logo-passion {
-            color: var(--text-main);
+            color: #000000;
+            transition: none !important;
+        }
+
+        [data-theme="dark"] .logo-passion {
+            color: #ffffff;
+        }
+
+        .logo-passion:hover {
+            color: #000000;
+        }
+
+        [data-theme="dark"] .logo-passion:hover {
+            color: #ffffff;
         }
 
         .logo-tools {
-            background: linear-gradient(135deg, #ef4444, #a855f7);
+            background: linear-gradient(135deg, var(--red), var(--purple));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
 
+        /* HEADER CONTROLS (Right Actions) */
         .header-controls {
             display: flex;
             align-items: center;
@@ -107,23 +133,20 @@
 
         .nav-link {
             font-size: 15px;
-            font-weight: 500;
-            color: var(--text-muted);
+            font-weight: 600;
+            color: var(--text-muted); /* Set to muted color by default */
             text-decoration: none;
-            transition: color 0.2s;
             display: flex;
             align-items: center;
             gap: 6px;
+            background: none;
+            border: none;
+            padding: 0;
+            transition: color 0.2s ease;
         }
 
         .nav-link:hover {
-            color: var(--accent);
-        }
-
-        .vertical-divider {
-            height: 20px;
-            width: 1px;
-            background-color: var(--border-color);
+            color: var(--red); /* Turns red only on hover */
         }
 
         .theme-toggle {
@@ -134,22 +157,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--text-muted);
+            font-size: 20px;
             border-radius: 6px;
-        }
-
-        .theme-toggle svg {
-            width: 20px;
-            height: 20px;
-            transition: color 0.2s, stroke 0.2s;
-        }
-
-        .theme-toggle:hover {
-            color: var(--bulb-hover);
-        }
-
-        [data-theme="dark"] .theme-toggle svg {
-            color: var(--bulb-active);
         }
 
         /* 📦 MAIN TOOL SECTION */
@@ -218,7 +227,6 @@
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
 
-        /* Hide number spinners */
         input[type=number]::-webkit-inner-spin-button, 
         input[type=number]::-webkit-outer-spin-button { 
             -webkit-appearance: none; 
@@ -383,9 +391,11 @@
 
     <header>
         <div class="header-container">
-            <div class="logo">
-                <span class="logo-passion">Passion</span><span class="logo-tools">Tools</span>
-            </div>
+            <a href="#" onclick="event.preventDefault();" class="logo-link">
+                <div class="logo">
+                    <span class="logo-passion">Passion</span><span class="logo-tools">Tools</span>
+                </div>
+            </a>
             <div class="header-controls">
                 <a href="index.html" class="nav-link">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -394,13 +404,8 @@
                     </svg>
                     Back to Tools
                 </a>
-                <div class="vertical-divider"></div>
                 <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.9 1.2 1.5 1.5 2.5"/>
-                        <path d="M9 18h6"/>
-                        <path d="M10 22h4"/>
-                    </svg>
+                    <span id="themeEmoji">☀️</span>
                 </button>
             </div>
         </div>
@@ -460,19 +465,22 @@
     <script>
         // 1. Theme Logic
         const themeToggleBtn = document.getElementById('themeToggle');
+        const themeEmoji = document.getElementById('themeEmoji');
         const htmlElement = document.documentElement;
         
         const savedTheme = localStorage.getItem('passionTheme') || 'light';
         htmlElement.setAttribute('data-theme', savedTheme);
+        themeEmoji.textContent = savedTheme === 'light' ? '☀️' : '🌙';
 
         themeToggleBtn.addEventListener('click', () => {
             const currentTheme = htmlElement.getAttribute('data-theme');
             const newTheme = currentTheme === 'light' ? 'dark' : 'light';
             htmlElement.setAttribute('data-theme', newTheme);
             localStorage.setItem('passionTheme', newTheme);
+            themeEmoji.textContent = newTheme === 'light' ? '☀️' : '🌙';
         });
 
-        // 2. Unit Dictionary mapping (Relative to a Base Unit for scaling)
+        // 2. Unit Dictionary mapping
         const unitData = {
             Length: {
                 "Meter": 1,
@@ -627,6 +635,7 @@
 
             const formattedResult = formatNumber(result);
             resultDisplay.textContent = `${formattedResult} ${to}`;
+            resultDisplay.title = `${formattedResult} ${to}`; /* For long numbers */
             formulaText.textContent = formula;
 
             // Animation logic
