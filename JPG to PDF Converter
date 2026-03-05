@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JPG to PDF Converter - PassionTools</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root {
+            --red: #ef4444;
+            --purple: #a855f7;
+            --blue: #3b82f6;
+            --blue-dark: #2563eb;
+            --green: #22c55e;
+            --bg-color: #f9fafb;
+            --card-bg: #ffffff;
+            --text-primary: #000000;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --hover-gray: #f3f4f6;
+            --btn-action-bg: #fef2f2;
+            --error-bg: #fee2e2;
+            --error-text: #991b1b;
+            --footer-bg: #111827;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #020617;
+            --card-bg: #111827;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --border-color: #1e293b;
+            --hover-gray: #1e293b;
+            --btn-action-bg: #450a0a;
+            --error-bg: #7f1d1d;
+            --error-text: #f87171;
+            --footer-bg: #020617;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* ==================== HEADER ==================== */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.75);
+            border-bottom: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        [data-theme="dark"] .header {
+            background: rgba(2, 6, 23, 0.75);
+        }
+
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            text-decoration: none;
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .logo-passion {
+            color: var(--text-primary);
+            transition: color 0.3s ease;
+        }
+
+        .logo-tools {
+            background: linear-gradient(135deg, var(--red), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .back-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+
+        .back-link:hover {
+            color: var(--red);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            line-height: 1;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.15);
+        }
+
+        /* ==================== MAIN CONTENT ==================== */
+        .main-content {
+            flex: 1;
+            max-width: 960px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 48px 24px 64px;
+        }
+
+        .tool-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .tool-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+            margin-bottom: 12px;
+            transition: color 0.3s ease;
+        }
+
+        .tool-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+            max-width: 560px;
+            margin: 0 auto;
+            line-height: 1.6;
+            font-weight: 400;
+            transition: color 0.3s ease;
+        }
+
+        /* ==================== WORKSPACE CARD ==================== */
+        .workspace {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 32px;
+            transition: all 0.3s ease;
+        }
+
+        /* ==================== STATE 1: UPLOAD AREA ==================== */
+        .upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 64px 32px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .upload-area:hover,
+        .upload-area.drag-over {
+            border-color: var(--blue);
+            background: rgba(59, 130, 246, 0.04);
+        }
+
+        [data-theme="dark"] .upload-area:hover,
+        [data-theme="dark"] .upload-area.drag-over {
+            background: rgba(59, 130, 246, 0.08);
+        }
+
+        .upload-area input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            color: var(--blue);
+            margin-bottom: 16px;
+            transition: transform 0.3s ease;
+        }
+
+        .upload-area:hover .upload-icon {
+            transform: translateY(-4px);
+        }
+
+        .upload-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            transition: color 0.3s ease;
+        }
+
+        .upload-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            transition: color 0.3s ease;
+        }
+
+        .upload-formats {
+            display: inline-flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .format-badge {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            padding: 4px 10px;
+            border-radius: 6px;
+            background: var(--hover-gray);
+            color: var(--text-secondary);
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+        }
+
+        /* ==================== STATE 2: PREVIEW & SETTINGS ==================== */
+        .preview-section {
+            display: none;
+        }
+
+        .preview-section.active {
+            display: block;
+            animation: fadeIn 0.35s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.3s ease;
+        }
+
+        .image-count {
+            font-size: 12px;
+            font-weight: 700;
+            background: var(--blue);
+            color: #ffffff;
+            padding: 2px 8px;
+            border-radius: 100px;
+        }
+
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+
+        .image-card {
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            background: var(--hover-gray);
+            aspect-ratio: 1;
+            transition: all 0.3s ease;
+            group: true;
+        }
+
+        .image-card:hover {
+            border-color: var(--blue);
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.12);
+            transform: translateY(-2px);
+        }
+
+        .image-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .image-card .card-number {
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            background: rgba(0,0,0,0.6);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .image-card .remove-btn {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: rgba(239, 68, 68, 0.9);
+            color: #fff;
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            font-size: 11px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .image-card:hover .remove-btn {
+            opacity: 1;
+        }
+
+        .remove-btn:hover {
+            background: rgba(220, 38, 38, 1);
+        }
+
+        .image-card .card-filename {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px 6px 6px;
+            background: linear-gradient(to top, rgba(0,0,0,0.65), transparent);
+            color: #fff;
+            font-size: 10px;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .add-more-card {
+            border: 2px dashed var(--border-color);
+            border-radius: 10px;
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            gap: 6px;
+            background: transparent;
+        }
+
+        .add-more-card:hover {
+            border-color: var(--blue);
+            background: rgba(59, 130, 246, 0.04);
+        }
+
+        .add-more-card i {
+            font-size: 20px;
+            color: var(--blue);
+        }
+
+        .add-more-card span {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .add-more-card input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        /* Settings */
+        .settings-bar {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+            padding: 16px;
+            background: var(--hover-gray);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .setting-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .setting-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: color 0.3s ease;
+        }
+
+        .setting-group select {
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 8px 32px 8px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+        }
+
+        .setting-group select:focus {
+            outline: none;
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        /* Action Bar */
+        .action-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            font-family: 'Inter', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 28px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #ffffff;
+            background: linear-gradient(135deg, var(--blue), var(--blue-dark));
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-ghost-red {
+            font-family: 'Inter', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--red);
+            background: var(--btn-action-bg);
+            border: 1px solid transparent;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-ghost-red:hover {
+            border-color: var(--red);
+            background: var(--error-bg);
+        }
+
+        /* Progress overlay */
+        .progress-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .progress-overlay.active {
+            display: flex;
+        }
+
+        .progress-modal {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            max-width: 360px;
+            width: 90%;
+            box-shadow: 0 24px 48px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--border-color);
+            border-top-color: var(--blue);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .progress-modal p {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-primary);
+            transition: color 0.3s ease;
+        }
+
+        .progress-modal .progress-sub {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 6px;
+        }
+
+        /* Success message */
+        .success-toast {
+            position: fixed;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--green);
+            color: #fff;
+            padding: 14px 28px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 3000;
+            box-shadow: 0 8px 24px rgba(34, 197, 94, 0.35);
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .success-toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ==================== FOOTER ==================== */
+        .footer {
+            text-align: center;
+            padding: 30px 20px;
+            font-size: 14px;
+            color: #94a3b8;
+            background: var(--footer-bg);
+            transition: background-color 0.3s ease;
+        }
+
+        /* ==================== RESPONSIVE ==================== */
+        @media (max-width: 640px) {
+            .main-content {
+                padding: 32px 16px 48px;
+            }
+
+            .tool-title {
+                font-size: 26px;
+            }
+
+            .tool-subtitle {
+                font-size: 14px;
+            }
+
+            .workspace {
+                padding: 20px;
+            }
+
+            .upload-area {
+                padding: 48px 20px;
+            }
+
+            .upload-icon {
+                font-size: 40px;
+            }
+
+            .image-grid {
+                grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+                gap: 8px;
+            }
+
+            .settings-bar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .action-bar {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .btn-primary, .btn-ghost-red {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .header-inner {
+                padding: 0 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-inner">
+            <a href="#" onclick="event.preventDefault();" class="logo">
+                <span class="logo-passion">Passion</span><span class="logo-tools">Tools</span>
+            </a>
+            <div class="header-actions">
+                <a href="index.html" class="back-link">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Back to Tools
+                </a>
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">☀️</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <!-- Tool Header -->
+        <div class="tool-header">
+            <h1 class="tool-title">JPG to PDF Converter</h1>
+            <p class="tool-subtitle">Combine multiple images into a single PDF document instantly. 100% private in-browser processing.</p>
+        </div>
+
+        <!-- Workspace -->
+        <div class="workspace">
+            <!-- State 1: Upload Area -->
+            <div class="upload-area" id="uploadArea">
+                <input type="file" id="fileInput" multiple accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+                <div class="upload-icon">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                </div>
+                <div class="upload-title">Drop your images here or click to browse</div>
+                <div class="upload-desc">Select one or multiple images to combine into a PDF</div>
+                <div class="upload-formats">
+                    <span class="format-badge">JPG</span>
+                    <span class="format-badge">JPEG</span>
+                    <span class="format-badge">PNG</span>
+                    <span class="format-badge">WEBP</span>
+                </div>
+            </div>
+
+            <!-- State 2: Preview & Settings -->
+            <div class="preview-section" id="previewSection">
+                <div class="section-label">
+                    Uploaded Images
+                    <span class="image-count" id="imageCount">0</span>
+                </div>
+
+                <div class="image-grid" id="imageGrid">
+                    <!-- Thumbnails rendered here -->
+                </div>
+
+                <div class="settings-bar">
+                    <div class="setting-group">
+                        <label for="pageSize"><i class="fa-solid fa-file-lines" style="margin-right: 4px;"></i> Page Size</label>
+                        <select id="pageSize">
+                            <option value="fit">Fit to Image Size</option>
+                            <option value="a4">A4</option>
+                            <option value="letter">Letter</option>
+                        </select>
+                    </div>
+                    <div class="setting-group">
+                        <label for="imageQuality"><i class="fa-solid fa-sliders" style="margin-right: 4px;"></i> Quality</label>
+                        <select id="imageQuality">
+                            <option value="0.92">High</option>
+                            <option value="0.75">Medium</option>
+                            <option value="0.5">Low</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="action-bar">
+                    <button class="btn-primary" id="convertBtn">
+                        <i class="fa-solid fa-file-pdf"></i>
+                        Convert & Download PDF
+                    </button>
+                    <button class="btn-ghost-red" id="resetBtn">
+                        <i class="fa-solid fa-rotate-left"></i>
+                        Start Over
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        © 2026 Passion Tools. Secure client-side processing.
+    </footer>
+
+    <!-- Progress Overlay -->
+    <div class="progress-overlay" id="progressOverlay">
+        <div class="progress-modal">
+            <div class="spinner"></div>
+            <p>Generating your PDF…</p>
+            <p class="progress-sub" id="progressText">Processing images...</p>
+        </div>
+    </div>
+
+    <!-- Success Toast -->
+    <div class="success-toast" id="successToast">
+        <i class="fa-solid fa-circle-check"></i>
+        PDF downloaded successfully!
+    </div>
+
+    <script>
+        // ==================== THEME TOGGLE ====================
+        const themeToggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+
+        function applyTheme(theme) {
+            html.setAttribute('data-theme', theme);
+            themeToggle.textContent = theme === 'dark' ? '🌙' : '☀️';
+            localStorage.setItem('passion-tools-theme', theme);
+        }
+
+        // Init theme
+        const savedTheme = localStorage.getItem('passion-tools-theme') || 'light';
+        applyTheme(savedTheme);
+
+        themeToggle.addEventListener('click', () => {
+            const current = html.getAttribute('data-theme');
+            applyTheme(current === 'dark' ? 'light' : 'dark');
+        });
+
+        // ==================== IMAGE HANDLING ====================
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const previewSection = document.getElementById('previewSection');
+        const imageGrid = document.getElementById('imageGrid');
+        const imageCount = document.getElementById('imageCount');
+        const convertBtn = document.getElementById('convertBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const progressOverlay = document.getElementById('progressOverlay');
+        const progressText = document.getElementById('progressText');
+        const successToast = document.getElementById('successToast');
+        const pageSizeSelect = document.getElementById('pageSize');
+        const imageQualitySelect = document.getElementById('imageQuality');
+
+        let uploadedImages = []; // Array of { dataUrl, name, file }
+
+        // Drag & Drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('drag-over');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('drag-over');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
+            const files = e.dataTransfer.files;
+            handleFiles(files);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+            fileInput.value = '';
+        });
+
+        function handleFiles(fileList) {
+            const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+            const files = Array.from(fileList).filter(f => validTypes.includes(f.type));
+
+            if (files.length === 0) return;
+
+            let loaded = 0;
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    uploadedImages.push({
+                        dataUrl: e.target.result,
+                        name: file.name
+                    });
+                    loaded++;
+                    if (loaded === files.length) {
+                        renderPreviews();
+                        showPreview();
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function showPreview() {
+            uploadArea.style.display = 'none';
+            previewSection.classList.add('active');
+        }
+
+        function renderPreviews() {
+            imageGrid.innerHTML = '';
+            imageCount.textContent = uploadedImages.length;
+
+            uploadedImages.forEach((img, index) => {
+                const card = document.createElement('div');
+                card.className = 'image-card';
+                card.innerHTML = `
+                    <img src="${img.dataUrl}" alt="${img.name}" loading="lazy">
+                    <span class="card-number">${index + 1}</span>
+                    <button class="remove-btn" data-index="${index}" title="Remove image">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                    <span class="card-filename">${img.name}</span>
+                `;
+                imageGrid.appendChild(card);
+            });
+
+            // Add "Add more" card
+            const addCard = document.createElement('div');
+            addCard.className = 'add-more-card';
+            addCard.innerHTML = `
+                <input type="file" multiple accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" class="add-more-input">
+                <i class="fa-solid fa-plus"></i>
+                <span>Add More</span>
+            `;
+            imageGrid.appendChild(addCard);
+
+            // Bind add more
+            const addMoreInput = addCard.querySelector('.add-more-input');
+            addMoreInput.addEventListener('change', (e) => {
+                handleFiles(e.target.files);
+                addMoreInput.value = '';
+            });
+
+            // Bind remove buttons
+            document.querySelectorAll('.remove-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const idx = parseInt(btn.getAttribute('data-index'));
+                    uploadedImages.splice(idx, 1);
+                    if (uploadedImages.length === 0) {
+                        resetUI();
+                    } else {
+                        renderPreviews();
+                    }
+                });
+            });
+        }
+
+        // ==================== RESET ====================
+        resetBtn.addEventListener('click', resetUI);
+
+        function resetUI() {
+            uploadedImages = [];
+            imageGrid.innerHTML = '';
+            imageCount.textContent = '0';
+            previewSection.classList.remove('active');
+            uploadArea.style.display = '';
+            fileInput.value = '';
+        }
+
+        // ==================== CONVERT TO PDF ====================
+        convertBtn.addEventListener('click', async () => {
+            if (uploadedImages.length === 0) return;
+
+            convertBtn.disabled = true;
+            progressOverlay.classList.add('active');
+
+            // Small delay to let UI render
+            await new Promise(r => setTimeout(r, 100));
+
+            try {
+                const pageSize = pageSizeSelect.value;
+                const quality = parseFloat(imageQualitySelect.value);
+                const { jsPDF } = window.jspdf;
+
+                let doc;
+
+                for (let i = 0; i < uploadedImages.length; i++) {
+                    progressText.textContent = `Processing image ${i + 1} of ${uploadedImages.length}...`;
+
+                    const imgData = uploadedImages[i].dataUrl;
+                    const dims = await getImageDimensions(imgData);
+
+                    if (pageSize === 'fit') {
+                        // Convert px to mm (assuming 96 DPI)
+                        const pxToMm = 25.4 / 96;
+                        let pageW = dims.width * pxToMm;
+                        let pageH = dims.height * pxToMm;
+
+                        // Cap at reasonable max (e.g., 14400mm)
+                        const maxDim = 14400;
+                        if (pageW > maxDim || pageH > maxDim) {
+                            const scale = maxDim / Math.max(pageW, pageH);
+                            pageW *= scale;
+                            pageH *= scale;
+                        }
+
+                        if (i === 0) {
+                            doc = new jsPDF({
+                                orientation: pageW > pageH ? 'landscape' : 'portrait',
+                                unit: 'mm',
+                                format: [pageW, pageH]
+                            });
+                        } else {
+                            doc.addPage([pageW, pageH], pageW > pageH ? 'landscape' : 'portrait');
+                        }
+
+                        doc.addImage(imgData, 'JPEG', 0, 0, pageW, pageH, undefined, 'FAST', 0);
+
+                    } else {
+                        // A4 or Letter
+                        const format = pageSize === 'a4' ? 'a4' : 'letter';
+                        const orientation = dims.width > dims.height ? 'landscape' : 'portrait';
+
+                        if (i === 0) {
+                            doc = new jsPDF({
+                                orientation: orientation,
+                                unit: 'mm',
+                                format: format
+                            });
+                        } else {
+                            doc.addPage(format, orientation);
+                        }
+
+                        const pageW = doc.internal.pageSize.getWidth();
+                        const pageH = doc.internal.pageSize.getHeight();
+
+                        const margin = 10;
+                        const availW = pageW - (margin * 2);
+                        const availH = pageH - (margin * 2);
+
+                        const imgRatio = dims.width / dims.height;
+                        const pageRatio = availW / availH;
+
+                        let imgW, imgH;
+                        if (imgRatio > pageRatio) {
+                            imgW = availW;
+                            imgH = availW / imgRatio;
+                        } else {
+                            imgH = availH;
+                            imgW = availH * imgRatio;
+                        }
+
+                        const x = margin + (availW - imgW) / 2;
+                        const y = margin + (availH - imgH) / 2;
+
+                        doc.addImage(imgData, 'JPEG', x, y, imgW, imgH, undefined, 'FAST', 0);
+                    }
+                }
+
+                progressText.textContent = 'Finalizing PDF...';
+                await new Promise(r => setTimeout(r, 200));
+
+                doc.save('passion-tools-document.pdf');
+
+                progressOverlay.classList.remove('active');
+                showSuccessToast();
+
+            } catch (err) {
+                console.error('PDF generation error:', err);
+                progressOverlay.classList.remove('active');
+                alert('An error occurred while generating the PDF. Please try again.');
+            }
+
+            convertBtn.disabled = false;
+        });
+
+        function getImageDimensions(dataUrl) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => {
+                    resolve({ width: img.naturalWidth, height: img.naturalHeight });
+                };
+                img.src = dataUrl;
+            });
+        }
+
+        function showSuccessToast() {
+            successToast.classList.add('show');
+            setTimeout(() => {
+                successToast.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
