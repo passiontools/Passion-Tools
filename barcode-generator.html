@@ -1,845 +1,822 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Barcode Generator – PassionTools</title>
-    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <title>Barcode Generator - PassionTools</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
     <style>
-        *, *::before, *::after {
+        :root {
+            --red: #ef4444;
+            --purple: #a855f7;
+            --blue: #3b82f6;
+            --blue-dark: #2563eb;
+            --green: #22c55e;
+            --bg-color: #f9fafb;
+            --card-bg: #ffffff;
+            --text-primary: #000000;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --hover-gray: #f3f4f6;
+            --btn-action-bg: #fef2f2;
+            --error-bg: #fee2e2;
+            --error-text: #991b1b;
+            --footer-bg: #111827;
+        }
+
+        html.dark {
+            --bg-color: #020617;
+            --card-bg: #111827;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --border-color: #1e293b;
+            --hover-gray: #1e293b;
+            --btn-action-bg: #450a0a;
+            --error-bg: #7f1d1d;
+            --error-text: #f87171;
+            --footer-bg: #020617;
+        }
+
+        * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        :root {
-            /* Global Colors */
-            --bg: #f8fafc;
-            --card-bg: #ffffff;
-            --text: #0f172a;
-            --text-secondary: #475569;
-            --border: #e2e8f0;
-            --input-bg: #f1f5f9;
-            --header-bg: rgba(255, 255, 255, 0.85);
-            --shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
-            --shadow-hover: 0 8px 32px rgba(0, 0, 0, 0.1);
-            
-            /* Header Specific Colors */
-            --logo-passion: #0f172a;
-            --nav-color: #64748b;
-            --nav-hover: #ef4444;
-            --divider-color: #cbd5e1;
-            --bulb-color: #64748b;
-            --bulb-hover: #0f172a;
-            
-            /* Footer */
-            --footer-bg: #111827;
-            --footer-text: #94a3b8;
-        }
-
-        [data-theme="dark"] {
-            --bg: #020617;
-            --card-bg: #111827;
-            --text: #f8fafc;
-            --text-secondary: #94a3b8;
-            --border: #1e293b;
-            --input-bg: #1e293b;
-            --header-bg: rgba(2, 6, 23, 0.85);
-            --shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
-            --shadow-hover: 0 8px 32px rgba(0, 0, 0, 0.4);
-            
-            --logo-passion: #f8fafc;
-            --nav-color: #94a3b8;
-            --divider-color: #334155;
-            --bulb-color: #f8fafc;
-            --bulb-hover: #fbbf24; 
-            
-            --footer-bg: #020617;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
         body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            transition: background-color 0.35s ease, color 0.35s ease;
-            line-height: 1.6;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        /* ========== HEADER ========== */
-        .header {
+        /* ─── Header ─── */
+        header {
             position: sticky;
             top: 0;
-            z-index: 1000;
-            height: 70px;
-            width: 100%;
-            background: var(--header-bg);
+            z-index: 100;
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            border-bottom: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.75);
+            border-bottom: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        html.dark header {
+            background: rgba(2, 6, 23, 0.75);
+        }
+
+        .header-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+            height: 64px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 24px;
-            transition: background 0.35s ease, border-color 0.35s ease;
         }
 
         .logo {
-            font-size: 24px;
+            text-decoration: none;
+            font-size: 22px;
             font-weight: 800;
             letter-spacing: -0.5px;
-            user-select: none;
-            text-decoration: none;
-            display: flex;
+            display: inline-flex;
             align-items: center;
+            background: none;
+            border: none;
+            outline: none;
         }
 
-        .logo-passion {
-            color: var(--logo-passion);
-            transition: color 0.35s ease;
+        .logo .passion {
+            color: var(--text-primary);
+            transition: color 0.3s ease;
         }
 
-        .logo-tools {
-            background: linear-gradient(135deg, #ef4444, #a855f7);
+        .logo .tools {
+            background: linear-gradient(135deg, var(--red), var(--purple));
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        .header-right {
+        .header-actions {
             display: flex;
             align-items: center;
             gap: 16px;
         }
 
         .back-link {
-            font-size: 15px;
-            font-weight: 500;
-            color: var(--nav-color);
-            text-decoration: none;
-            transition: color 0.25s ease, gap 0.25s ease;
             display: inline-flex;
             align-items: center;
             gap: 6px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            background: none;
+            border: none;
+            padding: 0;
         }
 
         .back-link:hover {
-            color: var(--nav-hover);
-            gap: 10px;
-        }
-
-        .back-link svg {
-            width: 18px;
-            height: 18px;
-            fill: none;
-            stroke: currentColor;
-            stroke-width: 2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            transition: transform 0.25s ease;
-        }
-
-        .back-link:hover svg {
-            transform: translateX(-3px);
-        }
-
-        .header-divider {
-            width: 1px;
-            height: 20px;
-            background: var(--divider-color);
-            transition: background 0.35s ease;
+            color: var(--red);
         }
 
         .theme-toggle {
             background: none;
             border: none;
             cursor: pointer;
+            font-size: 20px;
             padding: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--bulb-color);
-            transition: color 0.25s ease, transform 0.25s ease;
+            transition: all 0.3s ease;
             border-radius: 8px;
+            width: 36px;
+            height: 36px;
         }
 
         .theme-toggle:hover {
-            color: var(--bulb-hover);
-            transform: scale(1.1);
+            background: var(--hover-gray);
         }
 
-        .theme-toggle svg {
-            width: 20px;
-            height: 20px;
-        }
-
-        [data-theme="dark"] .theme-toggle:hover {
-            filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.5));
-        }
-
-        /* ========== MAIN ========== */
-        .main {
+        /* ─── Main Content ─── */
+        main {
             flex: 1;
+            max-width: 1280px;
             width: 100%;
-            max-width: 900px;
             margin: 0 auto;
-            padding: 32px 20px 48px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            padding: 40px 24px 60px;
         }
 
-        .page-title {
+        .tool-header {
             text-align: center;
-            margin-bottom: 8px;
+            margin-bottom: 40px;
+        }
+
+        .tool-header h1 {
             font-size: 32px;
             font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 10px;
             letter-spacing: -0.5px;
-            color: var(--text);
-            transition: color 0.35s ease;
+            transition: color 0.3s ease;
         }
 
-        .page-subtitle {
-            text-align: center;
-            color: var(--text-secondary);
+        .tool-header p {
             font-size: 16px;
-            margin-bottom: 36px;
-            transition: color 0.35s ease;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+            transition: color 0.3s ease;
+        }
+
+        /* ─── Workspace Grid ─── */
+        .workspace {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 28px;
+            align-items: start;
         }
 
         .card {
             background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 32px;
-            box-shadow: var(--shadow);
-            transition: background 0.35s ease, border-color 0.35s ease, box-shadow 0.3s ease, transform 0.3s ease;
-            width: 100%;
-            max-width: 650px;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 28px;
+            transition: all 0.3s ease;
         }
 
-        .card:hover {
-            box-shadow: var(--shadow-hover);
-        }
-
-        .card-header {
+        .card-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 24px;
             display: flex;
             align-items: center;
-            gap: 14px;
-            margin-bottom: 24px;
+            gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: color 0.3s ease;
         }
 
-        .card-icon {
-            width: 50px;
-            height: 50px;
+        .card-title i {
+            color: var(--blue);
+            font-size: 14px;
+        }
+
+        /* ─── Form Elements ─── */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            transition: color 0.3s ease;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-primary);
+            background: var(--bg-color);
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-input:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-primary);
+            background: var(--bg-color);
+            transition: all 0.3s ease;
+            outline: none;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            padding-right: 40px;
+        }
+
+        .form-select:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .checkbox-input {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--blue);
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .checkbox-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .color-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .color-picker-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 10px;
+            background: var(--bg-color);
+            transition: all 0.3s ease;
+        }
+
+        .color-picker-wrap:focus-within {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        .color-picker-wrap input[type="color"] {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            padding: 0;
+            background: none;
+            -webkit-appearance: none;
+        }
+
+        .color-picker-wrap input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+
+        .color-picker-wrap input[type="color"]::-webkit-color-swatch {
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+        }
+
+        .color-picker-text {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: color 0.3s ease;
+        }
+
+        /* ─── Error Message ─── */
+        .error-message {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            background: var(--error-bg);
+            color: var(--error-text);
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 16px;
+            transition: all 0.3s ease;
+            animation: fadeIn 0.25s ease;
+        }
+
+        .error-message.visible {
+            display: flex;
+        }
+
+        .error-message i {
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ─── Preview ─── */
+        .preview-box {
+            width: 100%;
+            min-height: 220px;
+            border: 2px dashed var(--border-color);
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #3b82f6, #6366f1);
-            flex-shrink: 0;
+            background: var(--bg-color);
+            transition: all 0.3s ease;
+            overflow: hidden;
+            position: relative;
         }
 
-        .card-title {
-            font-size: 22px;
-            font-weight: 700;
-            letter-spacing: -0.3px;
+        .preview-box svg {
+            max-width: 100%;
+            height: auto;
         }
 
-        /* ========== FORM & GRID ========== */
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 24px;
-        }
-
-        .full-width {
-            grid-column: 1 / -1;
-        }
-
-        .form-group {
+        .preview-placeholder {
             display: flex;
             flex-direction: column;
-            gap: 6px;
-        }
-
-        label {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-secondary);
-            transition: color 0.35s ease;
-        }
-
-        .input-field {
-            width: 100%;
-            padding: 12px 14px;
-            border-radius: 10px;
-            border: 1px solid var(--border);
-            background: var(--input-bg);
-            color: var(--text);
-            font-size: 14px;
-            font-family: inherit;
-            outline: none;
-            transition: border-color 0.25s ease, background 0.35s ease, color 0.35s ease, box-shadow 0.25s ease;
-        }
-
-        .input-field:focus {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
-        }
-
-        /* Custom Dropdown styling */
-        select.input-field {
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 14px center;
-            padding-right: 40px;
-            cursor: pointer;
-        }
-
-        [data-theme="dark"] select.input-field {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-        }
-
-        /* Toggle Switch */
-        .toggle-container {
-            display: flex;
             align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            margin-top: 4px;
+            gap: 10px;
+            color: var(--text-secondary);
+            transition: color 0.3s ease;
         }
 
-        .toggle-switch {
-            position: relative;
-            width: 44px;
-            height: 24px;
-            background-color: var(--border);
-            border-radius: 24px;
-            transition: 0.3s ease;
+        .preview-placeholder i {
+            font-size: 36px;
+            opacity: 0.4;
         }
 
-        .toggle-switch::after {
-            content: '';
-            position: absolute;
-            top: 2px;
-            left: 2px;
-            width: 20px;
-            height: 20px;
-            background-color: #fff;
-            border-radius: 50%;
-            transition: 0.3s ease;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-
-        input[type="checkbox"] {
-            display: none;
-        }
-
-        input[type="checkbox"]:checked + .toggle-switch {
-            background-color: #3b82f6;
-        }
-
-        input[type="checkbox"]:checked + .toggle-switch::after {
-            transform: translateX(20px);
-        }
-
-        .toggle-label {
+        .preview-placeholder span {
             font-size: 14px;
             font-weight: 500;
-            color: var(--text);
-            user-select: none;
         }
 
-        /* Error Message */
-        .error-message {
-            color: #ef4444;
-            font-size: 13px;
-            display: none;
-            align-items: center;
-            gap: 6px;
-            margin-top: 8px;
-            background: rgba(239, 68, 68, 0.1);
-            padding: 10px 14px;
-            border-radius: 8px;
-            border: 1px solid rgba(239, 68, 68, 0.2);
-            animation: fadeIn 0.3s ease;
-        }
-
-        .error-message.show {
+        /* ─── Action Bar ─── */
+        .action-bar {
             display: flex;
+            gap: 12px;
+            margin-top: 20px;
         }
 
-        /* ========== BUTTONS ========== */
         .btn {
-            width: 100%;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            padding: 14px 22px;
-            border: none;
+            padding: 12px 24px;
             border-radius: 10px;
-            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
             font-weight: 600;
-            font-family: inherit;
             cursor: pointer;
-            transition: all 0.25s ease;
+            border: none;
+            transition: all 0.3s ease;
+            outline: none;
+            text-decoration: none;
         }
 
-        .btn svg {
-            flex-shrink: 0;
-        }
-
-        .btn-generate {
-            background: linear-gradient(135deg, #2563eb, #4f46e5);
+        .btn-primary {
+            background: var(--blue);
             color: #ffffff;
-            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
-            grid-column: 1 / -1;
-        }
-
-        .btn-generate:hover {
-            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
-            transform: translateY(-1px);
-        }
-
-        .btn-generate:active {
-            transform: translateY(0);
-        }
-
-        /* Button Actions Wrapper (Download + Start Over) */
-        .btn-actions {
-            display: flex;
-            gap: 10px;
-            width: 100%;
-            margin-top: 16px;
-            display: none;
-        }
-
-        .btn-actions.show {
-            display: flex;
-            animation: fadeIn 0.4s ease;
-        }
-
-        .btn-actions .btn {
             flex: 1;
         }
 
-        .btn-download {
-            background: linear-gradient(135deg, #16a34a, #059669);
-            color: #ffffff;
-            box-shadow: 0 4px 14px rgba(22, 163, 74, 0.25);
+        .btn-primary:hover {
+            background: var(--blue-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
         }
 
-        .btn-download:hover {
-            box-shadow: 0 6px 20px rgba(22, 163, 74, 0.4);
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-ghost-red {
+            background: var(--btn-action-bg);
+            color: var(--red);
+            border: 1.5px solid transparent;
+        }
+
+        .btn-ghost-red:hover {
+            border-color: var(--red);
             transform: translateY(-1px);
         }
 
-        .btn-startover {
-            background: var(--input-bg);
-            color: var(--text-secondary);
-            border: 1px solid var(--border);
-            transition: all 0.25s ease;
+        .btn-ghost-red:active {
+            transform: translateY(0);
         }
 
-        .btn-startover:hover {
-            border-color: #ef4444;
-            color: #ef4444;
-            background: rgba(239, 68, 68, 0.06);
-        }
-
-        /* ========== PREVIEW AREA ========== */
-        .preview-area {
-            margin-top: 32px;
-            padding: 30px 20px;
-            border-radius: 12px;
-            background: #ffffff; /* Always white background for barcodes to ensure high contrast scanning */
-            border: 2px dashed var(--border);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 200px;
-            transition: border-color 0.3s ease;
-            overflow-x: auto;
-        }
-
-        .preview-area.has-barcode {
-            border-style: solid;
-            border-color: #e2e8f0;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-        }
-
-        .placeholder-text {
-            color: #94a3b8;
-            font-size: 14px;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .placeholder-text svg {
+        .btn:disabled {
             opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
         }
 
-        #barcodeCanvas {
-            max-width: 100%;
-            height: auto;
-            display: none;
-        }
-
-        #barcodeCanvas.show {
-            display: block;
-            animation: fadeIn 0.4s ease;
-        }
-
-        /* ========== TOAST NOTIFICATION ========== */
-        .toast {
-            position: fixed;
-            bottom: 24px;
-            left: 50%;
-            transform: translateX(-50%) translateY(80px);
-            background: #1e293b;
-            color: #f8fafc;
-            padding: 12px 24px;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 500;
-            z-index: 9999;
-            opacity: 0;
-            transition: all 0.35s ease;
-            pointer-events: none;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.25);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .toast.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
-
-        /* ========== FOOTER ========== */
-        .footer {
+        /* ─── Footer ─── */
+        footer {
+            background: var(--footer-bg);
             text-align: center;
             padding: 30px 20px;
             font-size: 14px;
-            color: var(--footer-text);
-            background: var(--footer-bg);
-            transition: background 0.35s ease;
-            margin-top: auto;
+            color: #94a3b8;
+            transition: background-color 0.3s ease;
         }
 
-        /* ========== RESPONSIVE ========== */
+        /* ─── Responsive ─── */
         @media (max-width: 768px) {
-            .header { padding: 0 16px; }
-            .logo { font-size: 20px; }
-            .back-link { font-size: 13px; }
-            .page-title { font-size: 24px; }
-            .page-subtitle { font-size: 14px; margin-bottom: 28px; }
-            .card { padding: 24px 16px; border-radius: 0; border-left: none; border-right: none; }
-            .main { padding: 20px 0 40px; }
-            .form-grid { grid-template-columns: 1fr; gap: 16px; }
-            .btn-actions { flex-direction: column; }
+            .workspace {
+                grid-template-columns: 1fr;
+            }
+
+            .tool-header h1 {
+                font-size: 26px;
+            }
+
+            .tool-header p {
+                font-size: 14px;
+            }
+
+            main {
+                padding: 28px 16px 48px;
+            }
+
+            .card {
+                padding: 22px;
+            }
+
+            .action-bar {
+                flex-direction: column;
+            }
+
+            .header-inner {
+                padding: 0 16px;
+            }
+
+            .back-link span {
+                display: none;
+            }
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        @media (max-width: 400px) {
+            .color-row {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-
-    <header class="header">
-        <a href="index.html" class="logo">
-            <span class="logo-passion">Passion</span><span class="logo-tools">Tools</span>
-        </a>
-        <div class="header-right">
-            <a href="index.html" class="back-link">
-                <svg viewBox="0 0 24 24"><path d="M19 12H5m0 0l7 7m-7-7l7-7"/></svg>
-                Back to Tools
+    <!-- ─── Header ─── -->
+    <header>
+        <div class="header-inner">
+            <a href="#" class="logo" onclick="event.preventDefault();">
+                <span class="passion">Passion</span><span class="tools">Tools</span>
             </a>
-            <div class="header-divider"></div>
-            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
-                <svg viewBox="0 0 24 24" id="themeIcon" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M9 21h6M12 3a6 6 0 0 0-4 10.47V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3.53A6 6 0 0 0 12 3z"/>
-                </svg>
-            </button>
+            <div class="header-actions">
+                <a href="index.html" class="back-link">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Back to Tools</span>
+                </a>
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">☀️</button>
+            </div>
         </div>
     </header>
 
-    <main class="main">
-        <h1 class="page-title">Barcode Generator</h1>
-        <p class="page-subtitle">Create high-quality, scannable barcodes locally on your device.</p>
+    <!-- ─── Main Content ─── -->
+    <main>
+        <div class="tool-header">
+            <h1>Barcode Generator</h1>
+            <p>Create custom, high-quality barcodes in various formats instantly. 100% private in-browser processing.</p>
+        </div>
 
-        <div class="card">
-            <div class="card-header">
-                <div class="card-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M3 5v14"></path>
-                        <path d="M8 5v14"></path>
-                        <path d="M12 5v14"></path>
-                        <path d="M17 5v14"></path>
-                        <path d="M21 5v14"></path>
-                    </svg>
+        <div class="workspace">
+            <!-- Left Column: Inputs & Settings -->
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-sliders"></i>
+                    Settings
                 </div>
-                <h2 class="card-title">Generate Barcode</h2>
-            </div>
 
-            <div class="form-grid">
-                <div class="form-group full-width">
-                    <label for="barcodeData">Enter Data *</label>
-                    <input type="text" id="barcodeData" class="input-field" placeholder="Enter text or numbers to encode...">
+                <div id="errorMessage" class="error-message">
+                    <i class="fas fa-circle-exclamation"></i>
+                    <span id="errorText">Invalid input for the selected format.</span>
                 </div>
 
                 <div class="form-group">
-                    <label for="barcodeFormat">Barcode Format</label>
-                    <select id="barcodeFormat" class="input-field">
-                        <option value="CODE128">CODE128 (Auto)</option>
-                        <option value="CODE39">CODE39</option>
-                        <option value="EAN13">EAN13</option>
-                        <option value="EAN8">EAN8</option>
-                        <option value="UPC">UPC</option>
-                        <option value="ITF14">ITF14</option>
-                        <option value="MSI">MSI</option>
+                    <label class="form-label" for="barcodeValue">Value</label>
+                    <input type="text" id="barcodeValue" class="form-input" placeholder="Enter text or numbers…" autocomplete="off">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="barcodeFormat">Format</label>
+                    <select id="barcodeFormat" class="form-select">
+                        <option value="CODE128" selected>CODE128 — Any characters</option>
+                        <option value="EAN13">EAN-13 — 13 digits</option>
+                        <option value="EAN8">EAN-8 — 8 digits</option>
+                        <option value="UPC">UPC — 12 digits</option>
+                        <option value="ITF14">ITF-14 — 14 digits</option>
+                        <option value="CODE39">CODE39 — Alphanumeric</option>
+                        <option value="pharmacode">Pharmacode — 3–131070</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label for="barcodeWidth">Bar Width (px)</label>
-                    <input type="number" id="barcodeWidth" class="input-field" value="2" min="1" max="5">
-                </div>
-
-                <div class="form-group">
-                    <label for="barcodeHeight">Barcode Height (px)</label>
-                    <input type="number" id="barcodeHeight" class="input-field" value="100" min="30" max="300">
-                </div>
-
-                <div class="form-group">
-                    <label class="toggle-container">
-                        <input type="checkbox" id="showText" checked>
-                        <div class="toggle-switch"></div>
-                        <span class="toggle-label">Show text below barcode</span>
+                    <label class="checkbox-group">
+                        <input type="checkbox" id="displayValue" class="checkbox-input" checked>
+                        <span class="checkbox-label">Display value below barcode</span>
                     </label>
                 </div>
 
-                <button class="btn btn-generate" id="generateBtn">
-                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                    </svg>
-                    Generate Barcode
-                </button>
-            </div>
-
-            <div class="error-message" id="errorMsg">
-                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
-                <span></span>
-            </div>
-
-            <div class="preview-area" id="previewArea">
-                <div class="placeholder-text" id="placeholderText">
-                    <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-                        <path d="M3 5v14"></path><path d="M8 5v14"></path><path d="M12 5v14"></path><path d="M17 5v14"></path><path d="M21 5v14"></path>
-                    </svg>
-                    Your barcode will appear here
+                <div class="form-group">
+                    <label class="form-label">Colors</label>
+                    <div class="color-row">
+                        <div class="color-picker-wrap">
+                            <input type="color" id="lineColor" value="#000000">
+                            <span class="color-picker-text">Line Color</span>
+                        </div>
+                        <div class="color-picker-wrap">
+                            <input type="color" id="bgColor" value="#ffffff">
+                            <span class="color-picker-text">Background</span>
+                        </div>
+                    </div>
                 </div>
-                <canvas id="barcodeCanvas"></canvas>
             </div>
 
-            <div class="btn-actions" id="actionBtns">
-                <button class="btn btn-download" id="downloadBtn">
-                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                        <polyline points="7 10 12 15 17 10"></polyline>
-                        <line x1="12" y1="15" x2="12" y2="3"></line>
-                    </svg>
-                    Download PNG
-                </button>
-                <button class="btn btn-startover" id="startOverBtn">
-                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-                        <polyline points="1 4 1 10 7 10"></polyline>
-                        <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
-                    </svg>
-                    Start Over
-                </button>
+            <!-- Right Column: Preview & Export -->
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-eye"></i>
+                    Live Preview
+                </div>
+
+                <div class="preview-box" id="previewBox">
+                    <div class="preview-placeholder" id="placeholder">
+                        <i class="fas fa-barcode"></i>
+                        <span>Enter a value to generate a barcode</span>
+                    </div>
+                    <svg id="barcodeSvg" style="display:none;"></svg>
+                </div>
+
+                <div class="action-bar">
+                    <button class="btn btn-primary" id="downloadBtn" disabled>
+                        <i class="fas fa-download"></i>
+                        Download Barcode
+                    </button>
+                    <button class="btn btn-ghost-red" id="resetBtn">
+                        <i class="fas fa-rotate-left"></i>
+                        Start Over
+                    </button>
+                </div>
             </div>
         </div>
     </main>
 
-    <footer class="footer">
+    <!-- ─── Footer ─── -->
+    <footer>
         © 2026 Passion Tools. Secure client-side processing.
     </footer>
 
-    <div class="toast" id="toast"></div>
-
+    <!-- ─── Scripts ─── -->
     <script>
-        // ===== THEME SYSTEM (Bulb Icon) =====
+        // ─── Theme Toggle ───
         const themeToggle = document.getElementById('themeToggle');
-        const themeIcon = document.getElementById('themeIcon');
         const html = document.documentElement;
-        
-        const bulbOff = '<path d="M9 21h6"/><path d="M12 3a6 6 0 0 0-4 10.47V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3.53A6 6 0 0 0 12 3z"/>';
-        const bulbOn = '<path d="M9 21h6" stroke-width="2"/><path d="M12 3a6 6 0 0 0-4 10.47V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3.53A6 6 0 0 0 12 3z" fill="currentColor"/><line x1="12" y1="0" x2="12" y2="1"/><line x1="4.22" y1="4.22" x2="4.93" y2="4.93"/><line x1="0" y1="12" x2="1" y2="12"/><line x1="4.22" y1="19.78" x2="4.93" y2="19.07"/><line x1="19.78" y1="4.22" x2="19.07" y2="4.93"/><line x1="23" y1="12" x2="22" y2="12"/><line x1="19.78" y1="19.78" x2="19.07" y2="19.07"/>';
 
-        function setTheme(theme) {
-            html.setAttribute('data-theme', theme);
-            localStorage.setItem('passiontools-theme', theme);
-            themeIcon.innerHTML = theme === 'dark' ? bulbOn : bulbOff;
+        function applyTheme(dark) {
+            if (dark) {
+                html.classList.add('dark');
+                themeToggle.textContent = '🌙';
+            } else {
+                html.classList.remove('dark');
+                themeToggle.textContent = '☀️';
+            }
         }
 
-        const savedTheme = localStorage.getItem('passiontools-theme') || 'light';
-        setTheme(savedTheme);
+        const savedTheme = localStorage.getItem('passion-tools-theme');
+        if (savedTheme === 'dark') {
+            applyTheme(true);
+        } else if (savedTheme === 'light') {
+            applyTheme(false);
+        } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            applyTheme(true);
+        }
 
         themeToggle.addEventListener('click', () => {
-            setTheme(html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+            const isDark = html.classList.toggle('dark');
+            themeToggle.textContent = isDark ? '🌙' : '☀️';
+            localStorage.setItem('passion-tools-theme', isDark ? 'dark' : 'light');
         });
 
-        // ===== TOAST UTILITY =====
-        function showToast(msg) {
-            const toast = document.getElementById('toast');
-            toast.textContent = msg;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 2800);
-        }
-
-        // ===== BARCODE GENERATION LOGIC =====
-        const generateBtn = document.getElementById('generateBtn');
+        // ─── DOM Elements ───
+        const barcodeValue = document.getElementById('barcodeValue');
+        const barcodeFormat = document.getElementById('barcodeFormat');
+        const displayValue = document.getElementById('displayValue');
+        const lineColor = document.getElementById('lineColor');
+        const bgColor = document.getElementById('bgColor');
+        const barcodeSvg = document.getElementById('barcodeSvg');
+        const placeholder = document.getElementById('placeholder');
+        const errorMessage = document.getElementById('errorMessage');
+        const errorText = document.getElementById('errorText');
         const downloadBtn = document.getElementById('downloadBtn');
-        const startOverBtn = document.getElementById('startOverBtn');
-        const actionBtns = document.getElementById('actionBtns');
-        const barcodeCanvas = document.getElementById('barcodeCanvas');
-        const previewArea = document.getElementById('previewArea');
-        const placeholderText = document.getElementById('placeholderText');
-        const errorMsg = document.getElementById('errorMsg');
-        const errorSpan = errorMsg.querySelector('span');
+        const resetBtn = document.getElementById('resetBtn');
 
-        function showError(msg) {
-            errorSpan.textContent = msg;
-            errorMsg.classList.add('show');
-            barcodeCanvas.classList.remove('show');
-            actionBtns.classList.remove('show');
-            previewArea.classList.remove('has-barcode');
-            placeholderText.style.display = 'flex';
-        }
+        let barcodeGenerated = false;
 
-        function hideError() {
-            errorMsg.classList.remove('show');
-        }
+        // ─── Format Hints ───
+        const formatHints = {
+            CODE128: 'Enter any text or numbers.',
+            EAN13: 'Enter exactly 12 or 13 digits.',
+            EAN8: 'Enter exactly 7 or 8 digits.',
+            UPC: 'Enter exactly 11 or 12 digits.',
+            ITF14: 'Enter exactly 13 or 14 digits.',
+            CODE39: 'Enter uppercase letters, numbers, or symbols (-.$/+% SPACE).',
+            pharmacode: 'Enter a number between 3 and 131070.'
+        };
 
-        generateBtn.addEventListener('click', () => {
-            hideError();
+        // ─── Generate Barcode ───
+        function generateBarcode() {
+            const value = barcodeValue.value.trim();
+
+            // Clear states
+            errorMessage.classList.remove('visible');
             
-            // Get values
-            const data = document.getElementById('barcodeData').value.trim();
-            const format = document.getElementById('barcodeFormat').value;
-            const width = document.getElementById('barcodeWidth').value;
-            const height = document.getElementById('barcodeHeight').value;
-            const showText = document.getElementById('showText').checked;
-
-            if (!data) {
-                showError('Please enter data to generate a barcode.');
+            if (!value) {
+                barcodeSvg.style.display = 'none';
+                placeholder.style.display = 'flex';
+                downloadBtn.disabled = true;
+                barcodeGenerated = false;
                 return;
             }
 
             try {
-                // Clear previous context if any
-                const ctx = barcodeCanvas.getContext('2d');
-                ctx.clearRect(0, 0, barcodeCanvas.width, barcodeCanvas.height);
-
-                // Use JsBarcode to render onto the canvas
-                JsBarcode(barcodeCanvas, data, {
-                    format: format,
-                    width: parseInt(width) || 2,
-                    height: parseInt(height) || 100,
-                    displayValue: showText,
-                    background: "#ffffff",
-                    lineColor: "#000000",
-                    margin: 10,
-                    fontSize: 18,
-                    fontOptions: "bold"
+                JsBarcode(barcodeSvg, value, {
+                    format: barcodeFormat.value,
+                    displayValue: displayValue.checked,
+                    lineColor: lineColor.value,
+                    background: bgColor.value,
+                    width: 2,
+                    height: 100,
+                    margin: 16,
+                    fontSize: 16,
+                    font: 'Inter',
+                    fontOptions: '500',
+                    textMargin: 6,
+                    valid: function(valid) {
+                        if (!valid) {
+                            throw new Error('Invalid input');
+                        }
+                    }
                 });
 
-                // Update UI on success
-                placeholderText.style.display = 'none';
-                barcodeCanvas.classList.add('show');
-                actionBtns.classList.add('show');
-                previewArea.classList.add('has-barcode');
-                
-                showToast('✅ Barcode generated successfully!');
+                barcodeSvg.style.display = 'block';
+                placeholder.style.display = 'none';
+                downloadBtn.disabled = false;
+                barcodeGenerated = true;
 
-            } catch (err) {
-                console.warn("JsBarcode Error:", err);
-                
-                let userFriendlyError = "Invalid input for the selected barcode format.";
-                if (typeof err === "string") {
-                    userFriendlyError = err.replace(/"/g, ''); // Clean up quotes
-                }
-                
-                showError(userFriendlyError);
+            } catch (e) {
+                barcodeSvg.style.display = 'none';
+                placeholder.style.display = 'flex';
+                downloadBtn.disabled = true;
+                barcodeGenerated = false;
+
+                const format = barcodeFormat.value;
+                errorText.textContent = formatHints[format] || 'Invalid input for the selected format.';
+                errorMessage.classList.add('visible');
             }
+        }
+
+        // ─── Event Listeners ───
+        barcodeValue.addEventListener('input', generateBarcode);
+        barcodeFormat.addEventListener('change', () => {
+            barcodeValue.placeholder = formatHints[barcodeFormat.value] || 'Enter text or numbers…';
+            generateBarcode();
         });
+        displayValue.addEventListener('change', generateBarcode);
+        lineColor.addEventListener('input', generateBarcode);
+        bgColor.addEventListener('input', generateBarcode);
 
-        // Add "Enter" key support for input field
-        document.getElementById('barcodeData').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                generateBtn.click();
-            }
-        });
-
-        // ===== START OVER LOGIC =====
-        startOverBtn.addEventListener('click', () => {
-            // Reset input values to default
-            document.getElementById('barcodeData').value = '';
-            document.getElementById('barcodeFormat').value = 'CODE128';
-            document.getElementById('barcodeWidth').value = '2';
-            document.getElementById('barcodeHeight').value = '100';
-            document.getElementById('showText').checked = true;
-
-            // Clear canvas
-            const ctx = barcodeCanvas.getContext('2d');
-            ctx.clearRect(0, 0, barcodeCanvas.width, barcodeCanvas.height);
-
-            // Reset UI State
-            hideError();
-            barcodeCanvas.classList.remove('show');
-            actionBtns.classList.remove('show');
-            previewArea.classList.remove('has-barcode');
-            placeholderText.style.display = 'flex';
-
-            showToast('🔄 Reset complete — start fresh!');
-        });
-
-        // ===== DOWNLOAD LOGIC =====
+        // ─── Download ───
         downloadBtn.addEventListener('click', () => {
-            const format = document.getElementById('barcodeFormat').value.toLowerCase();
-            
-            // Get Data URL from Canvas
-            const dataURL = barcodeCanvas.toDataURL("image/png");
-            
-            // Create a temporary link to trigger download
-            const a = document.createElement('a');
-            a.href = dataURL;
-            a.download = `passiontools-${format}-barcode.png`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            
-            showToast('📥 Barcode downloaded!');
+            if (!barcodeGenerated) return;
+
+            const svgElement = barcodeSvg;
+            const svgData = new XMLSerializer().serializeToString(svgElement);
+            const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+            const url = URL.createObjectURL(svgBlob);
+
+            const img = new Image();
+            img.onload = () => {
+                const scale = 3;
+                const canvas = document.createElement('canvas');
+                canvas.width = img.naturalWidth * scale;
+                canvas.height = img.naturalHeight * scale;
+                const ctx = canvas.getContext('2d');
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = 'high';
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                const pngDataUrl = canvas.toDataURL('image/png');
+                const a = document.createElement('a');
+                a.href = pngDataUrl;
+                a.download = 'passion-tools-barcode.png';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            };
+            img.src = url;
         });
 
+        // ─── Start Over ───
+        resetBtn.addEventListener('click', () => {
+            barcodeValue.value = '';
+            barcodeFormat.value = 'CODE128';
+            displayValue.checked = true;
+            lineColor.value = '#000000';
+            bgColor.value = '#ffffff';
+            barcodeSvg.style.display = 'none';
+            placeholder.style.display = 'flex';
+            downloadBtn.disabled = true;
+            barcodeGenerated = false;
+            errorMessage.classList.remove('visible');
+            barcodeValue.placeholder = 'Enter text or numbers…';
+            barcodeValue.focus();
+        });
     </script>
 </body>
 </html>
