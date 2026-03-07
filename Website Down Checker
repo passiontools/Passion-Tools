@@ -11,6 +11,7 @@
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
+            /* Standardized Theme Colors */
             --bg-primary: #f8fafc;
             --bg-secondary: #ffffff;
             --bg-tertiary: #f1f5f9;
@@ -18,6 +19,14 @@
             --text-secondary: #475569;
             --text-muted: #94a3b8;
             --border-color: #e2e8f0;
+            
+            /* Custom Colors for Standard Header */
+            --red: #ef4444;
+            --purple: #a855f7;
+            --logo-passion-color: #000000;
+            --header-bg: rgba(255, 255, 255, 0.75); /* Glassmorphism base */
+
+            /* Tool Specific */
             --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
             --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
             --shadow-lg: 0 10px 40px rgba(0,0,0,0.1);
@@ -25,8 +34,6 @@
             --input-border: #cbd5e1;
             --card-bg: #ffffff;
             --footer-bg: #111827;
-            --hero-icon-bg: linear-gradient(135deg, #fee2e2, #fce7f3, #ede9fe);
-            --hero-icon-color: #dc2626;
             --result-up-bg: #f0fdf4;
             --result-up-border: #86efac;
             --result-up-text: #166534;
@@ -35,11 +42,10 @@
             --result-down-text: #991b1b;
             --toast-bg: #1e293b;
             --toast-text: #f8fafc;
-            --red: #ef4444;
-            --btn-action-bg: rgba(239, 68, 68, 0.08);
         }
 
         [data-theme="dark"] {
+            /* Standardized Theme Colors */
             --bg-primary: #0f172a;
             --bg-secondary: #1e293b;
             --bg-tertiary: #1e293b;
@@ -47,6 +53,12 @@
             --text-secondary: #94a3b8;
             --text-muted: #64748b;
             --border-color: #334155;
+            
+            /* Custom Colors for Standard Header */
+            --logo-passion-color: #ffffff;
+            --header-bg: rgba(30, 41, 59, 0.75); /* Matches --bg-secondary */
+
+            /* Tool Specific */
             --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
             --shadow-md: 0 4px 16px rgba(0,0,0,0.3);
             --shadow-lg: 0 10px 40px rgba(0,0,0,0.4);
@@ -54,8 +66,6 @@
             --input-border: #475569;
             --card-bg: #1e293b;
             --footer-bg: #020617;
-            --hero-icon-bg: linear-gradient(135deg, #3b1a1a, #3b1a2e, #2e1a3b);
-            --hero-icon-color: #f87171;
             --result-up-bg: #052e16;
             --result-up-border: #166534;
             --result-up-text: #86efac;
@@ -65,11 +75,10 @@
             --toast-bg: #f8fafc;
             --toast-text: #0f172a;
             --red: #f87171;
-            --btn-action-bg: rgba(248, 113, 113, 0.12);
         }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', system-ui, sans-serif;
             background: var(--bg-primary);
             color: var(--text-primary);
             min-height: 100vh;
@@ -79,150 +88,109 @@
             line-height: 1.6;
         }
 
-        /* ===== HEADER ===== */
+        /* 🔷 HEADER (Sticky & Glassmorphism) */
         header {
-            background: var(--bg-secondary);
-            border-bottom: 1px solid var(--border-color);
-            padding: 0 24px;
-            height: 64px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
             position: sticky;
             top: 0;
-            z-index: 100;
-            transition: background 0.3s ease, border-color 0.3s ease;
+            height: 70px;
+            width: 100%;
+            background-color: var(--header-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .header-left {
+        .header-container {
+            width: 100%;
+            max-width: 1000px;
+            padding: 0 20px;
             display: flex;
+            justify-content: space-between;
             align-items: center;
         }
 
+        /* Logo Configuration */
         .logo {
-            text-decoration: none;
-            font-size: 22px;
+            font-size: 24px;
             font-weight: 800;
             letter-spacing: -0.5px;
             display: flex;
             align-items: center;
+            text-decoration: none;
+            background: none;
+            border: none;
+            padding: 0;
+            font-family: system-ui, -apple-system, sans-serif;
         }
 
-        .logo-passion {
-            color: #000000;
-            transition: color 0.25s ease;
+        .logo-passion { 
+            color: var(--logo-passion-color);
+            transition: none; /* DO NOTHING on hover */
         }
-
-        [data-theme="dark"] .logo-passion {
-            color: #f1f5f9;
+        
+        .logo-passion:hover {
+            color: var(--logo-passion-color); /* Strict enforcement */
         }
 
         .logo-tools {
-            background: linear-gradient(135deg, #ff0000, #a855f7);
+            background: linear-gradient(135deg, var(--red), var(--purple));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
 
-        /* ===== BACK TO TOOLS LINK ===== */
-        .back-link {
-            text-decoration: none;
-            color: var(--text-secondary);
-            font-size: 14px;
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        /* Back to Tools Link */
+        .nav-link {
+            font-size: 15px;
             font-weight: 500;
+            color: var(--text-primary);
+            text-decoration: none;
             display: flex;
             align-items: center;
             gap: 6px;
-            padding: 0;
-            border: none;
-            border-radius: 0;
             background: none;
-            transition: color 0.25s ease;
-            white-space: nowrap;
-        }
-
-        .back-link:hover {
-            color: var(--red);
-        }
-
-        .back-link i {
-            font-size: 12px;
-            transition: transform 0.25s ease;
-        }
-
-        .back-link:hover i {
-            transform: translateX(-3px);
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-
-        /* ===== THEME TOGGLE ===== */
-        .theme-toggle {
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
-            border-radius: 50px;
-            width: 52px;
-            height: 30px;
-            cursor: pointer;
-            position: relative;
-            transition: background 0.3s ease, border-color 0.3s ease;
-            display: flex;
-            align-items: center;
+            border: none;
             padding: 0;
-            outline: none;
+            font-family: system-ui, -apple-system, sans-serif;
         }
 
-        .theme-toggle::after {
-            content: '';
-            position: absolute;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background: #ffffff;
-            left: 2px;
-            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s ease;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+        .nav-link svg {
+            color: var(--text-primary);
+            transition: color 0.3s ease;
         }
 
-        [data-theme="dark"] .theme-toggle::after {
-            transform: translateX(22px);
-            background: #334155;
+        .nav-link:hover, 
+        .nav-link:hover svg { 
+            color: var(--red); 
         }
 
-        .theme-toggle .toggle-emoji {
-            position: absolute;
-            font-size: 13px;
-            line-height: 1;
-            transition: opacity 0.3s ease, transform 0.3s ease;
-            font-style: normal;
-            z-index: 1;
+        /* Emoji Theme Toggle */
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            user-select: none;
         }
 
-        .theme-toggle .sun-emoji {
-            left: 6px;
-            opacity: 1;
-            transform: scale(1) rotate(0deg);
-        }
-
-        .theme-toggle .moon-emoji {
-            right: 6px;
-            opacity: 0;
-            transform: scale(0.5) rotate(90deg);
-        }
-
-        [data-theme="dark"] .theme-toggle .sun-emoji {
-            opacity: 0;
-            transform: scale(0.5) rotate(-90deg);
-        }
-
-        [data-theme="dark"] .theme-toggle .moon-emoji {
-            opacity: 1;
-            transform: scale(1) rotate(0deg);
-        }
+        .theme-toggle .moon-icon { display: none; }
+        
+        [data-theme="dark"] .theme-toggle .sun-icon { display: none; }
+        [data-theme="dark"] .theme-toggle .moon-icon { display: inline; }
 
         /* ===== MAIN ===== */
         main {
@@ -237,24 +205,6 @@
         .hero {
             text-align: center;
             margin-bottom: 40px;
-        }
-
-        .hero-icon-wrapper {
-            width: 80px;
-            height: 80px;
-            border-radius: 22px;
-            background: var(--hero-icon-bg);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 20px;
-            transition: background 0.3s ease;
-        }
-
-        .hero-icon-wrapper i {
-            font-size: 34px;
-            color: var(--hero-icon-color);
-            transition: color 0.3s ease;
         }
 
         .hero h1 {
@@ -535,6 +485,7 @@
             color: #94a3b8;
             margin-top: auto;
             transition: background 0.3s ease;
+            font-family: system-ui, -apple-system, sans-serif;
         }
 
         /* ===== TOAST ===== */
@@ -598,53 +549,40 @@
                 flex-direction: column;
                 gap: 8px;
             }
-
-            header {
-                padding: 0 16px;
-            }
-
-            .header-right {
-                gap: 10px;
-            }
-
-            .back-link {
-                font-size: 13px;
-            }
         }
     </style>
 </head>
 <body>
-    <!-- HEADER -->
+
     <header>
-        <div class="header-left">
-            <a href="#" class="logo">
+        <div class="header-container">
+            <a href="#" onclick="event.preventDefault();" class="logo">
                 <span class="logo-passion">Passion</span><span class="logo-tools">Tools</span>
             </a>
-        </div>
-        <div class="header-right">
-            <a href="index.html" class="back-link">
-                <i class="fas fa-arrow-left"></i>
-                Back to Tools
-            </a>
-            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
-                <span class="toggle-emoji sun-emoji">☀️</span>
-                <span class="toggle-emoji moon-emoji">🌙</span>
-            </button>
+            
+            <div class="header-controls">
+                <a href="index.html" class="nav-link">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    Back to Tools
+                </a>
+                
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">
+                    <span class="sun-icon">☀️</span>
+                    <span class="moon-icon">🌙</span>
+                </button>
+            </div>
         </div>
     </header>
 
-    <!-- MAIN -->
     <main>
-        <!-- HERO -->
         <section class="hero">
-            <div class="hero-icon-wrapper">
-                <i class="fas fa-globe"></i>
-            </div>
             <h1>Website Down Checker</h1>
             <p>Instantly check if a website is down or it's just you. Get real-time status updates in seconds.</p>
         </section>
 
-        <!-- INPUT -->
         <div class="input-area">
             <div class="input-group">
                 <input type="text" id="urlInput" placeholder="Enter a URL, e.g. google.com" autocomplete="off" spellcheck="false">
@@ -656,7 +594,6 @@
             </div>
         </div>
 
-        <!-- RESULT -->
         <div class="result-box" id="resultBox">
             <div class="result-header">
                 <div class="status-icon" id="resultIcon"></div>
@@ -668,7 +605,6 @@
             <div class="result-details" id="resultDetails"></div>
         </div>
 
-        <!-- WHY CHECK SECTION -->
         <section class="why-section">
             <h2>Why Check Website Status?</h2>
             <p>Understanding downtime helps you act fast and stay informed.</p>
@@ -705,27 +641,24 @@
         </section>
     </main>
 
-    <!-- FOOTER -->
     <footer>
         © 2026 Passion Tools. Secure client-side processing.
     </footer>
 
-    <!-- TOAST CONTAINER -->
     <div class="toast-container" id="toastContainer"></div>
 
     <script>
-        // ===== THEME TOGGLE =====
-        const themeToggle = document.getElementById('themeToggle');
-        const html = document.documentElement;
+        // ===== THEME SYSTEM (Standardized) =====
+        const themeToggleBtn = document.getElementById('themeToggle');
+        const htmlElement = document.documentElement;
+        const savedTheme = localStorage.getItem('passionTheme') || 'light';
+        htmlElement.setAttribute('data-theme', savedTheme);
 
-        const savedTheme = localStorage.getItem('pt-theme') || 'light';
-        html.setAttribute('data-theme', savedTheme);
-
-        themeToggle.addEventListener('click', () => {
-            const current = html.getAttribute('data-theme');
-            const next = current === 'light' ? 'dark' : 'light';
-            html.setAttribute('data-theme', next);
-            localStorage.setItem('pt-theme', next);
+        themeToggleBtn.addEventListener('click', () => {
+            const currentTheme = htmlElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            htmlElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('passionTheme', newTheme);
         });
 
         // ===== TOAST NOTIFICATIONS =====
