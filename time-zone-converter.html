@@ -10,15 +10,19 @@
             /* Light Theme */
             --bg-color: #f8fafc;
             --card-bg: #ffffff;
-            --text-main: #0f172a;
+            --text-primary: #0f172a;
             --text-muted: #64748b;
             --border-color: #e2e8f0;
             --input-bg: #f8fafc;
             --input-border: #cbd5e1;
-            --accent: #ef4444;
+            
+            /* Custom Colors for Header */
+            --red: #ef4444;
+            --purple: #a855f7;
+            --logo-passion-color: #000000;
+            --header-bg: rgba(255, 255, 255, 0.75);
+            
             --accent-hover: #dc2626;
-            --bulb-hover: #0f172a;
-            --bulb-active: #0f172a;
             --modern-blue: #3b82f6;
             --modern-blue-dark: #2563eb;
             
@@ -31,13 +35,15 @@
             /* Dark Theme */
             --bg-color: #020617;
             --card-bg: #111827;
-            --text-main: #f8fafc;
+            --text-primary: #f8fafc;
             --text-muted: #94a3b8;
             --border-color: #334155;
             --input-bg: #1e293b;
             --input-border: #475569;
-            --bulb-hover: #f8fafc;
-            --bulb-active: #fbbf24;
+            
+            /* Custom Colors for Header */
+            --logo-passion-color: #ffffff;
+            --header-bg: rgba(17, 24, 39, 0.75);
 
             /* Footer */
             --footer-bg: #020617;
@@ -53,19 +59,21 @@
 
         body {
             background-color: var(--bg-color);
-            color: var(--text-main);
+            color: var(--text-primary);
             display: flex;
             flex-direction: column;
             min-height: 100vh;
         }
 
-        /* 🔷 HEADER */
+        /* 🔷 HEADER (Sticky & Glassmorphism) */
         header {
             position: sticky;
             top: 0;
             height: 70px;
             width: 100%;
-            background-color: var(--card-bg);
+            background-color: var(--header-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--border-color);
             z-index: 1000;
             display: flex;
@@ -88,11 +96,23 @@
             letter-spacing: -0.5px;
             display: flex;
             align-items: center;
+            text-decoration: none;
+            background: none;
+            border: none;
+            padding: 0;
         }
 
-        .logo-passion { color: var(--text-main); }
+        .logo-passion { 
+            color: var(--logo-passion-color);
+            transition: none; 
+        }
+        
+        .logo-passion:hover {
+            color: var(--logo-passion-color);
+        }
+
         .logo-tools {
-            background: linear-gradient(135deg, #ef4444, #a855f7);
+            background: linear-gradient(135deg, var(--red), var(--purple));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -101,42 +121,48 @@
         .header-controls {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 20px;
         }
 
         .nav-link {
             font-size: 15px;
             font-weight: 500;
-            color: var(--text-muted);
+            color: var(--text-primary);
             text-decoration: none;
             display: flex;
             align-items: center;
             gap: 6px;
+            background: none;
+            border: none;
+            padding: 0;
         }
 
-        .nav-link:hover { color: var(--accent); }
+        .nav-link svg {
+            color: var(--text-primary);
+            transition: color 0.3s ease;
+        }
 
-        .vertical-divider {
-            height: 20px;
-            width: 1px;
-            background-color: var(--border-color);
+        .nav-link:hover, 
+        .nav-link:hover svg { 
+            color: var(--red); 
         }
 
         .theme-toggle {
             background: none;
             border: none;
             cursor: pointer;
-            padding: 4px;
+            font-size: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--text-muted);
-            border-radius: 6px;
+            padding: 0;
+            user-select: none;
         }
 
-        .theme-toggle svg { width: 20px; height: 20px; }
-        .theme-toggle:hover { color: var(--bulb-hover); }
-        [data-theme="dark"] .theme-toggle svg { color: var(--bulb-active); }
+        .theme-toggle .moon-icon { display: none; }
+        
+        [data-theme="dark"] .theme-toggle .sun-icon { display: none; }
+        [data-theme="dark"] .theme-toggle .moon-icon { display: inline; }
 
         /* 📦 MAIN TOOL SECTION */
         main {
@@ -164,7 +190,7 @@
             font-size: 24px;
             margin-bottom: 25px;
             font-weight: 700;
-            color: var(--text-main);
+            color: var(--text-primary);
             text-align: center;
         }
 
@@ -200,7 +226,7 @@
             border-radius: 8px;
             border: 1px solid var(--input-border);
             background-color: var(--input-bg);
-            color: var(--text-main);
+            color: var(--text-primary);
             font-size: 16px;
             outline: none;
             cursor: pointer;
@@ -229,7 +255,7 @@
         .btn-swap {
             background-color: var(--input-bg);
             border: 1px solid var(--input-border);
-            color: var(--text-main);
+            color: var(--text-primary);
             width: 44px;
             height: 44px;
             border-radius: 50%;
@@ -253,7 +279,7 @@
             margin-top: 10px;
             flex-direction: column;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
         }
 
         .btn-action {
@@ -267,13 +293,56 @@
             cursor: pointer;
             transition: all 0.2s ease;
             width: 100%;
-            max-width: 300px;
+            max-width: 320px;
             box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
         }
 
         .btn-action:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+        }
+
+        .secondary-actions {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            max-width: 320px;
+        }
+
+        .btn-outline {
+            flex: 1;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-outline:hover {
+            background: var(--input-bg);
+            color: var(--text-primary);
+        }
+
+        .toggle-clocks-btn {
+            flex: 1;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .toggle-clocks-btn:hover {
+            background: var(--input-bg);
+            color: var(--text-primary);
         }
 
         .result-section {
@@ -317,7 +386,7 @@
         .result-date {
             font-size: 18px;
             font-weight: 600;
-            color: var(--text-main);
+            color: var(--text-primary);
         }
 
         .result-meta {
@@ -386,25 +455,8 @@
         .clock-card .time {
             font-size: 24px;
             font-weight: 700;
-            color: var(--text-main);
+            color: var(--text-primary);
             font-variant-numeric: tabular-nums;
-        }
-
-        .toggle-clocks-btn {
-            background: transparent;
-            border: 1px solid var(--border-color);
-            color: var(--text-muted);
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-        
-        .toggle-clocks-btn:hover {
-            background: var(--input-bg);
-            color: var(--text-main);
         }
 
         /* 📱 RESPONSIVENESS */
@@ -421,6 +473,9 @@
             .clocks-grid {
                 grid-template-columns: 1fr;
                 gap: 15px;
+            }
+            .secondary-actions {
+                flex-direction: column;
             }
         }
 
@@ -445,9 +500,10 @@
 
     <header>
         <div class="header-container">
-            <div class="logo">
+            <a href="#" onclick="event.preventDefault();" class="logo">
                 <span class="logo-passion">Passion</span><span class="logo-tools">Tools</span>
-            </div>
+            </a>
+            
             <div class="header-controls">
                 <a href="index.html" class="nav-link">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -456,13 +512,10 @@
                     </svg>
                     Back to Tools
                 </a>
-                <div class="vertical-divider"></div>
+                
                 <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.9 1.2 1.5 1.5 2.5"/>
-                        <path d="M9 18h6"/>
-                        <path d="M10 22h4"/>
-                    </svg>
+                    <span class="sun-icon">☀️</span>
+                    <span class="moon-icon">🌙</span>
                 </button>
             </div>
         </div>
@@ -508,7 +561,10 @@
 
                 <div class="actions">
                     <button class="btn-action" id="convertBtn">Convert Time</button>
-                    <button class="toggle-clocks-btn" id="toggleClocksBtn">Show Live Clocks</button>
+                    <div class="secondary-actions">
+                        <button class="btn-outline" id="startOverBtn">Start Over</button>
+                        <button class="toggle-clocks-btn" id="toggleClocksBtn">Show Live Clocks</button>
+                    </div>
                 </div>
 
                 <div class="result-section" id="resultContainer" style="opacity: 0;">
@@ -568,6 +624,7 @@
         const fromTzSelect = document.getElementById('fromTz');
         const toTzSelect = document.getElementById('toTz');
         const convertBtn = document.getElementById('convertBtn');
+        const startOverBtn = document.getElementById('startOverBtn');
         const swapBtn = document.getElementById('swapBtn');
         const resultContainer = document.getElementById('resultContainer');
         
@@ -639,15 +696,13 @@
 
         // --- 4. DAY/NIGHT HELPER ---
         function getDayNightIcon(hour24) {
-            // Day is considered 6:00 AM to 5:59 PM (17:59)
             if (hour24 >= 6 && hour24 < 18) {
                 return '☀️';
             }
-            // Night is 6:00 PM to 5:59 AM
             return '🌙';
         }
 
-        // --- 5. CONVERSION LOGIC ---
+        // --- 5. CORE LOGIC (CONVERT & RESET) ---
         function getUtcDateForTimezone(dateStr, timeStr, tz) {
             const [year, month, day] = dateStr.split('-').map(Number);
             const [hour, minute] = timeStr.split(':').map(Number);
@@ -694,7 +749,6 @@
             const formattedDate = new Intl.DateTimeFormat('en-US', optionsDate).format(trueDate);
             const formattedTime = new Intl.DateTimeFormat('en-US', optionsTime).format(trueDate);
             
-            // Extract Hour to determine Day or Night
             const targetHourParts = new Intl.DateTimeFormat('en-US', optionsHour24).formatToParts(trueDate);
             let targetHour = parseInt(targetHourParts.find(p => p.type === 'hour').value, 10);
             if (targetHour === 24) targetHour = 0;
@@ -710,12 +764,10 @@
             const msDiff = new Date(targetDayStr) - new Date(sourceDayStr);
             const dayDiff = Math.round(msDiff / 86400000);
 
-            // Update UI
             resTime.textContent = formattedTime;
             
-            // Re-trigger animation by re-rendering the icon element slightly
             resDayNightIcon.style.animation = 'none';
-            resDayNightIcon.offsetHeight; /* trigger reflow */
+            resDayNightIcon.offsetHeight; 
             resDayNightIcon.style.animation = null; 
             resDayNightIcon.textContent = getDayNightIcon(targetHour);
 
@@ -730,6 +782,25 @@
             }
 
             resultContainer.style.opacity = '1';
+        }
+
+        function resetApp() {
+            // 1. Reset Inputs to Local Time
+            setDefaultDateTime();
+
+            // 2. Reset Dropdowns
+            const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            const allZones = Intl.supportedValuesOf('timeZone');
+            fromTzSelect.value = allZones.includes(localTz) ? localTz : 'UTC';
+            toTzSelect.value = 'America/New_York';
+
+            // 3. Hide Results smoothly
+            resultContainer.style.opacity = '0';
+            
+            // 4. Hide Live Clocks if they are open
+            if (liveClocksWrapper.classList.contains('active')) {
+                toggleClocks();
+            }
         }
 
         // --- 6. LIVE CLOCKS FEATURE ---
@@ -772,6 +843,7 @@
 
         // --- 7. EVENT LISTENERS ---
         convertBtn.addEventListener('click', convertTime);
+        startOverBtn.addEventListener('click', resetApp);
         toggleClocksBtn.addEventListener('click', toggleClocks);
 
         swapBtn.addEventListener('click', () => {
