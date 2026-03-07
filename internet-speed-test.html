@@ -9,18 +9,24 @@
            🎨 GLOBAL TYPOGRAPHY & THEME VARIABLES
            ========================================================================== */
         :root {
-            /* Light Theme */
+            /* Standardized Theme Colors */
             --bg-color: #f8fafc;
             --card-bg: #ffffff;
             --text-main: #0f172a;
             --text-muted: #64748b;
             --border-color: #e2e8f0;
             --input-bg: #f8fafc;
+
+            /* Custom Colors for Standard Header */
+            --red: #ef4444;
+            --purple: #a855f7;
+            --logo-passion-color: #000000;
+            --header-bg: rgba(255, 255, 255, 0.75); /* Glassmorphism base */
+
+            /* Tool Specific */
             --accent: #ef4444;
             --modern-blue: #3b82f6;
             --modern-blue-dark: #2563eb;
-            
-            /* Analyzer Specific Colors */
             --inner-bg: rgba(248,250,252,0.5);
             --track-bg: rgba(15,23,42,0.06);
             --gauge-glow: rgba(59,130,246,0.08);
@@ -38,15 +44,19 @@
         }
 
         [data-theme="dark"] {
-            /* Dark Theme */
+            /* Standardized Theme Colors */
             --bg-color: #020617;
             --card-bg: #111827;
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
-            --border-color: #1e293b;
+            --border-color: #334155;
             --input-bg: #1e293b;
+
+            /* Custom Colors for Standard Header */
+            --logo-passion-color: #ffffff;
+            --header-bg: rgba(17, 24, 39, 0.75); /* Glassmorphism base */
             
-            /* Analyzer Specific Colors */
+            /* Tool Specific */
             --inner-bg: rgba(30,41,59,0.4);
             --track-bg: rgba(248,250,252,0.05);
             --gauge-glow: rgba(59,130,246,0.12);
@@ -79,20 +89,21 @@
         }
 
         /* ==========================================================================
-           🔷 HEADER
+           🔷 HEADER (Sticky & Glassmorphism)
            ========================================================================== */
         header {
             position: sticky;
             top: 0;
             height: 70px;
             width: 100%;
-            background-color: var(--card-bg);
+            background-color: var(--header-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--border-color);
             z-index: 1000;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
         .header-container {
@@ -104,6 +115,7 @@
             align-items: center;
         }
 
+        /* Logo Configuration */
         .logo {
             font-size: 24px;
             font-weight: 800;
@@ -111,11 +123,22 @@
             display: flex;
             align-items: center;
             text-decoration: none;
+            background: none;
+            border: none;
+            padding: 0;
         }
 
-        .logo-passion { color: var(--text-main); }
+        .logo-passion { 
+            color: var(--logo-passion-color);
+            transition: none; /* DO NOTHING on hover */
+        }
+        
+        .logo-passion:hover {
+            color: var(--logo-passion-color); /* Strict enforcement */
+        }
+
         .logo-tools {
-            background: linear-gradient(135deg, #ef4444, #a855f7);
+            background: linear-gradient(135deg, var(--red), var(--purple));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -124,42 +147,50 @@
         .header-controls {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 20px;
         }
 
+        /* Back to Tools Link */
         .nav-link {
             font-size: 15px;
             font-weight: 500;
-            color: var(--text-muted);
+            color: var(--text-main);
             text-decoration: none;
             display: flex;
             align-items: center;
             gap: 6px;
+            background: none;
+            border: none;
+            padding: 0;
         }
 
-        .nav-link:hover { color: var(--accent); }
-
-        .vertical-divider {
-            height: 20px;
-            width: 1px;
-            background-color: var(--border-color);
+        .nav-link svg {
+            color: var(--text-main);
+            transition: color 0.3s ease;
         }
 
+        .nav-link:hover, 
+        .nav-link:hover svg { 
+            color: var(--red); 
+        }
+
+        /* Emoji Theme Toggle */
         .theme-toggle {
             background: none;
             border: none;
             cursor: pointer;
-            padding: 4px;
+            font-size: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--text-muted);
-            border-radius: 6px;
+            padding: 0;
+            user-select: none;
         }
 
-        .theme-toggle svg { width: 20px; height: 20px; }
-        .theme-toggle:hover { color: var(--text-main); }
-        [data-theme="dark"] .theme-toggle svg { color: #fbbf24; }
+        .theme-toggle .moon-icon { display: none; }
+        
+        [data-theme="dark"] .theme-toggle .sun-icon { display: none; }
+        [data-theme="dark"] .theme-toggle .moon-icon { display: inline; }
 
         /* ==========================================================================
            📦 MAIN TOOL SECTION
@@ -431,24 +462,22 @@
 
     <header>
         <div class="header-container">
-            <a href="index.html" class="logo" aria-label="PassionTools Home">
+            <a href="#" onclick="event.preventDefault();" class="logo">
                 <span class="logo-passion">Passion</span><span class="logo-tools">Tools</span>
             </a>
+            
             <div class="header-controls">
-                <a href="index.html" class="nav-link" aria-label="Back to Tools">
+                <a href="index.html" class="nav-link">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="19" y1="12" x2="5" y2="12"></line>
                         <polyline points="12 19 5 12 12 5"></polyline>
                     </svg>
                     Back to Tools
                 </a>
-                <div class="vertical-divider"></div>
+                
                 <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.9 1.2 1.5 1.5 2.5"/>
-                        <path d="M9 18h6"/>
-                        <path d="M10 22h4"/>
-                    </svg>
+                    <span class="sun-icon">☀️</span>
+                    <span class="moon-icon">🌙</span>
                 </button>
             </div>
         </div>
@@ -618,7 +647,7 @@
         (() => {
             'use strict';
 
-            // --- 1. THEME MANAGEMENT ---
+            // --- 1. THEME SYSTEM (Standardized) ---
             const themeToggleBtn = document.getElementById('themeToggle');
             const htmlElement = document.documentElement;
             const savedTheme = localStorage.getItem('passionTheme') || 'light';
