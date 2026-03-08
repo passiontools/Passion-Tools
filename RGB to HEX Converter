@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RGB to HEX Converter - PassionTools</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --red: #ef4444;
+            --purple: #a855f7;
+            --blue: #3b82f6;
+            --blue-dark: #2563eb;
+            --green: #22c55e;
+            --bg-color: #f9fafb;
+            --card-bg: #ffffff;
+            --text-primary: #000000;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --hover-gray: #f3f4f6;
+            --btn-action-bg: #fef2f2;
+            --error-bg: #fee2e2;
+            --error-text: #991b1b;
+            --footer-bg: #111827;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #020617;
+            --card-bg: #111827;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --border-color: #1e293b;
+            --hover-gray: #1e293b;
+            --btn-action-bg: #450a0a;
+            --error-bg: #7f1d1d;
+            --error-text: #f87171;
+            --footer-bg: #020617;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            line-height: 1.6;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.72);
+            border-bottom: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        [data-theme="dark"] .header {
+            background: rgba(2, 6, 23, 0.72);
+        }
+
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo-link {
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            background: none;
+            border: none;
+            outline: none;
+        }
+
+        .logo-text {
+            font-size: 1.35rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .logo-passion {
+            color: var(--text-primary);
+            transition: color 0.3s ease;
+        }
+
+        .logo-tools {
+            background: linear-gradient(135deg, var(--red), var(--purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .back-link {
+            text-decoration: none;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.3s ease;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+
+        .back-link:hover {
+            color: var(--red);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.3rem;
+            line-height: 1;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.15);
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            flex: 1;
+            max-width: 720px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 48px 24px 60px;
+        }
+
+        /* ===== TOOL HEADER ===== */
+        .tool-header {
+            text-align: center;
+            margin-bottom: 36px;
+        }
+
+        .tool-title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.03em;
+            margin-bottom: 10px;
+            transition: color 0.3s ease;
+        }
+
+        .tool-subtitle {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+            max-width: 520px;
+            margin: 0 auto;
+            line-height: 1.65;
+            transition: color 0.3s ease;
+        }
+
+        /* ===== WORKSPACE CARD ===== */
+        .workspace-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03);
+        }
+
+        [data-theme="dark"] .workspace-card {
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2), 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        /* ===== LIVE COLOR PREVIEW ===== */
+        .color-preview {
+            width: 100%;
+            height: 150px;
+            border-radius: 16px 16px 0 0;
+            transition: background-color 0.3s ease;
+            position: relative;
+            background-color: #ffffff;
+            background-image:
+                linear-gradient(45deg, #e0e0e0 25%, transparent 25%),
+                linear-gradient(-45deg, #e0e0e0 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #e0e0e0 75%),
+                linear-gradient(-45deg, transparent 75%, #e0e0e0 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        }
+
+        .color-preview.active {
+            background-image: none;
+        }
+
+        /* ===== INPUT/OUTPUT GRID ===== */
+        .io-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            padding: 28px;
+        }
+
+        .io-section-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            transition: color 0.3s ease;
+        }
+
+        /* RGB Inputs */
+        .rgb-inputs-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .rgb-field {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .rgb-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            transition: color 0.3s ease;
+        }
+
+        .rgb-label.label-r { color: var(--red); }
+        .rgb-label.label-g { color: var(--green); }
+        .rgb-label.label-b { color: var(--blue); }
+
+        .rgb-input {
+            width: 100%;
+            padding: 10px 10px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1.05rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            background: var(--bg-color);
+            border: 1.5px solid var(--border-color);
+            border-radius: 10px;
+            text-align: center;
+            outline: none;
+            transition: all 0.3s ease;
+            -moz-appearance: textfield;
+        }
+
+        .rgb-input::-webkit-outer-spin-button,
+        .rgb-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .rgb-input:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        /* HEX Output */
+        .hex-output-wrapper {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
+        .hex-output-row {
+            display: flex;
+            align-items: stretch;
+            gap: 10px;
+        }
+
+        .hex-output {
+            flex: 1;
+            padding: 10px 14px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            background: var(--bg-color);
+            border: 1.5px solid var(--border-color);
+            border-radius: 10px;
+            text-align: center;
+            outline: none;
+            letter-spacing: 0.04em;
+            transition: all 0.3s ease;
+        }
+
+        .hex-output:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        .color-picker-wrapper {
+            position: relative;
+            width: 46px;
+            min-width: 46px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .color-picker-btn {
+            width: 46px;
+            height: 100%;
+            min-height: 44px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 10px;
+            cursor: pointer;
+            padding: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            background: var(--bg-color);
+        }
+
+        .color-picker-btn:hover {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        .color-picker-native {
+            width: 200%;
+            height: 200%;
+            border: none;
+            cursor: pointer;
+            transform: translate(-25%, -25%);
+        }
+
+        /* ===== ACTION BAR ===== */
+        .action-bar {
+            display: flex;
+            gap: 12px;
+            padding: 0 28px 28px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 11px 22px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 600;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .btn-copy {
+            background: var(--blue);
+            color: #ffffff;
+            flex: 1;
+        }
+
+        .btn-copy:hover {
+            background: var(--blue-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
+        }
+
+        .btn-copy:active {
+            transform: translateY(0);
+        }
+
+        .btn-copy.copied {
+            background: var(--green);
+        }
+
+        .btn-reset {
+            background: var(--btn-action-bg);
+            color: var(--red);
+            border: 1.5px solid transparent;
+        }
+
+        .btn-reset:hover {
+            border-color: var(--red);
+            transform: translateY(-1px);
+        }
+
+        .btn-reset:active {
+            transform: translateY(0);
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            background: var(--footer-bg);
+            text-align: center;
+            padding: 30px 20px;
+            font-size: 14px;
+            color: #94a3b8;
+            transition: background-color 0.3s ease;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 640px) {
+            .main-content {
+                padding: 32px 16px 48px;
+            }
+
+            .tool-title {
+                font-size: 1.6rem;
+            }
+
+            .tool-subtitle {
+                font-size: 0.92rem;
+            }
+
+            .io-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 20px;
+            }
+
+            .hex-output-wrapper {
+                justify-content: flex-start;
+            }
+
+            .action-bar {
+                padding: 0 20px 20px;
+            }
+
+            .color-preview {
+                height: 120px;
+            }
+
+            .header-inner {
+                padding: 0 16px;
+            }
+
+            .back-link span {
+                display: none;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .rgb-inputs-row {
+                gap: 6px;
+            }
+
+            .rgb-input {
+                padding: 10px 6px;
+                font-size: 0.95rem;
+            }
+
+            .action-bar {
+                flex-direction: column;
+            }
+        }
+
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: #1e293b;
+            color: #f1f5f9;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 9999;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        [data-theme="dark"] .toast {
+            background: #334155;
+            color: #f8fafc;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-inner">
+            <a href="#" onclick="event.preventDefault();" class="logo-link">
+                <span class="logo-text">
+                    <span class="logo-passion">Passion</span><span class="logo-tools">Tools</span>
+                </span>
+            </a>
+            <div class="header-actions">
+                <a href="index.html" class="back-link">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Back to Tools</span>
+                </a>
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">☀️</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN -->
+    <main class="main-content">
+        <!-- Tool Header -->
+        <div class="tool-header">
+            <h1 class="tool-title">RGB to HEX Converter</h1>
+            <p class="tool-subtitle">Instantly convert RGB color values to HEX format. 100% private in-browser processing.</p>
+        </div>
+
+        <!-- Workspace Card -->
+        <div class="workspace-card">
+            <!-- Live Color Preview -->
+            <div class="color-preview" id="colorPreview"></div>
+
+            <!-- Input / Output Grid -->
+            <div class="io-grid">
+                <!-- RGB Inputs -->
+                <div class="rgb-section">
+                    <div class="io-section-label">RGB Values</div>
+                    <div class="rgb-inputs-row">
+                        <div class="rgb-field">
+                            <label class="rgb-label label-r" for="inputR">R</label>
+                            <input type="number" id="inputR" class="rgb-input" min="0" max="255" placeholder="0">
+                        </div>
+                        <div class="rgb-field">
+                            <label class="rgb-label label-g" for="inputG">G</label>
+                            <input type="number" id="inputG" class="rgb-input" min="0" max="255" placeholder="0">
+                        </div>
+                        <div class="rgb-field">
+                            <label class="rgb-label label-b" for="inputB">B</label>
+                            <input type="number" id="inputB" class="rgb-input" min="0" max="255" placeholder="0">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- HEX Output -->
+                <div class="hex-output-wrapper">
+                    <div class="io-section-label">HEX Code</div>
+                    <div class="hex-output-row">
+                        <input type="text" id="hexOutput" class="hex-output" readonly placeholder="#000000">
+                        <div class="color-picker-wrapper">
+                            <div class="color-picker-btn">
+                                <input type="color" id="colorPicker" class="color-picker-native" value="#000000">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Bar -->
+            <div class="action-bar">
+                <button class="btn btn-copy" id="btnCopy">
+                    <i class="fa-regular fa-copy"></i>
+                    Copy HEX
+                </button>
+                <button class="btn btn-reset" id="btnReset">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    Start Over
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        © 2026 Passion Tools. Secure client-side processing.
+    </footer>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ===== DOM ELEMENTS =====
+        const inputR = document.getElementById('inputR');
+        const inputG = document.getElementById('inputG');
+        const inputB = document.getElementById('inputB');
+        const hexOutput = document.getElementById('hexOutput');
+        const colorPreview = document.getElementById('colorPreview');
+        const colorPicker = document.getElementById('colorPicker');
+        const btnCopy = document.getElementById('btnCopy');
+        const btnReset = document.getElementById('btnReset');
+        const themeToggle = document.getElementById('themeToggle');
+        const toast = document.getElementById('toast');
+
+        // ===== THEME MANAGEMENT =====
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+            localStorage.setItem('passiontools-theme', theme);
+        }
+
+        function initTheme() {
+            const saved = localStorage.getItem('passiontools-theme');
+            if (saved) {
+                applyTheme(saved);
+            } else {
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                applyTheme(prefersDark ? 'dark' : 'light');
+            }
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const current = document.documentElement.getAttribute('data-theme');
+            applyTheme(current === 'dark' ? 'light' : 'dark');
+        });
+
+        initTheme();
+
+        // ===== CLAMP HELPER =====
+        function clamp(val, min, max) {
+            if (val === '' || isNaN(val)) return min;
+            return Math.min(Math.max(Math.round(Number(val)), min), max);
+        }
+
+        // ===== RGB TO HEX CONVERSION =====
+        function rgbToHex(r, g, b) {
+            const toHex = (n) => n.toString(16).padStart(2, '0');
+            return '#' + toHex(r) + toHex(g) + toHex(b);
+        }
+
+        // ===== HEX TO RGB CONVERSION =====
+        function hexToRgb(hex) {
+            hex = hex.replace('#', '');
+            return {
+                r: parseInt(hex.substring(0, 2), 16),
+                g: parseInt(hex.substring(2, 4), 16),
+                b: parseInt(hex.substring(4, 6), 16)
+            };
+        }
+
+        // ===== UPDATE FROM RGB INPUTS =====
+        function updateFromRgb() {
+            const r = clamp(inputR.value, 0, 255);
+            const g = clamp(inputG.value, 0, 255);
+            const b = clamp(inputB.value, 0, 255);
+
+            const hex = rgbToHex(r, g, b).toUpperCase();
+            hexOutput.value = hex;
+
+            colorPreview.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+            colorPreview.classList.add('active');
+
+            colorPicker.value = rgbToHex(r, g, b);
+        }
+
+        // ===== UPDATE FROM COLOR PICKER =====
+        function updateFromPicker() {
+            const hex = colorPicker.value;
+            const { r, g, b } = hexToRgb(hex);
+
+            inputR.value = r;
+            inputG.value = g;
+            inputB.value = b;
+
+            hexOutput.value = hex.toUpperCase();
+
+            colorPreview.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+            colorPreview.classList.add('active');
+        }
+
+        // ===== EVENT LISTENERS =====
+        inputR.addEventListener('input', updateFromRgb);
+        inputG.addEventListener('input', updateFromRgb);
+        inputB.addEventListener('input', updateFromRgb);
+        colorPicker.addEventListener('input', updateFromPicker);
+
+        // Clamp on blur
+        [inputR, inputG, inputB].forEach(input => {
+            input.addEventListener('blur', () => {
+                if (input.value !== '') {
+                    input.value = clamp(input.value, 0, 255);
+                    updateFromRgb();
+                }
+            });
+        });
+
+        // ===== COPY HEX =====
+        btnCopy.addEventListener('click', () => {
+            const hex = hexOutput.value;
+            if (!hex) {
+                showToast('Enter RGB values first!');
+                return;
+            }
+            navigator.clipboard.writeText(hex).then(() => {
+                btnCopy.classList.add('copied');
+                btnCopy.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
+                showToast('HEX code copied to clipboard!');
+                setTimeout(() => {
+                    btnCopy.classList.remove('copied');
+                    btnCopy.innerHTML = '<i class="fa-regular fa-copy"></i> Copy HEX';
+                }, 2000);
+            }).catch(() => {
+                // Fallback
+                const temp = document.createElement('textarea');
+                temp.value = hex;
+                document.body.appendChild(temp);
+                temp.select();
+                document.execCommand('copy');
+                document.body.removeChild(temp);
+                btnCopy.classList.add('copied');
+                btnCopy.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
+                showToast('HEX code copied to clipboard!');
+                setTimeout(() => {
+                    btnCopy.classList.remove('copied');
+                    btnCopy.innerHTML = '<i class="fa-regular fa-copy"></i> Copy HEX';
+                }, 2000);
+            });
+        });
+
+        // ===== START OVER =====
+        btnReset.addEventListener('click', () => {
+            inputR.value = '';
+            inputG.value = '';
+            inputB.value = '';
+            hexOutput.value = '';
+            colorPreview.style.backgroundColor = '';
+            colorPreview.classList.remove('active');
+            colorPicker.value = '#000000';
+            showToast('All values reset!');
+        });
+
+        // ===== TOAST =====
+        let toastTimer;
+        function showToast(message) {
+            clearTimeout(toastTimer);
+            toast.textContent = message;
+            toast.classList.add('show');
+            toastTimer = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+    </script>
+</body>
+</html>
