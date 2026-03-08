@@ -213,10 +213,17 @@
             cursor: pointer;
         }
 
+        /* NEW UPLOAD ICON STYLING */
         .upload-icon {
-            font-size: 40px;
+            font-size: 48px;
             color: var(--blue);
             margin-bottom: 16px;
+            transition: transform 0.3s ease;
+        }
+
+        .upload-area:hover .upload-icon,
+        .upload-area.drag-over .upload-icon {
+            transform: translateY(-5px);
         }
 
         .upload-text-primary {
@@ -696,13 +703,7 @@
                 <div class="upload-area" id="uploadArea">
                     <input type="file" id="fileInput" accept=".pdf,application/pdf">
                     <div class="upload-icon">
-                        <svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M14 34 C8 34 4 30 4 25 C4 20 8 16.5 12.5 16 C13 11 17.5 7 23 7 C27.5 7 31.5 9.5 33.5 13 C34.2 12.8 35 12.7 36 12.7 C41 12.7 45 16.7 45 21.7 C45 22.5 44.9 23.2 44.7 23.9 C47 25 48.5 27.3 48.5 30 C48.5 33.5 45.7 36.5 42 36.5 L38 36.5" stroke="var(--blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.35"/>
-                            <path d="M26 44 L26 28" stroke="var(--blue)" stroke-width="2.5" stroke-linecap="round"/>
-                            <path d="M20 33 L26 27 L32 33" stroke="var(--blue)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-                            <rect x="14" y="38" width="24" height="12" rx="3" fill="var(--blue)" opacity="0.12"/>
-                            <text x="26" y="47" text-anchor="middle" fill="var(--blue)" font-family="Inter, sans-serif" font-size="7" font-weight="700">PDF</text>
-                        </svg>
+                        <i class="fa-solid fa-file-arrow-up"></i>
                     </div>
                     <div class="upload-text-primary">Click or Drag & Drop PDF here</div>
                     <div class="upload-text-secondary">Supports .pdf files up to 100MB</div>
@@ -892,6 +893,14 @@
         });
 
         function handleFile(file) {
+            // Check for 100MB file limit
+            const maxSize = 100 * 1024 * 1024; // 100MB in bytes
+            if (file.size > maxSize) {
+                alert("File is too large. Please upload a PDF under 100MB.");
+                fileInput.value = ''; // Reset input
+                return;
+            }
+
             uploadedFile = file;
             fileNameEl.textContent = file.name;
             fileSizeEl.textContent = formatSize(file.size);
