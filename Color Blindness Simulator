@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Blindness Simulator — PassionTools</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --red: #ef4444;
+            --purple: #a855f7;
+            --blue: #3b82f6;
+            --blue-dark: #2563eb;
+            --green: #22c55e;
+            --bg-color: #f9fafb;
+            --card-bg: #ffffff;
+            --text-primary: #000000;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --hover-gray: #f3f4f6;
+            --btn-action-bg: #fef2f2;
+            --error-bg: #fee2e2;
+            --error-text: #991b1b;
+            --footer-bg: #111827;
+        }
+        [data-theme="dark"] {
+            --bg-color: #020617;
+            --card-bg: #111827;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --border-color: #1e293b;
+            --hover-gray: #1e293b;
+            --btn-action-bg: #450a0a;
+            --error-bg: #7f1d1d;
+            --error-text: #f87171;
+            --footer-bg: #020617;
+        }
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family:'Inter',sans-serif;
+            background:var(--bg-color);
+            color:var(--text-primary);
+            min-height:100vh;
+            display:flex;
+            flex-direction:column;
+            transition:background-color .3s ease,color .3s ease;
+            -webkit-font-smoothing:antialiased;
+        }
+        /* HEADER */
+        .header {
+            position:sticky;top:0;z-index:1000;
+            backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+            background:rgba(255,255,255,.75);
+            border-bottom:1px solid var(--border-color);
+            transition:all .3s ease;
+        }
+        [data-theme="dark"] .header { background:rgba(2,6,23,.75); }
+        .header-inner { max-width:1200px;margin:0 auto;padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between; }
+        .logo { text-decoration:none;font-size:1.35rem;font-weight:700;display:inline-flex;align-items:center;line-height:1;cursor:pointer; }
+        .logo-passion { color:var(--text-primary);transition:color .3s ease; }
+        .logo-tools { background:linear-gradient(135deg,var(--red),var(--purple));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent; }
+        .header-actions { display:flex;align-items:center;gap:16px; }
+        .back-link { text-decoration:none;color:var(--text-primary);font-size:.9rem;font-weight:500;display:inline-flex;align-items:center;gap:6px;transition:color .3s ease; }
+        .back-link:hover { color:var(--red); }
+        .theme-toggle { background:none;border:none;cursor:pointer;font-size:1.25rem;line-height:1;padding:4px;display:flex;align-items:center;justify-content:center;transition:transform .3s ease; }
+        .theme-toggle:hover { transform:scale(1.15); }
+
+        /* MAIN */
+        .main-content { flex:1;max-width:960px;width:100%;margin:0 auto;padding:48px 24px 64px; }
+        .tool-header { text-align:center;margin-bottom:40px; }
+        .tool-title { font-size:2rem;font-weight:800;color:var(--text-primary);margin-bottom:12px;letter-spacing:-.025em;transition:color .3s ease; }
+        .tool-subtitle { font-size:1rem;color:var(--text-secondary);max-width:620px;margin:0 auto;line-height:1.65;font-weight:400;transition:color .3s ease; }
+
+        /* CARD */
+        .workspace-card { background:var(--card-bg);border:1px solid var(--border-color);border-radius:16px;overflow:hidden;transition:all .3s ease; }
+
+        /* UPLOAD */
+        .upload-area { padding:48px 32px;display:flex;flex-direction:column;align-items:center;justify-content:center; }
+        .upload-area.hidden { display:none; }
+        .drop-zone { width:100%;max-width:560px;border:2.5px dashed var(--border-color);border-radius:14px;padding:56px 32px;text-align:center;cursor:pointer;transition:all .3s ease;position:relative; }
+        .drop-zone:hover,.drop-zone.drag-over { border-color:var(--blue);background:rgba(59,130,246,.04); }
+        [data-theme="dark"] .drop-zone:hover,[data-theme="dark"] .drop-zone.drag-over { background:rgba(59,130,246,.08); }
+        .drop-zone-icon { font-size:2.5rem;color:var(--blue);margin-bottom:16px; }
+        .drop-zone-title { font-size:1.1rem;font-weight:600;color:var(--text-primary);margin-bottom:6px;transition:color .3s ease; }
+        .drop-zone-subtitle { font-size:.875rem;color:var(--text-secondary);transition:color .3s ease; }
+        .drop-zone-formats { margin-top:16px;font-size:.8rem;color:var(--text-secondary);font-weight:500;letter-spacing:.02em; }
+        .drop-zone-paste { margin-top:10px;font-size:.75rem;color:var(--text-secondary);opacity:.7; }
+        .file-input-hidden { display:none; }
+
+        /* SIMULATOR */
+        .simulator-area { display:none;flex-direction:column; }
+        .simulator-area.active { display:flex; }
+
+        /* TOOLBAR */
+        .toolbar { padding:12px 20px;border-bottom:1px solid var(--border-color);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;transition:border-color .3s ease; }
+        .view-modes { display:flex;background:var(--hover-gray);border-radius:10px;padding:3px;transition:background .3s ease; }
+        .view-mode-btn {
+            padding:7px 14px;border-radius:8px;border:none;background:none;cursor:pointer;
+            font-family:'Inter',sans-serif;font-size:.78rem;font-weight:600;
+            color:var(--text-secondary);transition:all .3s ease;white-space:nowrap;
+            display:inline-flex;align-items:center;gap:5px;
+        }
+        .view-mode-btn.active { background:var(--card-bg);color:var(--text-primary);box-shadow:0 1px 4px rgba(0,0,0,.08); }
+        [data-theme="dark"] .view-mode-btn.active { box-shadow:0 1px 4px rgba(0,0,0,.3); }
+        .view-mode-btn:hover:not(.active) { color:var(--text-primary); }
+        .tool-actions { display:flex;gap:4px;align-items:center; }
+        .tool-btn {
+            width:36px;height:36px;border-radius:9px;border:1.5px solid var(--border-color);
+            background:var(--card-bg);color:var(--text-secondary);cursor:pointer;
+            display:flex;align-items:center;justify-content:center;font-size:.85rem;
+            transition:all .3s ease;position:relative;
+        }
+        .tool-btn:hover { border-color:var(--blue);color:var(--blue);background:rgba(59,130,246,.05); }
+        .tool-btn.active { background:var(--blue);border-color:var(--blue);color:#fff; }
+        .tool-btn[data-tooltip]:hover::after {
+            content:attr(data-tooltip);position:absolute;bottom:-32px;left:50%;transform:translateX(-50%);
+            background:rgba(0,0,0,.8);color:#fff;padding:4px 10px;border-radius:6px;
+            font-size:.7rem;white-space:nowrap;z-index:99;pointer-events:none;
+        }
+
+        /* CONTROLS */
+        .controls-panel { padding:14px 20px;border-bottom:1px solid var(--border-color);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:var(--border-color) transparent; }
+        .controls-panel::-webkit-scrollbar { height:4px; }
+        .controls-panel::-webkit-scrollbar-track { background:transparent; }
+        .controls-panel::-webkit-scrollbar-thumb { background:var(--border-color);border-radius:4px; }
+        .filter-buttons { display:flex;gap:7px;min-width:max-content; }
+        .filter-btn {
+            padding:8px 15px;border-radius:9px;border:1.5px solid var(--border-color);
+            background:var(--card-bg);color:var(--text-secondary);
+            font-family:'Inter',sans-serif;font-size:.78rem;font-weight:550;
+            cursor:pointer;white-space:nowrap;transition:all .3s ease;
+            display:inline-flex;align-items:center;gap:6px;
+        }
+        .filter-btn:hover { border-color:var(--blue);color:var(--blue);background:rgba(59,130,246,.05); }
+        .filter-btn.active { background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 2px 8px rgba(59,130,246,.3); }
+        .filter-dot { width:8px;height:8px;border-radius:50%;flex-shrink:0; }
+
+        /* SEVERITY */
+        .severity-panel { padding:12px 20px;border-bottom:1px solid var(--border-color);display:flex;align-items:center;gap:14px;transition:all .3s ease; }
+        .severity-panel.hidden { display:none; }
+        .severity-label { font-size:.78rem;font-weight:600;color:var(--text-secondary);white-space:nowrap;min-width:60px; }
+        .severity-slider-wrap { flex:1;display:flex;align-items:center;gap:12px; }
+        .severity-slider {
+            -webkit-appearance:none;appearance:none;flex:1;height:6px;border-radius:3px;
+            background:var(--border-color);outline:none;cursor:pointer;transition:background .3s ease;
+        }
+        .severity-slider::-webkit-slider-thumb {
+            -webkit-appearance:none;width:20px;height:20px;border-radius:50%;
+            background:#fff;border:2.5px solid var(--blue);cursor:pointer;
+            box-shadow:0 2px 6px rgba(0,0,0,.15);transition:transform .2s ease;
+        }
+        .severity-slider::-webkit-slider-thumb:hover { transform:scale(1.15); }
+        .severity-slider::-moz-range-thumb {
+            width:20px;height:20px;border-radius:50%;background:#fff;
+            border:2.5px solid var(--blue);cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.15);
+        }
+        .severity-value { font-size:.8rem;font-weight:700;color:var(--blue);min-width:38px;text-align:right; }
+
+        /* IMAGE INFO */
+        .image-info-bar { padding:8px 20px;border-bottom:1px solid var(--border-color);display:flex;align-items:center;gap:16px;font-size:.75rem;color:var(--text-secondary);flex-wrap:wrap;transition:all .3s ease; }
+        .image-info-bar i { color:var(--blue); }
+        .image-info-item { display:inline-flex;align-items:center;gap:5px; }
+        .image-info-sep { width:1px;height:14px;background:var(--border-color); }
+
+        /* PREVIEW */
+        .preview-container { position:relative;background:var(--bg-color);transition:background .3s ease; }
+        .preview-area { padding:24px;display:flex;align-items:center;justify-content:center;min-height:200px;overflow:hidden;position:relative; }
+        .canvas-wrapper { position:relative;transition:transform .15s ease;transform-origin:center center;cursor:default; }
+        .canvas-wrapper.zoomed { cursor:grab; }
+        .canvas-wrapper.panning { cursor:grabbing; }
+        .preview-canvas { max-width:100%;height:auto;max-height:600px;border-radius:10px;border:1px solid var(--border-color);display:block;transition:border-color .3s ease; }
+        .preview-area.eyedropper-active { cursor:crosshair !important; }
+        .preview-area.eyedropper-active .canvas-wrapper { cursor:crosshair !important; }
+
+        /* ZOOM INDICATOR */
+        .zoom-indicator {
+            position:absolute;bottom:16px;right:16px;
+            background:rgba(0,0,0,.65);color:#fff;padding:5px 12px;border-radius:8px;
+            font-size:.72rem;font-weight:700;pointer-events:none;
+            opacity:0;transition:opacity .3s ease;z-index:5;
+            backdrop-filter:blur(4px);
+        }
+        .zoom-indicator.visible { opacity:1; }
+
+        /* COMPARE VIEW */
+        .compare-view { display:none;padding:24px;justify-content:center; }
+        .compare-view.active { display:flex; }
+        .compare-container {
+            position:relative;max-width:100%;max-height:600px;overflow:hidden;
+            border-radius:10px;border:1px solid var(--border-color);user-select:none;
+        }
+        .compare-canvas-base { max-width:100%;height:auto;max-height:600px;display:block; }
+        .compare-overlay-wrap {
+            position:absolute;top:0;left:0;right:0;bottom:0;
+            clip-path:inset(0 0 0 50%);transition:none;
+        }
+        .compare-canvas-overlay { width:100%;height:100%;display:block;object-fit:contain; }
+        .compare-handle {
+            position:absolute;top:0;bottom:0;left:50%;z-index:10;
+            transform:translateX(-50%);cursor:col-resize;width:36px;
+            display:flex;align-items:center;justify-content:center;
+        }
+        .compare-handle-line { position:absolute;top:0;bottom:0;left:50%;width:3px;background:#fff;transform:translateX(-50%);box-shadow:0 0 8px rgba(0,0,0,.4); }
+        .compare-handle-grip {
+            width:36px;height:36px;border-radius:50%;background:#fff;
+            box-shadow:0 2px 10px rgba(0,0,0,.25);display:flex;align-items:center;
+            justify-content:center;z-index:11;font-size:.8rem;color:#333;
+        }
+        .compare-label {
+            position:absolute;top:12px;padding:5px 14px;border-radius:8px;
+            background:rgba(0,0,0,.55);color:#fff;font-size:.7rem;font-weight:700;
+            z-index:5;backdrop-filter:blur(4px);pointer-events:none;
+            transition:opacity .3s ease;letter-spacing:.02em;
+        }
+        .compare-label-left { left:12px; }
+        .compare-label-right { right:12px; }
+
+        /* GRID VIEW */
+        .grid-view { display:none;padding:20px; }
+        .grid-view.active { display:block; }
+        .grid-container { display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px; }
+        .grid-item {
+            border-radius:10px;overflow:hidden;border:1px solid var(--border-color);
+            background:var(--card-bg);cursor:pointer;transition:all .3s ease;
+        }
+        .grid-item:hover { border-color:var(--blue);transform:translateY(-2px);box-shadow:0 4px 16px rgba(59,130,246,.12); }
+        .grid-item canvas { width:100%;height:auto;display:block; }
+        .grid-item-label {
+            padding:8px 12px;font-size:.72rem;font-weight:600;
+            color:var(--text-secondary);border-top:1px solid var(--border-color);
+            display:flex;align-items:center;gap:6px;transition:color .3s ease;
+        }
+        .grid-item-loading {
+            aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;
+            color:var(--text-secondary);font-size:1.2rem;
+        }
+
+        /* EYEDROPPER TOOLTIP */
+        .eyedropper-tooltip {
+            position:fixed;z-index:9999;background:var(--card-bg);border:1px solid var(--border-color);
+            border-radius:12px;padding:14px;box-shadow:0 8px 28px rgba(0,0,0,.18);
+            pointer-events:none;display:none;min-width:200px;
+            transition:background .3s ease,border-color .3s ease;
+        }
+        .eyedropper-tooltip.visible { display:block; }
+        .eyedropper-colors { display:flex;gap:10px;margin-bottom:10px; }
+        .eyedropper-swatch-group { text-align:center; }
+        .eyedropper-swatch { width:44px;height:44px;border-radius:8px;border:2px solid var(--border-color);margin-bottom:4px; }
+        .eyedropper-swatch-label { font-size:.6rem;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.04em; }
+        .eyedropper-info { font-size:.72rem;color:var(--text-secondary);line-height:1.6; }
+        .eyedropper-info strong { color:var(--text-primary);font-weight:600; }
+
+        /* PALETTE PANEL */
+        .panel-section { border-top:1px solid var(--border-color); }
+        .panel-toggle {
+            width:100%;padding:14px 20px;background:none;border:none;cursor:pointer;
+            display:flex;align-items:center;justify-content:space-between;
+            font-family:'Inter',sans-serif;font-size:.82rem;font-weight:600;
+            color:var(--text-primary);transition:all .3s ease;
+        }
+        .panel-toggle:hover { background:var(--hover-gray); }
+        .panel-toggle i { font-size:.7rem;color:var(--text-secondary);transition:transform .3s ease; }
+        .panel-toggle.open i { transform:rotate(180deg); }
+        .panel-content { max-height:0;overflow:hidden;transition:max-height .4s ease; }
+        .panel-content.open { max-height:500px; }
+        .panel-inner { padding:0 20px 18px; }
+
+        .palette-section { margin-bottom:14px; }
+        .palette-section:last-child { margin-bottom:0; }
+        .palette-section-label { font-size:.7rem;font-weight:600;color:var(--text-secondary);margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em; }
+        .palette-row { display:flex;gap:8px;flex-wrap:wrap; }
+        .palette-swatch {
+            width:42px;height:42px;border-radius:10px;border:2px solid var(--border-color);
+            cursor:pointer;transition:all .2s ease;position:relative;
+        }
+        .palette-swatch:hover { transform:scale(1.12);box-shadow:0 4px 12px rgba(0,0,0,.15); }
+        .palette-swatch[data-tooltip]:hover::after {
+            content:attr(data-tooltip);position:absolute;bottom:-26px;left:50%;transform:translateX(-50%);
+            background:rgba(0,0,0,.8);color:#fff;padding:3px 8px;border-radius:5px;
+            font-size:.65rem;white-space:nowrap;z-index:99;
+        }
+        .palette-arrow { display:flex;align-items:center;justify-content:center;color:var(--text-secondary);font-size:.7rem;padding:0 4px; }
+
+        /* ACCESSIBILITY PANEL */
+        .accessibility-inner { padding:0 20px 18px; }
+        .score-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:12px; }
+        .score-big { font-size:2rem;font-weight:800;line-height:1; }
+        .score-big .out-of { font-size:.9rem;font-weight:500;color:var(--text-secondary); }
+        .score-rating {
+            padding:5px 14px;border-radius:20px;font-size:.72rem;font-weight:700;
+            text-transform:uppercase;letter-spacing:.04em;
+        }
+        .score-excellent { background:#dcfce7;color:#166534; }
+        .score-good { background:#fef9c3;color:#854d0e; }
+        .score-fair { background:#ffedd5;color:#9a3412; }
+        .score-poor { background:#fee2e2;color:#991b1b; }
+        [data-theme="dark"] .score-excellent { background:#14532d;color:#86efac; }
+        [data-theme="dark"] .score-good { background:#713f12;color:#fde047; }
+        [data-theme="dark"] .score-fair { background:#7c2d12;color:#fdba74; }
+        [data-theme="dark"] .score-poor { background:#7f1d1d;color:#fca5a5; }
+        .score-bar-wrap { margin-bottom:14px; }
+        .score-bar { height:8px;border-radius:4px;background:var(--hover-gray);overflow:hidden; }
+        .score-fill { height:100%;border-radius:4px;transition:width .8s ease,background .3s ease; }
+        .score-details { display:flex;flex-direction:column;gap:6px; }
+        .score-detail-item {
+            display:flex;align-items:center;gap:8px;font-size:.75rem;color:var(--text-secondary);
+            padding:6px 10px;border-radius:8px;background:var(--hover-gray);transition:background .3s ease;
+        }
+        .score-detail-icon { font-size:.7rem; }
+        .confusable-badge { display:inline-block;padding:2px 8px;border-radius:10px;font-size:.65rem;font-weight:700;margin-left:auto; }
+
+        /* ACTION BAR */
+        .action-bar {
+            padding:14px 20px;border-top:1px solid var(--border-color);
+            display:flex;align-items:center;justify-content:center;gap:10px;
+            flex-wrap:wrap;transition:border-color .3s ease;
+        }
+        .btn {
+            font-family:'Inter',sans-serif;font-size:.82rem;font-weight:600;
+            padding:10px 20px;border-radius:10px;cursor:pointer;
+            display:inline-flex;align-items:center;gap:7px;
+            transition:all .3s ease;border:none;text-decoration:none;
+        }
+        .btn-primary { background:var(--blue);color:#fff;box-shadow:0 2px 8px rgba(59,130,246,.25); }
+        .btn-primary:hover { background:var(--blue-dark);box-shadow:0 4px 14px rgba(59,130,246,.35);transform:translateY(-1px); }
+        .btn-secondary { background:var(--hover-gray);color:var(--text-primary);border:1.5px solid var(--border-color); }
+        .btn-secondary:hover { border-color:var(--blue);color:var(--blue);transform:translateY(-1px); }
+        .btn-ghost-red { background:var(--btn-action-bg);color:var(--red);border:1.5px solid transparent; }
+        .btn-ghost-red:hover { border-color:var(--red);transform:translateY(-1px); }
+
+        /* FOOTER */
+        .footer { background:var(--footer-bg);text-align:center;padding:30px 20px;margin-top:auto; }
+        .footer-text { font-size:14px;color:#94a3b8;font-weight:400; }
+
+        /* TOAST */
+        .toast-container { position:fixed;bottom:24px;right:24px;z-index:10001;display:flex;flex-direction:column-reverse;gap:8px; }
+        .toast {
+            padding:12px 20px;border-radius:10px;font-size:.82rem;font-weight:500;color:#fff;
+            box-shadow:0 4px 16px rgba(0,0,0,.18);animation:toastIn .35s ease;
+            display:flex;align-items:center;gap:8px;backdrop-filter:blur(8px);
+        }
+        .toast-info { background:rgba(59,130,246,.92); }
+        .toast-success { background:rgba(34,197,94,.92); }
+        .toast-error { background:rgba(239,68,68,.92); }
+        .toast-exit { animation:toastOut .3s ease forwards; }
+
+        /* SHORTCUTS MODAL */
+        .modal-overlay {
+            position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10000;
+            display:none;align-items:center;justify-content:center;
+            backdrop-filter:blur(4px);animation:fadeIn .25s ease;
+        }
+        .modal-overlay.active { display:flex; }
+        .modal-content {
+            background:var(--card-bg);border:1px solid var(--border-color);
+            border-radius:16px;padding:28px 32px;max-width:480px;width:92%;
+            max-height:80vh;overflow-y:auto;animation:scaleIn .25s ease;
+        }
+        .modal-title { font-size:1.1rem;font-weight:700;margin-bottom:4px;color:var(--text-primary); }
+        .modal-desc { font-size:.82rem;color:var(--text-secondary);margin-bottom:20px; }
+        .modal-close {
+            position:absolute;top:16px;right:16px;background:none;border:none;
+            font-size:1.1rem;color:var(--text-secondary);cursor:pointer;transition:color .3s ease;
+        }
+        .modal-close:hover { color:var(--text-primary); }
+        .shortcut-group-title { font-size:.72rem;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.06em;margin:16px 0 8px; }
+        .shortcut-row { display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border-color); }
+        .shortcut-row:last-child { border-bottom:none; }
+        .shortcut-desc { font-size:.8rem;color:var(--text-secondary); }
+        .shortcut-key {
+            display:inline-block;padding:3px 9px;background:var(--hover-gray);border:1px solid var(--border-color);
+            border-radius:6px;font-family:'Inter',monospace;font-size:.72rem;font-weight:700;
+            color:var(--text-primary);min-width:28px;text-align:center;
+        }
+
+        /* ANIMATIONS */
+        .fade-in { animation:fadeIn .35s ease; }
+        @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes scaleIn { from{opacity:0;transform:scale(.95)} to{opacity:1;transform:scale(1)} }
+        @keyframes toastIn { from{opacity:0;transform:translateX(40px)} to{opacity:1;transform:translateX(0)} }
+        @keyframes toastOut { from{opacity:1;transform:translateX(0)} to{opacity:0;transform:translateX(40px)} }
+        @keyframes gridItemIn { from{opacity:0;transform:scale(.92)} to{opacity:1;transform:scale(1)} }
+        @keyframes pulse { 0%,100%{opacity:.4} 50%{opacity:1} }
+
+        /* RESPONSIVE */
+        @media(max-width:768px) {
+            .toolbar { padding:10px 14px;gap:8px; }
+            .view-mode-btn { padding:6px 10px;font-size:.72rem; }
+            .grid-container { grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px; }
+        }
+        @media(max-width:640px) {
+            .header-inner { padding:0 16px; }
+            .main-content { padding:28px 12px 48px; }
+            .tool-title { font-size:1.45rem; }
+            .tool-subtitle { font-size:.9rem; }
+            .drop-zone { padding:36px 18px; }
+            .drop-zone-icon { font-size:2rem; }
+            .controls-panel { padding:10px 12px; }
+            .filter-btn { padding:7px 11px;font-size:.72rem; }
+            .preview-area { padding:14px; }
+            .action-bar { padding:12px 14px;gap:8px; }
+            .btn { padding:9px 16px;font-size:.78rem; }
+            .back-link span { display:none; }
+            .severity-panel { padding:10px 14px; }
+            .grid-container { grid-template-columns:1fr 1fr;gap:6px; }
+            .view-mode-btn span.vm-text { display:none; }
+            .tool-actions { gap:3px; }
+            .tool-btn { width:32px;height:32px;font-size:.75rem; }
+            .toast-container { bottom:12px;right:12px;left:12px; }
+            .toast { font-size:.78rem;padding:10px 14px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-inner">
+            <a href="#" onclick="event.preventDefault();" class="logo">
+                <span class="logo-passion">Passion</span><span class="logo-tools">Tools</span>
+            </a>
+            <div class="header-actions">
+                <a href="index.html" class="back-link"><i class="fa-solid fa-arrow-left"></i><span>Back to Tools</span></a>
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">☀️</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN -->
+    <main class="main-content">
+        <div class="tool-header fade-in">
+            <h1 class="tool-title">Color Blindness Simulator</h1>
+            <p class="tool-subtitle">Upload an image to see how it appears to people with different types of color vision deficiency. 100% private in-browser processing.</p>
+        </div>
+        <div class="workspace-card fade-in">
+            <!-- STATE 1: UPLOAD -->
+            <div class="upload-area" id="uploadArea">
+                <div class="drop-zone" id="dropZone">
+                    <div class="drop-zone-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+                    <div class="drop-zone-title">Drop your image here or click to browse</div>
+                    <div class="drop-zone-subtitle">Select a photo to simulate color vision deficiency</div>
+                    <div class="drop-zone-formats">Supports JPG, PNG, WEBP</div>
+                    <div class="drop-zone-paste"><i class="fa-regular fa-keyboard"></i> Or press Ctrl+V to paste from clipboard</div>
+                    <input type="file" class="file-input-hidden" id="fileInput" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+                </div>
+            </div>
+
+            <!-- STATE 2: SIMULATOR -->
+            <div class="simulator-area" id="simulatorArea">
+                <!-- Toolbar -->
+                <div class="toolbar">
+                    <div class="view-modes" id="viewModes">
+                        <button class="view-mode-btn active" data-view="single"><i class="fa-regular fa-image"></i> <span class="vm-text">Single</span></button>
+                        <button class="view-mode-btn" data-view="compare"><i class="fa-solid fa-arrows-left-right"></i> <span class="vm-text">Compare</span></button>
+                        <button class="view-mode-btn" data-view="grid"><i class="fa-solid fa-grip"></i> <span class="vm-text">Grid</span></button>
+                    </div>
+                    <div class="tool-actions">
+                        <button class="tool-btn" id="eyedropperBtn" data-tooltip="Eyedropper (E)"><i class="fa-solid fa-eye-dropper"></i></button>
+                        <button class="tool-btn" id="zoomInBtn" data-tooltip="Zoom In (+)"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
+                        <button class="tool-btn" id="zoomOutBtn" data-tooltip="Zoom Out (-)"><i class="fa-solid fa-magnifying-glass-minus"></i></button>
+                        <button class="tool-btn" id="zoomResetBtn" data-tooltip="Reset Zoom (0)"><i class="fa-solid fa-expand"></i></button>
+                        <button class="tool-btn" id="fullscreenBtn" data-tooltip="Fullscreen (F)"><i class="fa-solid fa-up-right-and-down-left-from-center"></i></button>
+                        <button class="tool-btn" id="shortcutsBtn" data-tooltip="Shortcuts (?)"><i class="fa-regular fa-keyboard"></i></button>
+                    </div>
+                </div>
+
+                <!-- Filter Buttons -->
+                <div class="controls-panel">
+                    <div class="filter-buttons" id="filterButtons">
+                        <button class="filter-btn active" data-filter="normal"><span class="filter-dot" style="background:#22c55e"></span>Normal Vision</button>
+                        <button class="filter-btn" data-filter="protanopia"><span class="filter-dot" style="background:#ef4444"></span>Protanopia</button>
+                        <button class="filter-btn" data-filter="deuteranopia"><span class="filter-dot" style="background:#f97316"></span>Deuteranopia</button>
+                        <button class="filter-btn" data-filter="tritanopia"><span class="filter-dot" style="background:#3b82f6"></span>Tritanopia</button>
+                        <button class="filter-btn" data-filter="achromatopsia"><span class="filter-dot" style="background:#6b7280"></span>Achromatopsia</button>
+                        <button class="filter-btn" data-filter="protanomaly"><span class="filter-dot" style="background:#fb923c"></span>Protanomaly</button>
+                        <button class="filter-btn" data-filter="deuteranomaly"><span class="filter-dot" style="background:#fbbf24"></span>Deuteranomaly</button>
+                        <button class="filter-btn" data-filter="tritanomaly"><span class="filter-dot" style="background:#818cf8"></span>Tritanomaly</button>
+                    </div>
+                </div>
+
+                <!-- Severity Slider -->
+                <div class="severity-panel" id="severityPanel">
+                    <span class="severity-label"><i class="fa-solid fa-sliders"></i> Severity</span>
+                    <div class="severity-slider-wrap">
+                        <input type="range" class="severity-slider" id="severitySlider" min="0" max="100" value="100">
+                        <span class="severity-value" id="severityValue">100%</span>
+                    </div>
+                </div>
+
+                <!-- Image Info -->
+                <div class="image-info-bar" id="imageInfoBar">
+                    <span class="image-info-item"><i class="fa-regular fa-image"></i> <span id="infoName">image.jpg</span></span>
+                    <span class="image-info-sep"></span>
+                    <span class="image-info-item"><i class="fa-solid fa-ruler-combined"></i> <span id="infoDims">0 × 0</span></span>
+                    <span class="image-info-sep"></span>
+                    <span class="image-info-item"><i class="fa-solid fa-weight-hanging"></i> <span id="infoSize">0 KB</span></span>
+                </div>
+
+                <!-- SINGLE VIEW -->
+                <div class="preview-area" id="singleView">
+                    <div class="canvas-wrapper" id="canvasWrapper">
+                        <canvas class="preview-canvas" id="previewCanvas"></canvas>
+                    </div>
+                    <div class="zoom-indicator" id="zoomIndicator">100%</div>
+                </div>
+
+                <!-- COMPARE VIEW -->
+                <div class="compare-view" id="compareView">
+                    <div class="compare-container" id="compareContainer">
+                        <canvas class="compare-canvas-base" id="compareFilteredCanvas"></canvas>
+                        <div class="compare-overlay-wrap" id="compareOverlay">
+                            <canvas class="compare-canvas-overlay" id="compareOriginalCanvas"></canvas>
+                        </div>
+                        <div class="compare-handle" id="compareHandle">
+                            <div class="compare-handle-line"></div>
+                            <div class="compare-handle-grip"><i class="fa-solid fa-arrows-left-right"></i></div>
+                        </div>
+                        <div class="compare-label compare-label-left" id="compareLabelLeft">Original</div>
+                        <div class="compare-label compare-label-right" id="compareLabelRight">Filtered</div>
+                    </div>
+                </div>
+
+                <!-- GRID VIEW -->
+                <div class="grid-view" id="gridView">
+                    <div class="grid-container" id="gridContainer"></div>
+                </div>
+
+                <!-- COLOR PALETTE PANEL -->
+                <div class="panel-section" id="paletteSection">
+                    <button class="panel-toggle" id="paletteToggle"><span><i class="fa-solid fa-palette"></i> Color Palette Analysis</span><i class="fa-solid fa-chevron-down"></i></button>
+                    <div class="panel-content" id="paletteContent">
+                        <div class="panel-inner">
+                            <div class="palette-section">
+                                <div class="palette-section-label">Original Colors</div>
+                                <div class="palette-row" id="paletteOriginal"></div>
+                            </div>
+                            <div style="display:flex;align-items:center;justify-content:center;padding:6px 0;">
+                                <div class="palette-arrow"><i class="fa-solid fa-arrow-down"></i> Simulated</div>
+                            </div>
+                            <div class="palette-section">
+                                <div class="palette-section-label" id="paletteSimLabel">Simulated Colors</div>
+                                <div class="palette-row" id="paletteSimulated"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ACCESSIBILITY PANEL -->
+                <div class="panel-section" id="accessibilitySection">
+                    <button class="panel-toggle" id="accessibilityToggle"><span><i class="fa-solid fa-universal-access"></i> Accessibility Report</span><i class="fa-solid fa-chevron-down"></i></button>
+                    <div class="panel-content" id="accessibilityContent">
+                        <div class="accessibility-inner" id="accessibilityInner"></div>
+                    </div>
+                </div>
+
+                <!-- ACTION BAR -->
+                <div class="action-bar">
+                    <button class="btn btn-primary" id="downloadBtn"><i class="fa-solid fa-download"></i> Download</button>
+                    <button class="btn btn-secondary" id="downloadAllBtn"><i class="fa-solid fa-file-zipper"></i> Download All</button>
+                    <button class="btn btn-secondary" id="copyBtn"><i class="fa-regular fa-copy"></i> Copy</button>
+                    <button class="btn btn-ghost-red" id="startOverBtn"><i class="fa-solid fa-arrow-rotate-left"></i> Start Over</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <p class="footer-text">© 2026 Passion Tools. Secure client-side processing.</p>
+    </footer>
+
+    <!-- EYEDROPPER TOOLTIP -->
+    <div class="eyedropper-tooltip" id="eyedropperTooltip">
+        <div class="eyedropper-colors">
+            <div class="eyedropper-swatch-group">
+                <div class="eyedropper-swatch" id="edSwatchOrig"></div>
+                <div class="eyedropper-swatch-label">Original</div>
+            </div>
+            <div class="eyedropper-swatch-group">
+                <div class="eyedropper-swatch" id="edSwatchSim"></div>
+                <div class="eyedropper-swatch-label">Simulated</div>
+            </div>
+        </div>
+        <div class="eyedropper-info" id="edInfo"></div>
+    </div>
+
+    <!-- TOAST CONTAINER -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- SHORTCUTS MODAL -->
+    <div class="modal-overlay" id="shortcutsModal">
+        <div class="modal-content" style="position:relative;">
+            <button class="modal-close" id="modalClose"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-title">Keyboard Shortcuts</div>
+            <div class="modal-desc">Use these shortcuts to work faster.</div>
+            <div class="shortcut-group-title">View Modes</div>
+            <div class="shortcut-row"><span class="shortcut-desc">Single View</span><span class="shortcut-key">S</span></div>
+            <div class="shortcut-row"><span class="shortcut-desc">Compare View</span><span class="shortcut-key">C</span></div>
+            <div class="shortcut-row"><span class="shortcut-desc">Grid View</span><span class="shortcut-key">G</span></div>
+            <div class="shortcut-group-title">Filters</div>
+            <div class="shortcut-row"><span class="shortcut-desc">Normal / Protanopia / Deuter…</span><span><span class="shortcut-key">1</span> – <span class="shortcut-key">8</span></span></div>
+            <div class="shortcut-group-title">Tools</div>
+            <div class="shortcut-row"><span class="shortcut-desc">Eyedropper</span><span class="shortcut-key">E</span></div>
+            <div class="shortcut-row"><span class="shortcut-desc">Zoom In</span><span class="shortcut-key">+</span></div>
+            <div class="shortcut-row"><span class="shortcut-desc">Zoom Out</span><span class="shortcut-key">-</span></div>
+            <div class="shortcut-row"><span class="shortcut-desc">Reset Zoom</span><span class="shortcut-key">0</span></div>
+            <div class="shortcut-row"><span class="shortcut-desc">Fullscreen</span><span class="shortcut-key">F</span></div>
+            <div class="shortcut-group-title">Actions</div>
+            <div class="shortcut-row"><span class="shortcut-desc">Download</span><span class="shortcut-key">D</span></div>
+            <div class="shortcut-row"><span class="shortcut-desc">Download All</span><span><span class="shortcut-key">Shift</span>+<span class="shortcut-key">D</span></span></div>
+            <div class="shortcut-row"><span class="shortcut-desc">Copy to Clipboard</span><span><span class="shortcut-key">Ctrl</span>+<span class="shortcut-key">C</span></span></div>
+            <div class="shortcut-row"><span class="shortcut-desc">Close / Reset</span><span class="shortcut-key">Esc</span></div>
+        </div>
+    </div>
+
+    <!-- OFFSCREEN CANVAS -->
+    <canvas id="offscreenCanvas" style="display:none"></canvas>
+
+    <script>
+    (() => {
+    'use strict';
+
+    // ===== MATRICES =====
+    const IDENTITY = [1,0,0, 0,1,0, 0,0,1];
+    const MATRICES = {
+        normal:        [1,0,0, 0,1,0, 0,0,1],
+        protanopia:    [0.56667,0.43333,0, 0.55833,0.44167,0, 0,0.24167,0.75833],
+        deuteranopia:  [0.625,0.375,0, 0.7,0.3,0, 0,0.3,0.7],
+        tritanopia:    [0.95,0.05,0, 0,0.43333,0.56667, 0,0.475,0.525],
+        achromatopsia: [0.299,0.587,0.114, 0.299,0.587,0.114, 0.299,0.587,0.114],
+        protanomaly:   [0.81667,0.18333,0, 0.33333,0.66667,0, 0,0.125,0.875],
+        deuteranomaly: [0.8,0.2,0, 0.25833,0.74167,0, 0,0.14167,0.85833],
+        tritanomaly:   [0.96667,0.03333,0, 0,0.73333,0.26667, 0,0.18333,0.81667]
+    };
+    const FILTER_LABELS = {
+        normal:'Normal Vision', protanopia:'Protanopia (Red-Blind)',
+        deuteranopia:'Deuteranopia (Green-Blind)', tritanopia:'Tritanopia (Blue-Blind)',
+        achromatopsia:'Achromatopsia (Monochromacy)', protanomaly:'Protanomaly (Red-Weak)',
+        deuteranomaly:'Deuteranomaly (Green-Weak)', tritanomaly:'Tritanomaly (Blue-Weak)'
+    };
+    const FILTER_KEYS = Object.keys(MATRICES);
+    const MAX_DIM = 4096;
+
+    // ===== STATE =====
+    const state = {
+        activeFilter:'normal', viewMode:'single', severity:100,
+        zoom:1, panX:0, panY:0, isPanning:false, panStart:{x:0,y:0},
+        eyedropper:false, fileName:'image', fileSize:0,
+        dominantColors:[], imageLoaded:false
+    };
+
+    // ===== DOM =====
+    const $ = id => document.getElementById(id);
+    const html = document.documentElement;
+    const themeToggle = $('themeToggle');
+    const uploadArea = $('uploadArea');
+    const simulatorArea = $('simulatorArea');
+    const dropZone = $('dropZone');
+    const fileInput = $('fileInput');
+    const previewCanvas = $('previewCanvas');
+    const offscreenCanvas = $('offscreenCanvas');
+    const canvasWrapper = $('canvasWrapper');
+    const filterButtonsEl = $('filterButtons');
+    const downloadBtn = $('downloadBtn');
+    const downloadAllBtn = $('downloadAllBtn');
+    const copyBtn = $('copyBtn');
+    const startOverBtn = $('startOverBtn');
+    const severitySlider = $('severitySlider');
+    const severityValue = $('severityValue');
+    const severityPanel = $('severityPanel');
+    const zoomIndicator = $('zoomIndicator');
+    const eyedropperBtn = $('eyedropperBtn');
+    const eyedropperTooltip = $('eyedropperTooltip');
+    const singleView = $('singleView');
+    const compareView = $('compareView');
+    const gridView = $('gridView');
+    const compareContainer = $('compareContainer');
+    const compareOriginalCanvas = $('compareOriginalCanvas');
+    const compareFilteredCanvas = $('compareFilteredCanvas');
+    const compareOverlay = $('compareOverlay');
+    const compareHandle = $('compareHandle');
+    const compareLabelLeft = $('compareLabelLeft');
+    const compareLabelRight = $('compareLabelRight');
+    const gridContainer = $('gridContainer');
+    const viewModesEl = $('viewModes');
+    const toastContainer = $('toastContainer');
+    const shortcutsModal = $('shortcutsModal');
+
+    const previewCtx = previewCanvas.getContext('2d', {willReadFrequently:true});
+    const offscreenCtx = offscreenCanvas.getContext('2d', {willReadFrequently:true});
+
+    // ===== THEME =====
+    function setTheme(t) {
+        html.setAttribute('data-theme', t);
+        themeToggle.textContent = t==='dark' ? '🌙' : '☀️';
+        localStorage.setItem('passion-tools-theme', t);
+    }
+    (() => {
+        const s = localStorage.getItem('passion-tools-theme');
+        if(s) setTheme(s);
+        else if(matchMedia('(prefers-color-scheme:dark)').matches) setTheme('dark');
+    })();
+    themeToggle.addEventListener('click', () => setTheme(html.getAttribute('data-theme')==='dark'?'light':'dark'));
+
+    // ===== TOAST =====
+    function showToast(msg, type='info') {
+        const t = document.createElement('div');
+        t.className = `toast toast-${type}`;
+        const icons = {info:'fa-circle-info', success:'fa-circle-check', error:'fa-circle-exclamation'};
+        t.innerHTML = `<i class="fa-solid ${icons[type]||icons.info}"></i> ${msg}`;
+        toastContainer.appendChild(t);
+        setTimeout(() => { t.classList.add('toast-exit'); setTimeout(()=>t.remove(),300); }, 3000);
+    }
+
+    // ===== FILE HANDLING =====
+    const validTypes = ['image/jpeg','image/png','image/webp'];
+
+    dropZone.addEventListener('click', () => fileInput.click());
+    dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+    dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('drag-over'); if(e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]); });
+    fileInput.addEventListener('change', e => { if(e.target.files.length) handleFile(e.target.files[0]); });
+
+    // Clipboard paste
+    document.addEventListener('paste', e => {
+        const items = e.clipboardData?.items;
+        if(!items) return;
+        for(const item of items) {
+            if(item.type.startsWith('image/')) {
+                e.preventDefault();
+                handleFile(item.getAsFile());
+                break;
+            }
+        }
+    });
+
+    function handleFile(file) {
+        if(!validTypes.includes(file.type)) { showToast('Unsupported format. Use JPG, PNG, or WEBP.','error'); return; }
+        state.fileName = file.name.replace(/\.[^/.]+$/,'') || 'image';
+        state.fileSize = file.size;
+        const reader = new FileReader();
+        reader.onload = e => {
+            const img = new Image();
+            img.onload = () => {
+                let w = img.width, h = img.height;
+                if(w > MAX_DIM || h > MAX_DIM) {
+                    const scale = MAX_DIM / Math.max(w,h);
+                    w = Math.round(w*scale); h = Math.round(h*scale);
+                }
+                offscreenCanvas.width = w; offscreenCanvas.height = h;
+                offscreenCtx.drawImage(img, 0, 0, w, h);
+                previewCanvas.width = w; previewCanvas.height = h;
+                previewCtx.drawImage(img, 0, 0, w, h);
+                $('infoName').textContent = state.fileName + '.' + (file.name.split('.').pop()||'png');
+                $('infoDims').textContent = `${w} × ${h}`;
+                $('infoSize').textContent = formatBytes(state.fileSize);
+                state.imageLoaded = true;
+                state.dominantColors = extractPalette();
+                showSimulator();
+                showToast('Image loaded successfully!','success');
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function formatBytes(b) {
+        if(b<1024) return b+' B';
+        if(b<1048576) return (b/1024).toFixed(1)+' KB';
+        return (b/1048576).toFixed(1)+' MB';
+    }
+
+    // ===== VIEW MANAGEMENT =====
+    function showSimulator() {
+        uploadArea.classList.add('hidden');
+        simulatorArea.classList.add('active');
+        simulatorArea.classList.add('fade-in');
+        state.activeFilter = 'normal';
+        state.severity = 100;
+        severitySlider.value = 100;
+        severityValue.textContent = '100%';
+        resetZoom();
+        updateFilterButtons();
+        updateSeverityVisibility();
+        setViewMode('single');
+        renderPalette();
+        renderAccessibility();
+    }
+
+    function showUpload() {
+        simulatorArea.classList.remove('active','fade-in');
+        uploadArea.classList.remove('hidden');
+        uploadArea.classList.add('fade-in');
+        state.imageLoaded = false;
+        state.eyedropper = false;
+        eyedropperBtn.classList.remove('active');
+        eyedropperTooltip.classList.remove('visible');
+    }
+
+    function setViewMode(mode) {
+        state.viewMode = mode;
+        singleView.style.display = mode==='single' ? 'flex' : 'none';
+        compareView.classList.toggle('active', mode==='compare');
+        gridView.classList.toggle('active', mode==='grid');
+        document.querySelectorAll('.view-mode-btn').forEach(b => b.classList.toggle('active', b.dataset.view===mode));
+        updateSeverityVisibility();
+        if(mode==='single') renderSingle();
+        else if(mode==='compare') renderCompare();
+        else if(mode==='grid') renderGrid();
+    }
+
+    viewModesEl.addEventListener('click', e => {
+        const btn = e.target.closest('.view-mode-btn');
+        if(btn && state.imageLoaded) setViewMode(btn.dataset.view);
+    });
+
+    function updateSeverityVisibility() {
+        severityPanel.classList.toggle('hidden', state.activeFilter==='normal');
+    }
+
+    // ===== FILTER BUTTONS =====
+    filterButtonsEl.addEventListener('click', e => {
+        const btn = e.target.closest('.filter-btn');
+        if(!btn) return;
+        state.activeFilter = btn.dataset.filter;
+        updateFilterButtons();
+        updateSeverityVisibility();
+        if(state.viewMode==='single') renderSingle();
+        else if(state.viewMode==='compare') renderCompare();
+        else if(state.viewMode==='grid') renderGrid();
+        renderPalette();
+    });
+
+    function updateFilterButtons() {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.dataset.filter===state.activeFilter));
+    }
+
+    // ===== SEVERITY SLIDER =====
+    let rafSeverity = null;
+    severitySlider.addEventListener('input', () => {
+        state.severity = parseInt(severitySlider.value);
+        severityValue.textContent = state.severity + '%';
+        if(rafSeverity) cancelAnimationFrame(rafSeverity);
+        rafSeverity = requestAnimationFrame(() => {
+            if(state.viewMode==='single') renderSingle();
+            else if(state.viewMode==='compare') renderCompare();
+            else if(state.viewMode==='grid') renderGrid();
+            renderPalette();
+            rafSeverity = null;
+        });
+    });
+
+    // ===== PIXEL PROCESSING ENGINE =====
+    function getInterpolatedMatrix(filterName, severity) {
+        const t = severity / 100;
+        const target = MATRICES[filterName];
+        return IDENTITY.map((v,i) => v + (target[i] - v) * t);
+    }
+
+    function applyMatrixToImageData(srcData, filterName, severity) {
+        const w = srcData.width, h = srcData.height;
+        const src = srcData.data;
+        const out = new ImageData(w, h);
+        const dst = out.data;
+        if(filterName==='normal' || severity===0) { dst.set(src); return out; }
+        const m = getInterpolatedMatrix(filterName, severity);
+        for(let i=0; i<src.length; i+=4) {
+            const r=src[i], g=src[i+1], b=src[i+2];
+            dst[i]   = Math.min(255, Math.max(0, m[0]*r + m[1]*g + m[2]*b));
+            dst[i+1] = Math.min(255, Math.max(0, m[3]*r + m[4]*g + m[5]*b));
+            dst[i+2] = Math.min(255, Math.max(0, m[6]*r + m[7]*g + m[8]*b));
+            dst[i+3] = src[i+3];
+        }
+        return out;
+    }
+
+    function applyColorMatrix(r, g, b, filterName, severity) {
+        if(filterName==='normal' || severity===0) return {r,g,b};
+        const m = getInterpolatedMatrix(filterName, severity);
+        return {
+            r: Math.min(255, Math.max(0, Math.round(m[0]*r + m[1]*g + m[2]*b))),
+            g: Math.min(255, Math.max(0, Math.round(m[3]*r + m[4]*g + m[5]*b))),
+            b: Math.min(255, Math.max(0, Math.round(m[6]*r + m[7]*g + m[8]*b)))
+        };
+    }
+
+    // ===== RENDER FUNCTIONS =====
+    function renderSingle() {
+        const w = offscreenCanvas.width, h = offscreenCanvas.height;
+        const orig = offscreenCtx.getImageData(0,0,w,h);
+        const filtered = applyMatrixToImageData(orig, state.activeFilter, state.severity);
+        previewCtx.putImageData(filtered, 0, 0);
+    }
+
+    function renderCompare() {
+        const w = offscreenCanvas.width, h = offscreenCanvas.height;
+        compareOriginalCanvas.width = w; compareOriginalCanvas.height = h;
+        compareFilteredCanvas.width = w; compareFilteredCanvas.height = h;
+        const origData = offscreenCtx.getImageData(0,0,w,h);
+        const origCtx = compareOriginalCanvas.getContext('2d');
+        origCtx.putImageData(origData, 0, 0);
+        const filteredData = applyMatrixToImageData(origData, state.activeFilter, state.severity);
+        const filtCtx = compareFilteredCanvas.getContext('2d');
+        filtCtx.putImageData(filteredData, 0, 0);
+        compareLabelRight.textContent = FILTER_LABELS[state.activeFilter] || 'Filtered';
+    }
+
+    async function renderGrid() {
+        gridContainer.innerHTML = '';
+        const origData = offscreenCtx.getImageData(0, 0, offscreenCanvas.width, offscreenCanvas.height);
+        for(let i=0; i<FILTER_KEYS.length; i++) {
+            const filter = FILTER_KEYS[i];
+            const item = document.createElement('div');
+            item.className = 'grid-item';
+            item.style.animation = `gridItemIn .35s ease ${i*0.05}s both`;
+            item.dataset.filter = filter;
+
+            const canvas = document.createElement('canvas');
+            canvas.width = offscreenCanvas.width;
+            canvas.height = offscreenCanvas.height;
+            const ctx = canvas.getContext('2d');
+
+            const label = document.createElement('div');
+            label.className = 'grid-item-label';
+            const dot = document.createElement('span');
+            dot.className = 'filter-dot';
+            const dotColors = {normal:'#22c55e',protanopia:'#ef4444',deuteranopia:'#f97316',tritanopia:'#3b82f6',achromatopsia:'#6b7280',protanomaly:'#fb923c',deuteranomaly:'#fbbf24',tritanomaly:'#818cf8'};
+            dot.style.background = dotColors[filter]||'#6b7280';
+            label.appendChild(dot);
+            label.appendChild(document.createTextNode(' ' + FILTER_LABELS[filter]));
+
+            item.appendChild(canvas);
+            item.appendChild(label);
+            gridContainer.appendChild(item);
+
+            // Render asynchronously to keep UI responsive
+            await new Promise(resolve => {
+                requestAnimationFrame(() => {
+                    const filtered = applyMatrixToImageData(origData, filter, state.severity);
+                    ctx.putImageData(filtered, 0, 0);
+                    resolve();
+                });
+            });
+        }
+
+        // Click grid item to switch to single view with that filter
+        gridContainer.querySelectorAll('.grid-item').forEach(item => {
+            item.addEventListener('click', () => {
+                state.activeFilter = item.dataset.filter;
+                updateFilterButtons();
+                updateSeverityVisibility();
+                setViewMode('single');
+                renderPalette();
+            });
+        });
+    }
+
+    // ===== COMPARE SLIDER =====
+    let compareActive = false;
+    function updateCompareSlider(clientX) {
+        const rect = compareContainer.getBoundingClientRect();
+        let x = (clientX - rect.left) / rect.width;
+        x = Math.max(0.03, Math.min(0.97, x));
+        const pct = x * 100;
+        compareOverlay.style.clipPath = `inset(0 ${100-pct}% 0 0)`;
+        compareHandle.style.left = pct + '%';
+        compareLabelLeft.style.opacity = pct > 12 ? '1' : '0';
+        compareLabelRight.style.opacity = pct < 88 ? '1' : '0';
+    }
+    compareHandle.addEventListener('mousedown', e => { e.preventDefault(); compareActive = true; });
+    compareContainer.addEventListener('mousedown', e => { compareActive = true; updateCompareSlider(e.clientX); });
+    document.addEventListener('mousemove', e => { if(compareActive) updateCompareSlider(e.clientX); });
+    document.addEventListener('mouseup', () => compareActive = false);
+    // Touch
+    compareHandle.addEventListener('touchstart', e => { e.preventDefault(); compareActive = true; }, {passive:false});
+    compareContainer.addEventListener('touchstart', e => { compareActive = true; updateCompareSlider(e.touches[0].clientX); });
+    document.addEventListener('touchmove', e => { if(compareActive) updateCompareSlider(e.touches[0].clientX); });
+    document.addEventListener('touchend', () => compareActive = false);
+
+    // ===== ZOOM & PAN =====
+    function setZoom(z) {
+        state.zoom = Math.max(0.25, Math.min(5, z));
+        canvasWrapper.style.transform = `scale(${state.zoom}) translate(${state.panX}px, ${state.panY}px)`;
+        canvasWrapper.classList.toggle('zoomed', state.zoom > 1.01);
+        zoomIndicator.textContent = Math.round(state.zoom*100) + '%';
+        zoomIndicator.classList.add('visible');
+        clearTimeout(zoomIndicator._hide);
+        zoomIndicator._hide = setTimeout(() => zoomIndicator.classList.remove('visible'), 1500);
+    }
+    function resetZoom() {
+        state.zoom = 1; state.panX = 0; state.panY = 0;
+        canvasWrapper.style.transform = '';
+        canvasWrapper.classList.remove('zoomed','panning');
+    }
+    singleView.addEventListener('wheel', e => {
+        if(!state.imageLoaded || state.viewMode!=='single') return;
+        e.preventDefault();
+        const delta = e.deltaY > 0 ? 0.9 : 1.1;
+        setZoom(state.zoom * delta);
+    }, {passive:false});
+
+    // Pan
+    canvasWrapper.addEventListener('mousedown', e => {
+        if(state.zoom <= 1.01 || state.eyedropper) return;
+        state.isPanning = true;
+        state.panStart = {x:e.clientX - state.panX*state.zoom, y:e.clientY - state.panY*state.zoom};
+        canvasWrapper.classList.add('panning');
+    });
+    document.addEventListener('mousemove', e => {
+        if(!state.isPanning) return;
+        state.panX = (e.clientX - state.panStart.x) / state.zoom;
+        state.panY = (e.clientY - state.panStart.y) / state.zoom;
+        canvasWrapper.style.transform = `scale(${state.zoom}) translate(${state.panX}px, ${state.panY}px)`;
+    });
+    document.addEventListener('mouseup', () => { state.isPanning = false; canvasWrapper.classList.remove('panning'); });
+
+    $('zoomInBtn').addEventListener('click', () => setZoom(state.zoom * 1.25));
+    $('zoomOutBtn').addEventListener('click', () => setZoom(state.zoom * 0.8));
+    $('zoomResetBtn').addEventListener('click', () => { resetZoom(); setZoom(1); });
+
+    // ===== FULLSCREEN =====
+    $('fullscreenBtn').addEventListener('click', () => {
+        const el = state.viewMode==='compare' ? compareContainer : singleView;
+        if(!document.fullscreenElement) {
+            el.requestFullscreen?.() || el.webkitRequestFullscreen?.();
+        } else {
+            document.exitFullscreen?.() || document.webkitExitFullscreen?.();
+        }
+    });
+
+    // ===== EYEDROPPER =====
+    eyedropperBtn.addEventListener('click', () => {
+        state.eyedropper = !state.eyedropper;
+        eyedropperBtn.classList.toggle('active', state.eyedropper);
+        singleView.classList.toggle('eyedropper-active', state.eyedropper);
+        if(!state.eyedropper) eyedropperTooltip.classList.remove('visible');
+    });
+
+    previewCanvas.addEventListener('mousemove', e => {
+        if(!state.eyedropper || !state.imageLoaded) return;
+        const rect = previewCanvas.getBoundingClientRect();
+        const px = Math.floor((e.clientX - rect.left) / rect.width * previewCanvas.width);
+        const py = Math.floor((e.clientY - rect.top) / rect.height * previewCanvas.height);
+        if(px<0||py<0||px>=previewCanvas.width||py>=previewCanvas.height) { eyedropperTooltip.classList.remove('visible'); return; }
+
+        const origData = offscreenCtx.getImageData(px, py, 1, 1).data;
+        const simColor = applyColorMatrix(origData[0], origData[1], origData[2], state.activeFilter, state.severity);
+        const origHex = rgbToHex(origData[0], origData[1], origData[2]);
+        const simHex = rgbToHex(simColor.r, simColor.g, simColor.b);
+
+        $('edSwatchOrig').style.background = origHex;
+        $('edSwatchSim').style.background = simHex;
+        $('edInfo').innerHTML = `<strong>Position:</strong> ${px}, ${py}<br><strong>Original:</strong> ${origHex} · rgb(${origData[0]},${origData[1]},${origData[2]})<br><strong>Simulated:</strong> ${simHex} · rgb(${simColor.r},${simColor.g},${simColor.b})`;
+
+        let tx = e.clientX + 18, ty = e.clientY + 18;
+        if(tx + 220 > window.innerWidth) tx = e.clientX - 220;
+        if(ty + 150 > window.innerHeight) ty = e.clientY - 150;
+        eyedropperTooltip.style.left = tx + 'px';
+        eyedropperTooltip.style.top = ty + 'px';
+        eyedropperTooltip.classList.add('visible');
+    });
+
+    previewCanvas.addEventListener('mouseleave', () => eyedropperTooltip.classList.remove('visible'));
+
+    previewCanvas.addEventListener('click', e => {
+        if(!state.eyedropper || !state.imageLoaded) return;
+        const rect = previewCanvas.getBoundingClientRect();
+        const px = Math.floor((e.clientX - rect.left) / rect.width * previewCanvas.width);
+        const py = Math.floor((e.clientY - rect.top) / rect.height * previewCanvas.height);
+        if(px<0||py<0||px>=previewCanvas.width||py>=previewCanvas.height) return;
+        const origData = offscreenCtx.getImageData(px, py, 1, 1).data;
+        const hex = rgbToHex(origData[0], origData[1], origData[2]);
+        navigator.clipboard?.writeText(hex).then(() => showToast(`Copied ${hex}`,'success')).catch(()=>{});
+    });
+
+    function rgbToHex(r,g,b) { return '#'+[r,g,b].map(c=>c.toString(16).padStart(2,'0')).join(''); }
+
+    // ===== COLOR PALETTE EXTRACTION =====
+    function extractPalette(count=8) {
+        const w = offscreenCanvas.width, h = offscreenCanvas.height;
+        const data = offscreenCtx.getImageData(0,0,w,h).data;
+        const step = Math.max(1, Math.floor(data.length / 4 / 12000)) * 4;
+        const buckets = {};
+        for(let i=0; i<data.length; i+=step) {
+            const r = Math.round(data[i]/32)*32;
+            const g = Math.round(data[i+1]/32)*32;
+            const b = Math.round(data[i+2]/32)*32;
+            const key = `${r},${g},${b}`;
+            if(!buckets[key]) buckets[key] = {r:0,g:0,b:0,n:0};
+            buckets[key].r += data[i]; buckets[key].g += data[i+1]; buckets[key].b += data[i+2]; buckets[key].n++;
+        }
+        const sorted = Object.values(buckets).sort((a,b)=>b.n-a.n);
+        const result = [];
+        for(const c of sorted) {
+            const avg = {r:Math.round(c.r/c.n), g:Math.round(c.g/c.n), b:Math.round(c.b/c.n)};
+            const tooClose = result.some(e => colorDist(e,avg)<55);
+            if(!tooClose) { result.push(avg); if(result.length>=count) break; }
+        }
+        return result;
+    }
+
+    function colorDist(a,b) { return Math.sqrt((a.r-b.r)**2+(a.g-b.g)**2+(a.b-b.b)**2); }
+
+    function renderPalette() {
+        const origRow = $('paletteOriginal');
+        const simRow = $('paletteSimulated');
+        origRow.innerHTML = ''; simRow.innerHTML = '';
+        $('paletteSimLabel').textContent = FILTER_LABELS[state.activeFilter] || 'Simulated';
+        state.dominantColors.forEach(c => {
+            const hex = rgbToHex(c.r,c.g,c.b);
+            const sw = document.createElement('div');
+            sw.className = 'palette-swatch';
+            sw.style.background = hex;
+            sw.setAttribute('data-tooltip', hex);
+            sw.addEventListener('click', () => { navigator.clipboard?.writeText(hex); showToast(`Copied ${hex}`,'success'); });
+            origRow.appendChild(sw);
+
+            const sim = applyColorMatrix(c.r,c.g,c.b, state.activeFilter, state.severity);
+            const simHex = rgbToHex(sim.r,sim.g,sim.b);
+            const sw2 = document.createElement('div');
+            sw2.className = 'palette-swatch';
+            sw2.style.background = simHex;
+            sw2.setAttribute('data-tooltip', simHex);
+            sw2.addEventListener('click', () => { navigator.clipboard?.writeText(simHex); showToast(`Copied ${simHex}`,'success'); });
+            simRow.appendChild(sw2);
+        });
+    }
+
+    // ===== ACCESSIBILITY REPORT =====
+    function renderAccessibility() {
+        const inner = $('accessibilityInner');
+        const colors = state.dominantColors;
+        if(colors.length < 2) { inner.innerHTML = '<p style="font-size:.82rem;color:var(--text-secondary)">Need more color variety to analyze.</p>'; return; }
+
+        const cvdTypes = ['protanopia','deuteranopia','tritanopia','protanomaly','deuteranomaly','tritanomaly','achromatopsia'];
+        let totalConfusable = 0;
+        const details = [];
+
+        for(const cvd of cvdTypes) {
+            const simColors = colors.map(c => applyColorMatrix(c.r,c.g,c.b, cvd, 100));
+            let confusable = 0;
+            for(let i=0;i<colors.length;i++) {
+                for(let j=i+1;j<colors.length;j++) {
+                    const origDist = colorDist(colors[i], colors[j]);
+                    const simDist = colorDist(simColors[i], simColors[j]);
+                    if(origDist > 50 && simDist < 25) confusable++;
+                }
+            }
+            totalConfusable += confusable;
+            details.push({cvd, confusable, label:FILTER_LABELS[cvd]});
+        }
+
+        const maxPairs = cvdTypes.length * (colors.length*(colors.length-1)/2);
+        const ratio = maxPairs > 0 ? totalConfusable / maxPairs : 0;
+        const score = Math.max(1, Math.min(10, Math.round(10 - ratio * 30)));
+        let rating, ratingClass;
+        if(score >= 8) { rating='Excellent'; ratingClass='score-excellent'; }
+        else if(score >= 6) { rating='Good'; ratingClass='score-good'; }
+        else if(score >= 4) { rating='Fair'; ratingClass='score-fair'; }
+        else { rating='Poor'; ratingClass='score-poor'; }
+
+        const barColor = score>=8?'var(--green)':score>=6?'#eab308':score>=4?'#f97316':'var(--red)';
+
+        let detailsHtml = '';
+        details.forEach(d => {
+            const icon = d.confusable===0 ? 'fa-circle-check' : 'fa-triangle-exclamation';
+            const iconColor = d.confusable===0 ? 'var(--green)' : (d.confusable<=1?'#eab308':'var(--red)');
+            const badgeColor = d.confusable===0 ? 'var(--green)' : (d.confusable<=1?'#eab308':'var(--red)');
+            detailsHtml += `<div class="score-detail-item">
+                <i class="fa-solid ${icon} score-detail-icon" style="color:${iconColor}"></i>
+                <span>${d.label}</span>
+                <span class="confusable-badge" style="background:${badgeColor}20;color:${badgeColor}">${d.confusable} issue${d.confusable!==1?'s':''}</span>
+            </div>`;
+        });
+
+        inner.innerHTML = `
+            <div class="score-header">
+                <div class="score-big">${score}<span class="out-of">/10</span></div>
+                <span class="score-rating ${ratingClass}">${rating}</span>
+            </div>
+            <div class="score-bar-wrap">
+                <div class="score-bar"><div class="score-fill" style="width:${score*10}%;background:${barColor}"></div></div>
+            </div>
+            <div style="font-size:.75rem;color:var(--text-secondary);margin-bottom:12px;">
+                ${totalConfusable===0 ? 'No confusable color pairs detected. Great color accessibility!' :
+                `${totalConfusable} potentially confusable color pair${totalConfusable!==1?'s':''} detected across all CVD types.`}
+            </div>
+            <div class="score-details">${detailsHtml}</div>`;
+    }
+
+    // ===== PANEL TOGGLES =====
+    $('paletteToggle').addEventListener('click', function() {
+        this.classList.toggle('open');
+        $('paletteContent').classList.toggle('open');
+    });
+    $('accessibilityToggle').addEventListener('click', function() {
+        this.classList.toggle('open');
+        $('accessibilityContent').classList.toggle('open');
+    });
+
+    // ===== DOWNLOAD =====
+    downloadBtn.addEventListener('click', () => {
+        if(!state.imageLoaded) return;
+        const canvas = state.viewMode==='compare' ? compareFilteredCanvas : previewCanvas;
+        const link = document.createElement('a');
+        link.download = `${state.fileName}-${state.activeFilter}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        showToast('Image downloaded!','success');
+    });
+
+    downloadAllBtn.addEventListener('click', async () => {
+        if(!state.imageLoaded) return;
+        showToast('Preparing downloads…','info');
+        const origData = offscreenCtx.getImageData(0,0,offscreenCanvas.width,offscreenCanvas.height);
+        for(let i=0; i<FILTER_KEYS.length; i++) {
+            const f = FILTER_KEYS[i];
+            await new Promise(r => setTimeout(r, 400));
+            const tc = document.createElement('canvas');
+            tc.width = offscreenCanvas.width; tc.height = offscreenCanvas.height;
+            const tctx = tc.getContext('2d');
+            tctx.putImageData(applyMatrixToImageData(origData, f, state.severity), 0, 0);
+            const link = document.createElement('a');
+            link.download = `${state.fileName}-${f}.png`;
+            link.href = tc.toDataURL('image/png');
+            link.click();
+        }
+        showToast(`All ${FILTER_KEYS.length} images downloaded!`,'success');
+    });
+
+    // ===== COPY =====
+    copyBtn.addEventListener('click', async () => {
+        if(!state.imageLoaded) return;
+        try {
+            const canvas = state.viewMode==='compare' ? compareFilteredCanvas : previewCanvas;
+            const blob = await new Promise(r => canvas.toBlob(r));
+            await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
+            showToast('Copied to clipboard!','success');
+        } catch(err) {
+            showToast('Copy failed. Try downloading instead.','error');
+        }
+    });
+
+    // ===== START OVER =====
+    startOverBtn.addEventListener('click', () => {
+        fileInput.value = '';
+        previewCtx.clearRect(0,0,previewCanvas.width,previewCanvas.height);
+        offscreenCtx.clearRect(0,0,offscreenCanvas.width,offscreenCanvas.height);
+        previewCanvas.width = 0; previewCanvas.height = 0;
+        offscreenCanvas.width = 0; offscreenCanvas.height = 0;
+        state.activeFilter = 'normal';
+        state.dominantColors = [];
+        resetZoom();
+        showUpload();
+    });
+
+    // ===== SHORTCUTS MODAL =====
+    $('shortcutsBtn').addEventListener('click', () => shortcutsModal.classList.add('active'));
+    $('modalClose').addEventListener('click', () => shortcutsModal.classList.remove('active'));
+    shortcutsModal.addEventListener('click', e => { if(e.target===shortcutsModal) shortcutsModal.classList.remove('active'); });
+
+    // ===== KEYBOARD SHORTCUTS =====
+    document.addEventListener('keydown', e => {
+        // Don't trigger if typing in input
+        if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA') return;
+        if(shortcutsModal.classList.contains('active')) { if(e.key==='Escape') shortcutsModal.classList.remove('active'); return; }
+
+        if(!state.imageLoaded) return;
+
+        const key = e.key.toLowerCase();
+
+        // Filter selection 1-8
+        if(key>='1'&&key<='8'&&!e.ctrlKey&&!e.metaKey&&!e.altKey) {
+            const idx = parseInt(key)-1;
+            if(idx < FILTER_KEYS.length) {
+                state.activeFilter = FILTER_KEYS[idx];
+                updateFilterButtons();
+                updateSeverityVisibility();
+                if(state.viewMode==='single') renderSingle();
+                else if(state.viewMode==='compare') renderCompare();
+                renderPalette();
+            }
+            return;
+        }
+
+        // View modes
+        if(key==='s'&&!e.ctrlKey) { setViewMode('single'); return; }
+        if(key==='c'&&!e.ctrlKey&&!e.metaKey) { setViewMode('compare'); return; }
+        if(key==='g'&&!e.ctrlKey) { setViewMode('grid'); return; }
+
+        // Tools
+        if(key==='e'&&!e.ctrlKey) { eyedropperBtn.click(); return; }
+        if(key==='='||key==='+') { e.preventDefault(); setZoom(state.zoom*1.25); return; }
+        if(key==='-') { e.preventDefault(); setZoom(state.zoom*0.8); return; }
+        if(key==='0'&&!e.ctrlKey) { resetZoom(); setZoom(1); return; }
+        if(key==='f'&&!e.ctrlKey) { $('fullscreenBtn').click(); return; }
+
+        // Actions
+        if(key==='d'&&!e.ctrlKey&&!e.metaKey&&!e.shiftKey) { downloadBtn.click(); return; }
+        if(key==='d'&&e.shiftKey&&!e.ctrlKey) { downloadAllBtn.click(); return; }
+        if(key==='?'||key==='/') { shortcutsModal.classList.add('active'); return; }
+        if(key==='escape') { startOverBtn.click(); return; }
+    });
+
+    })();
+    </script>
+</body>
+</html>
