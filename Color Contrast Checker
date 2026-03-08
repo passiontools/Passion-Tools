@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Contrast Checker - PassionTools</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Roboto+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --red: #ef4444;
+            --purple: #a855f7;
+            --blue: #3b82f6;
+            --blue-dark: #2563eb;
+            --green: #22c55e;
+            --bg-color: #f9fafb;
+            --card-bg: #ffffff;
+            --text-primary: #000000;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --hover-gray: #f3f4f6;
+            --btn-action-bg: #fef2f2;
+            --error-bg: #fee2e2;
+            --error-text: #991b1b;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #020617;
+            --card-bg: #111827;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --border-color: #1e293b;
+            --hover-gray: #1e293b;
+            --btn-action-bg: #450a0a;
+            --error-bg: #7f1d1d;
+            --error-text: #f87171;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            background: rgba(255, 255, 255, 0.75);
+            border-bottom: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        [data-theme="dark"] .header {
+            background: rgba(2, 6, 23, 0.8);
+        }
+
+        .header-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            text-decoration: none;
+            font-size: 22px;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            line-height: 1;
+        }
+
+        .logo-passion {
+            color: var(--text-primary);
+            transition: color 0.3s ease;
+        }
+
+        .logo-tools {
+            background: linear-gradient(135deg, var(--red), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .back-link {
+            text-decoration: none;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: var(--red);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            line-height: 1;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.15);
+        }
+
+        /* ===== MAIN ===== */
+        .main-content {
+            flex: 1;
+            max-width: 1280px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 40px 24px 48px;
+        }
+
+        /* ===== TOOL HEADER ===== */
+        .tool-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .tool-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            letter-spacing: -0.02em;
+            transition: color 0.3s ease;
+        }
+
+        .tool-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+            max-width: 640px;
+            margin: 0 auto;
+            line-height: 1.6;
+            font-weight: 400;
+            transition: color 0.3s ease;
+        }
+
+        /* ===== WORKSPACE ===== */
+        .workspace {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 28px;
+            margin-bottom: 32px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 28px;
+            transition: all 0.3s ease;
+        }
+
+        /* ===== INPUTS AREA ===== */
+        .inputs-area .card-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 24px;
+        }
+
+        .color-input-group {
+            margin-bottom: 24px;
+        }
+
+        .color-input-group:last-of-type {
+            margin-bottom: 0;
+        }
+
+        .color-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            letter-spacing: 0.02em;
+        }
+
+        .color-input-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .hex-input {
+            flex: 1;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 20px;
+            font-weight: 600;
+            padding: 12px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            outline: none;
+            transition: all 0.3s ease;
+            letter-spacing: 0.04em;
+        }
+
+        .hex-input:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        .hex-input.invalid {
+            border-color: var(--red);
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+        }
+
+        .color-picker-wrapper {
+            position: relative;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: border-color 0.3s ease;
+        }
+
+        .color-picker-wrapper:hover {
+            border-color: var(--blue);
+        }
+
+        .color-picker-wrapper input[type="color"] {
+            position: absolute;
+            top: -8px;
+            left: -8px;
+            width: calc(100% + 16px);
+            height: calc(100% + 16px);
+            border: none;
+            cursor: pointer;
+            background: none;
+        }
+
+        .color-picker-wrapper input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+
+        .color-picker-wrapper input[type="color"]::-webkit-color-swatch {
+            border: none;
+            border-radius: 0;
+        }
+
+        .color-picker-wrapper input[type="color"]::-moz-color-swatch {
+            border: none;
+        }
+
+        /* ===== SWAP BUTTON ===== */
+        .swap-container {
+            display: flex;
+            justify-content: center;
+            margin: -4px 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .swap-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 2px solid var(--border-color);
+            background: var(--card-bg);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .swap-btn:hover {
+            border-color: var(--blue);
+            color: var(--blue);
+            background: var(--hover-gray);
+            transform: rotate(180deg);
+        }
+
+        /* ===== RESULTS AREA ===== */
+        .preview-box {
+            border-radius: 12px;
+            padding: 32px 24px;
+            text-align: center;
+            margin-bottom: 24px;
+            border: 1px solid var(--border-color);
+            transition: border-color 0.3s ease;
+            min-height: 140px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .preview-normal {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .preview-large {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .ratio-display {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .ratio-value {
+            font-size: 48px;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+            transition: color 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .ratio-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        /* ===== WCAG BADGES ===== */
+        .wcag-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .wcag-badge {
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .wcag-badge.pass {
+            background: rgba(34, 197, 94, 0.1);
+            border-color: rgba(34, 197, 94, 0.25);
+        }
+
+        .wcag-badge.fail {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.25);
+        }
+
+        [data-theme="dark"] .wcag-badge.pass {
+            background: rgba(34, 197, 94, 0.12);
+            border-color: rgba(34, 197, 94, 0.2);
+        }
+
+        [data-theme="dark"] .wcag-badge.fail {
+            background: rgba(239, 68, 68, 0.12);
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+
+        .wcag-badge-level {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 4px;
+            color: var(--text-secondary);
+        }
+
+        .wcag-badge-type {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            opacity: 0.8;
+        }
+
+        .wcag-badge-status {
+            font-size: 15px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .wcag-badge.pass .wcag-badge-status {
+            color: var(--green);
+        }
+
+        .wcag-badge.fail .wcag-badge-status {
+            color: var(--red);
+        }
+
+        .wcag-badge-status i {
+            font-size: 13px;
+        }
+
+        /* ===== ACTION BAR ===== */
+        .action-bar {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        .btn-reset {
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 12px 28px;
+            border-radius: 12px;
+            border: 2px solid var(--red);
+            background: transparent;
+            color: var(--red);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-reset:hover {
+            background: var(--btn-action-bg);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
+        }
+
+        .btn-reset:active {
+            transform: translateY(0);
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            text-align: center;
+            padding: 30px 20px;
+            background: #111827;
+            color: #94a3b8;
+            font-size: 14px;
+            font-weight: 400;
+            transition: background-color 0.3s ease;
+            margin-top: auto;
+        }
+
+        [data-theme="dark"] .footer {
+            background: #020617;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .workspace {
+                grid-template-columns: 1fr;
+            }
+
+            .tool-title {
+                font-size: 26px;
+            }
+
+            .tool-subtitle {
+                font-size: 14px;
+            }
+
+            .ratio-value {
+                font-size: 36px;
+            }
+
+            .main-content {
+                padding: 28px 16px 36px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .header-inner {
+                padding: 0 16px;
+            }
+
+            .hex-input {
+                font-size: 16px;
+                padding: 10px 14px;
+            }
+
+            .wcag-grid {
+                gap: 8px;
+            }
+
+            .wcag-badge {
+                padding: 12px 8px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .back-link span {
+                display: none;
+            }
+
+            .header-actions {
+                gap: 12px;
+            }
+
+            .tool-title {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== HEADER ===== -->
+    <header class="header">
+        <div class="header-inner">
+            <a href="#" onclick="event.preventDefault();" class="logo">
+                <span class="logo-passion">Passion</span><span class="logo-tools">Tools</span>
+            </a>
+            <div class="header-actions">
+                <a href="index.html" class="back-link">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Back to Tools</span>
+                </a>
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">☀️</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="main-content">
+
+        <!-- Tool Header -->
+        <div class="tool-header">
+            <h1 class="tool-title">Color Contrast Checker</h1>
+            <p class="tool-subtitle">Check color contrast ratios to ensure your text meets WCAG accessibility standards. 100% private in-browser processing.</p>
+        </div>
+
+        <!-- Workspace -->
+        <div class="workspace">
+
+            <!-- Inputs Area -->
+            <div class="inputs-area card">
+                <div class="card-title">Color Selection</div>
+
+                <div class="color-input-group">
+                    <label class="color-label" for="fgHex">Foreground (Text) Color</label>
+                    <div class="color-input-row">
+                        <input type="text" id="fgHex" class="hex-input" value="#000000" maxlength="7" spellcheck="false" autocomplete="off">
+                        <div class="color-picker-wrapper">
+                            <input type="color" id="fgPicker" value="#000000">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="swap-container">
+                    <button class="swap-btn" id="swapBtn" aria-label="Swap colors" title="Swap colors">
+                        <i class="fa-solid fa-arrows-up-down"></i>
+                    </button>
+                </div>
+
+                <div class="color-input-group">
+                    <label class="color-label" for="bgHex">Background Color</label>
+                    <div class="color-input-row">
+                        <input type="text" id="bgHex" class="hex-input" value="#FFFFFF" maxlength="7" spellcheck="false" autocomplete="off">
+                        <div class="color-picker-wrapper">
+                            <input type="color" id="bgPicker" value="#ffffff">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Area -->
+            <div class="results-area card">
+                <div class="preview-box" id="previewBox">
+                    <span class="preview-normal">Normal Text</span>
+                    <span class="preview-large">Large Text</span>
+                </div>
+
+                <div class="ratio-display">
+                    <div class="ratio-value" id="ratioValue">21.00 : 1</div>
+                    <div class="ratio-label">Contrast Ratio</div>
+                </div>
+
+                <div class="wcag-grid">
+                    <div class="wcag-badge pass" id="badgeAANormal">
+                        <div class="wcag-badge-level">AA</div>
+                        <div class="wcag-badge-type">Normal Text</div>
+                        <div class="wcag-badge-status">
+                            <i class="fa-solid fa-check"></i> Pass
+                        </div>
+                    </div>
+                    <div class="wcag-badge pass" id="badgeAAANormal">
+                        <div class="wcag-badge-level">AAA</div>
+                        <div class="wcag-badge-type">Normal Text</div>
+                        <div class="wcag-badge-status">
+                            <i class="fa-solid fa-check"></i> Pass
+                        </div>
+                    </div>
+                    <div class="wcag-badge pass" id="badgeAALarge">
+                        <div class="wcag-badge-level">AA</div>
+                        <div class="wcag-badge-type">Large Text</div>
+                        <div class="wcag-badge-status">
+                            <i class="fa-solid fa-check"></i> Pass
+                        </div>
+                    </div>
+                    <div class="wcag-badge pass" id="badgeAAALarge">
+                        <div class="wcag-badge-level">AAA</div>
+                        <div class="wcag-badge-type">Large Text</div>
+                        <div class="wcag-badge-status">
+                            <i class="fa-solid fa-check"></i> Pass
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Bar -->
+        <div class="action-bar">
+            <button class="btn-reset" id="resetBtn">
+                <i class="fa-solid fa-rotate-left"></i>
+                Start Over
+            </button>
+        </div>
+
+    </main>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer">
+        © 2026 Passion Tools. Secure client-side processing.
+    </footer>
+
+    <!-- ===== JAVASCRIPT ===== -->
+    <script>
+        // === Theme Toggle ===
+        const themeToggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+
+        function setTheme(theme) {
+            html.setAttribute('data-theme', theme);
+            themeToggle.textContent = theme === 'dark' ? '🌙' : '☀️';
+            localStorage.setItem('passiontools-theme', theme);
+        }
+
+        (function initTheme() {
+            const saved = localStorage.getItem('passiontools-theme');
+            if (saved) {
+                setTheme(saved);
+            } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                setTheme('dark');
+            }
+        })();
+
+        themeToggle.addEventListener('click', () => {
+            const current = html.getAttribute('data-theme');
+            setTheme(current === 'dark' ? 'light' : 'dark');
+        });
+
+        // === DOM Elements ===
+        const fgHex = document.getElementById('fgHex');
+        const bgHex = document.getElementById('bgHex');
+        const fgPicker = document.getElementById('fgPicker');
+        const bgPicker = document.getElementById('bgPicker');
+        const swapBtn = document.getElementById('swapBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const previewBox = document.getElementById('previewBox');
+        const ratioValue = document.getElementById('ratioValue');
+        const badgeAANormal = document.getElementById('badgeAANormal');
+        const badgeAAANormal = document.getElementById('badgeAAANormal');
+        const badgeAALarge = document.getElementById('badgeAALarge');
+        const badgeAAALarge = document.getElementById('badgeAAALarge');
+
+        // === Utility Functions ===
+        function isValidHex(hex) {
+            return /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(hex);
+        }
+
+        function normalizeHex(hex) {
+            hex = hex.trim();
+            if (!hex.startsWith('#')) hex = '#' + hex;
+            if (/^#[0-9A-Fa-f]{3}$/.test(hex)) {
+                hex = '#' + hex[1] + hex[1] + hex[2] + hex[2] + hex[3] + hex[3];
+            }
+            return hex.toUpperCase();
+        }
+
+        function hexToRgb(hex) {
+            hex = normalizeHex(hex);
+            const r = parseInt(hex.substring(1, 3), 16);
+            const g = parseInt(hex.substring(3, 5), 16);
+            const b = parseInt(hex.substring(5, 7), 16);
+            return { r, g, b };
+        }
+
+        function relativeLuminance(r, g, b) {
+            const [rs, gs, bs] = [r, g, b].map(c => {
+                const sRGB = c / 255;
+                return sRGB <= 0.04045
+                    ? sRGB / 12.92
+                    : Math.pow((sRGB + 0.055) / 1.055, 2.4);
+            });
+            return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
+        }
+
+        function contrastRatio(l1, l2) {
+            const lighter = Math.max(l1, l2);
+            const darker = Math.min(l1, l2);
+            return (lighter + 0.05) / (darker + 0.05);
+        }
+
+        function updateBadge(badge, pass) {
+            badge.className = 'wcag-badge ' + (pass ? 'pass' : 'fail');
+            const statusEl = badge.querySelector('.wcag-badge-status');
+            if (pass) {
+                statusEl.innerHTML = '<i class="fa-solid fa-check"></i> Pass';
+            } else {
+                statusEl.innerHTML = '<i class="fa-solid fa-xmark"></i> Fail';
+            }
+        }
+
+        // === Main Calculation ===
+        function calculate() {
+            let fgVal = fgHex.value.trim();
+            let bgVal = bgHex.value.trim();
+
+            if (!fgVal.startsWith('#')) fgVal = '#' + fgVal;
+            if (!bgVal.startsWith('#')) bgVal = '#' + bgVal;
+
+            const fgValid = isValidHex(fgVal);
+            const bgValid = isValidHex(bgVal);
+
+            fgHex.classList.toggle('invalid', !fgValid);
+            bgHex.classList.toggle('invalid', !bgValid);
+
+            if (!fgValid || !bgValid) return;
+
+            const fgNorm = normalizeHex(fgVal);
+            const bgNorm = normalizeHex(bgVal);
+
+            // Sync pickers
+            fgPicker.value = fgNorm.length === 7 ? fgNorm.toLowerCase() : fgPicker.value;
+            bgPicker.value = bgNorm.length === 7 ? bgNorm.toLowerCase() : bgPicker.value;
+
+            const fgRgb = hexToRgb(fgNorm);
+            const bgRgb = hexToRgb(bgNorm);
+
+            const fgLum = relativeLuminance(fgRgb.r, fgRgb.g, fgRgb.b);
+            const bgLum = relativeLuminance(bgRgb.r, bgRgb.g, bgRgb.b);
+
+            const ratio = contrastRatio(fgLum, bgLum);
+
+            // Update preview
+            previewBox.style.backgroundColor = bgNorm;
+            previewBox.style.color = fgNorm;
+
+            // Update ratio display
+            ratioValue.textContent = ratio.toFixed(2) + ' : 1';
+
+            // Update WCAG badges
+            updateBadge(badgeAANormal, ratio >= 4.5);
+            updateBadge(badgeAAANormal, ratio >= 7);
+            updateBadge(badgeAALarge, ratio >= 3);
+            updateBadge(badgeAAALarge, ratio >= 4.5);
+        }
+
+        // === Event Listeners ===
+
+        // Hex text inputs
+        fgHex.addEventListener('input', () => {
+            calculate();
+        });
+
+        bgHex.addEventListener('input', () => {
+            calculate();
+        });
+
+        // Color pickers
+        fgPicker.addEventListener('input', (e) => {
+            fgHex.value = e.target.value.toUpperCase();
+            calculate();
+        });
+
+        bgPicker.addEventListener('input', (e) => {
+            bgHex.value = e.target.value.toUpperCase();
+            calculate();
+        });
+
+        // Swap button
+        swapBtn.addEventListener('click', () => {
+            const tempHex = fgHex.value;
+            fgHex.value = bgHex.value;
+            bgHex.value = tempHex;
+
+            const tempPicker = fgPicker.value;
+            fgPicker.value = bgPicker.value;
+            bgPicker.value = tempPicker;
+
+            calculate();
+        });
+
+        // Reset button
+        resetBtn.addEventListener('click', () => {
+            fgHex.value = '#000000';
+            bgHex.value = '#FFFFFF';
+            fgPicker.value = '#000000';
+            bgPicker.value = '#ffffff';
+            calculate();
+        });
+
+        // Auto-prepend # on blur if missing
+        [fgHex, bgHex].forEach(input => {
+            input.addEventListener('blur', () => {
+                let val = input.value.trim();
+                if (val && !val.startsWith('#')) {
+                    input.value = '#' + val;
+                }
+                if (isValidHex(input.value)) {
+                    input.value = normalizeHex(input.value);
+                }
+                calculate();
+            });
+        });
+
+        // Initial calculation
+        calculate();
+    </script>
+</body>
+</html>
