@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text to Speech Converter - PassionTools</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --red: #ef4444;
+            --purple: #a855f7;
+            --blue: #3b82f6;
+            --blue-dark: #2563eb;
+            --green: #22c55e;
+            --bg-color: #f9fafb;
+            --card-bg: #ffffff;
+            --text-primary: #000000;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --hover-gray: #f3f4f6;
+            --btn-action-bg: #fef2f2;
+            --error-bg: #fee2e2;
+            --error-text: #991b1b;
+            --footer-bg: #111827;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #020617;
+            --card-bg: #111827;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --border-color: #1e293b;
+            --hover-gray: #1e293b;
+            --btn-action-bg: #450a0a;
+            --error-bg: #7f1d1d;
+            --error-text: #f87171;
+            --footer-bg: #020617;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            line-height: 1.6;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.75);
+            border-bottom: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        [data-theme="dark"] .header {
+            background: rgba(2, 6, 23, 0.75);
+        }
+
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo-link {
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .logo-passion {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--text-primary);
+            transition: color 0.3s ease;
+        }
+
+        .logo-tools {
+            font-size: 22px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--red), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .back-link {
+            text-decoration: none;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: var(--red);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 22px;
+            line-height: 1;
+            padding: 4px;
+            transition: transform 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.15);
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            flex: 1;
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 48px 24px 64px;
+        }
+
+        .tool-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .tool-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .tool-subtitle {
+            font-size: 16px;
+            font-weight: 400;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        /* ===== WORKSPACE CARD ===== */
+        .workspace-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 32px;
+            transition: all 0.3s ease;
+        }
+
+        /* Textarea */
+        .textarea-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .text-input {
+            width: 100%;
+            min-height: 200px;
+            resize: vertical;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            line-height: 1.7;
+            color: var(--text-primary);
+            background: var(--bg-color);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+            outline: none;
+        }
+
+        .text-input::placeholder {
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .text-input:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        .char-count {
+            text-align: right;
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 6px;
+            font-weight: 500;
+        }
+
+        /* ===== VOICE SETTINGS ===== */
+        .settings-section {
+            margin-top: 28px;
+        }
+
+        .settings-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .settings-title i {
+            color: var(--blue);
+            font-size: 14px;
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+        }
+
+        .setting-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .setting-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .setting-value {
+            font-weight: 600;
+            color: var(--blue);
+            font-size: 12px;
+            background: rgba(59, 130, 246, 0.1);
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
+
+        .voice-select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            background: var(--bg-color);
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%236b7280' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            padding-right: 36px;
+        }
+
+        .voice-select:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        /* Range Sliders */
+        .range-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--border-color);
+            outline: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-top: 4px;
+        }
+
+        .range-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--blue);
+            cursor: pointer;
+            border: 3px solid var(--card-bg);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .range-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+        }
+
+        .range-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--blue);
+            cursor: pointer;
+            border: 3px solid var(--card-bg);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+
+        /* ===== ACTION BAR ===== */
+        .action-bar {
+            margin-top: 28px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            outline: none;
+            white-space: nowrap;
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Primary Blue */
+        .btn-primary {
+            background: var(--blue);
+            color: #ffffff;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--blue-dark);
+            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
+        }
+
+        /* Ghost Blue */
+        .btn-ghost-blue {
+            background: transparent;
+            color: var(--blue);
+            border: 2px solid var(--blue);
+        }
+
+        .btn-ghost-blue:hover:not(:disabled) {
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        /* Ghost Gray */
+        .btn-ghost-gray {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 2px solid var(--border-color);
+        }
+
+        .btn-ghost-gray:hover:not(:disabled) {
+            background: var(--hover-gray);
+            color: var(--text-primary);
+            border-color: var(--text-secondary);
+        }
+
+        /* Ghost Red */
+        .btn-ghost-red {
+            background: transparent;
+            color: var(--red);
+            border: 2px solid var(--red);
+        }
+
+        .btn-ghost-red:hover:not(:disabled) {
+            background: var(--btn-action-bg);
+        }
+
+        /* Pulse animation for Play button while speaking */
+        @keyframes pulse-play {
+            0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.5); }
+            70% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+        }
+
+        .btn-primary.is-speaking {
+            animation: pulse-play 1.5s infinite;
+        }
+
+        /* Status indicator */
+        .status-bar {
+            margin-top: 20px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .status-bar.active {
+            display: flex;
+        }
+
+        .status-bar.speaking {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--blue);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .status-bar.paused {
+            background: rgba(168, 85, 247, 0.1);
+            color: var(--purple);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+        }
+
+        .status-bar.error {
+            background: var(--error-bg);
+            color: var(--error-text);
+            border: 1px solid transparent;
+        }
+
+        @keyframes spin-icon {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .status-bar .spinner-icon {
+            animation: spin-icon 1.2s linear infinite;
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            text-align: center;
+            padding: 30px 20px;
+            font-size: 14px;
+            color: #94a3b8;
+            background: #111827;
+            margin-top: auto;
+        }
+
+        [data-theme="dark"] .footer {
+            background: #020617;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 32px 16px 48px;
+            }
+
+            .tool-title {
+                font-size: 26px;
+            }
+
+            .tool-subtitle {
+                font-size: 15px;
+            }
+
+            .workspace-card {
+                padding: 20px;
+            }
+
+            .settings-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .action-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .header-inner {
+                padding: 14px 16px;
+            }
+
+            .logo-passion, .logo-tools {
+                font-size: 19px;
+            }
+
+            .back-link span {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .tool-title {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== HEADER ===== -->
+    <header class="header">
+        <div class="header-inner">
+            <a href="#" onclick="event.preventDefault();" class="logo-link">
+                <span class="logo-passion">Passion</span><span class="logo-tools">Tools</span>
+            </a>
+            <div class="header-actions">
+                <a href="index.html" class="back-link">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Back to Tools</span>
+                </a>
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">☀️</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="main-content">
+        <div class="tool-header">
+            <h1 class="tool-title">Text to Speech Converter</h1>
+            <p class="tool-subtitle">Convert your text into natural-sounding speech instantly. Free, unlimited, and runs entirely in your browser.</p>
+        </div>
+
+        <div class="workspace-card">
+            <!-- Textarea -->
+            <label class="textarea-label" for="textInput">
+                <i class="fa-solid fa-pen-to-square" style="color: var(--blue); margin-right: 6px;"></i>Your Text
+            </label>
+            <textarea
+                id="textInput"
+                class="text-input"
+                placeholder="Type or paste the text you want to hear spoken out loud..."
+                spellcheck="true"
+            ></textarea>
+            <div class="char-count" id="charCount">0 characters</div>
+
+            <!-- Voice Settings -->
+            <div class="settings-section">
+                <div class="settings-title">
+                    <i class="fa-solid fa-sliders"></i> Voice Settings
+                </div>
+                <div class="settings-grid">
+                    <!-- Voice Selector -->
+                    <div class="setting-group">
+                        <label class="setting-label" for="voiceSelect">
+                            Voice
+                        </label>
+                        <select id="voiceSelect" class="voice-select">
+                            <option value="">Loading voices...</option>
+                        </select>
+                    </div>
+
+                    <!-- Rate Slider -->
+                    <div class="setting-group">
+                        <label class="setting-label" for="rateSlider">
+                            Speed
+                            <span class="setting-value" id="rateValue">1.0x</span>
+                        </label>
+                        <input
+                            type="range"
+                            id="rateSlider"
+                            class="range-slider"
+                            min="0.5"
+                            max="2"
+                            step="0.1"
+                            value="1"
+                        >
+                    </div>
+
+                    <!-- Pitch Slider -->
+                    <div class="setting-group">
+                        <label class="setting-label" for="pitchSlider">
+                            Pitch
+                            <span class="setting-value" id="pitchValue">1.0</span>
+                        </label>
+                        <input
+                            type="range"
+                            id="pitchSlider"
+                            class="range-slider"
+                            min="0"
+                            max="2"
+                            step="0.1"
+                            value="1"
+                        >
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Bar -->
+            <div class="action-bar">
+                <button class="btn btn-primary" id="btnPlay">
+                    <i class="fa-solid fa-play"></i> Play Audio
+                </button>
+                <button class="btn btn-ghost-blue" id="btnPauseResume" disabled>
+                    <i class="fa-solid fa-pause"></i> Pause
+                </button>
+                <button class="btn btn-ghost-gray" id="btnStop" disabled>
+                    <i class="fa-solid fa-stop"></i> Stop
+                </button>
+                <button class="btn btn-ghost-red" id="btnStartOver">
+                    <i class="fa-solid fa-rotate-left"></i> Start Over
+                </button>
+            </div>
+
+            <!-- Status Bar -->
+            <div class="status-bar" id="statusBar">
+                <i class="fa-solid fa-circle-notch spinner-icon"></i>
+                <span id="statusText">Speaking...</span>
+            </div>
+        </div>
+    </main>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer">
+        © 2026 Passion Tools. Secure client-side processing.
+    </footer>
+
+    <!-- ===== JAVASCRIPT ===== -->
+    <script>
+        // ========== THEME TOGGLE ==========
+        const themeToggle = document.getElementById('themeToggle');
+        const root = document.documentElement;
+
+        function setTheme(theme) {
+            root.setAttribute('data-theme', theme);
+            themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+            localStorage.setItem('pt-theme', theme);
+        }
+
+        // Init theme
+        const savedTheme = localStorage.getItem('pt-theme') || 
+            (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        setTheme(savedTheme);
+
+        themeToggle.addEventListener('click', () => {
+            const current = root.getAttribute('data-theme');
+            setTheme(current === 'dark' ? 'light' : 'dark');
+        });
+
+        // ========== ELEMENTS ==========
+        const textInput = document.getElementById('textInput');
+        const charCount = document.getElementById('charCount');
+        const voiceSelect = document.getElementById('voiceSelect');
+        const rateSlider = document.getElementById('rateSlider');
+        const pitchSlider = document.getElementById('pitchSlider');
+        const rateValue = document.getElementById('rateValue');
+        const pitchValue = document.getElementById('pitchValue');
+        const btnPlay = document.getElementById('btnPlay');
+        const btnPauseResume = document.getElementById('btnPauseResume');
+        const btnStop = document.getElementById('btnStop');
+        const statusBar = document.getElementById('statusBar');
+        const statusText = document.getElementById('statusText');
+        const btnStartOver = document.getElementById('btnStartOver');
+
+        // ========== CHARACTER COUNT ==========
+        textInput.addEventListener('input', () => {
+            const len = textInput.value.length;
+            charCount.textContent = `${len.toLocaleString()} character${len !== 1 ? 's' : ''}`;
+        });
+
+        // ========== VOICE LOADING ==========
+        let voices = [];
+
+        function loadVoices() {
+            voices = window.speechSynthesis.getVoices();
+            if (voices.length === 0) return;
+
+            voiceSelect.innerHTML = '';
+            voices.forEach((voice, i) => {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = `${voice.name} (${voice.lang})`;
+                if (voice.default) option.textContent += ' — default';
+                voiceSelect.appendChild(option);
+            });
+
+            // Select default voice
+            const defaultIndex = voices.findIndex(v => v.default);
+            if (defaultIndex !== -1) voiceSelect.value = defaultIndex;
+        }
+
+        loadVoices();
+        if (window.speechSynthesis.onvoiceschanged !== undefined) {
+            window.speechSynthesis.onvoiceschanged = loadVoices;
+        }
+
+        // ========== SLIDER DISPLAY ==========
+        rateSlider.addEventListener('input', () => {
+            rateValue.textContent = `${parseFloat(rateSlider.value).toFixed(1)}x`;
+        });
+
+        pitchSlider.addEventListener('input', () => {
+            pitchValue.textContent = parseFloat(pitchSlider.value).toFixed(1);
+        });
+
+        // ========== SPEECH STATE ==========
+        let isSpeaking = false;
+        let isPaused = false;
+
+        function updateUI(state) {
+            // states: idle, speaking, paused
+            switch (state) {
+                case 'idle':
+                    isSpeaking = false;
+                    isPaused = false;
+                    btnPlay.disabled = false;
+                    btnPlay.classList.remove('is-speaking');
+                    btnPlay.innerHTML = '<i class="fa-solid fa-play"></i> Play Audio';
+                    btnPauseResume.disabled = true;
+                    btnPauseResume.innerHTML = '<i class="fa-solid fa-pause"></i> Pause';
+                    btnStop.disabled = true;
+                    statusBar.classList.remove('active', 'speaking', 'paused');
+                    break;
+                case 'speaking':
+                    isSpeaking = true;
+                    isPaused = false;
+                    btnPlay.disabled = true;
+                    btnPlay.classList.add('is-speaking');
+                    btnPlay.innerHTML = '<i class="fa-solid fa-volume-high"></i> Playing...';
+                    btnPauseResume.disabled = false;
+                    btnPauseResume.innerHTML = '<i class="fa-solid fa-pause"></i> Pause';
+                    btnStop.disabled = false;
+                    statusBar.className = 'status-bar active speaking';
+                    statusText.textContent = 'Speaking your text...';
+                    break;
+                case 'paused':
+                    isPaused = true;
+                    btnPlay.disabled = true;
+                    btnPlay.classList.remove('is-speaking');
+                    btnPauseResume.disabled = false;
+                    btnPauseResume.innerHTML = '<i class="fa-solid fa-play"></i> Resume';
+                    btnStop.disabled = false;
+                    statusBar.className = 'status-bar active paused';
+                    statusText.textContent = 'Paused — click Resume to continue.';
+                    break;
+            }
+        }
+
+        function showError(msg) {
+            statusBar.className = 'status-bar active error';
+            statusBar.querySelector('.spinner-icon')?.classList.remove('spinner-icon');
+            statusText.textContent = msg;
+            setTimeout(() => {
+                statusBar.classList.remove('active');
+            }, 3500);
+        }
+
+        // ========== PLAY ==========
+        btnPlay.addEventListener('click', () => {
+            const text = textInput.value.trim();
+            if (!text) {
+                showError('Please enter some text to convert to speech.');
+                return;
+            }
+
+            // Cancel any ongoing speech
+            window.speechSynthesis.cancel();
+
+            const utterance = new SpeechSynthesisUtterance(text);
+
+            // Set voice
+            const selectedVoiceIndex = voiceSelect.value;
+            if (voices[selectedVoiceIndex]) {
+                utterance.voice = voices[selectedVoiceIndex];
+            }
+
+            utterance.rate = parseFloat(rateSlider.value);
+            utterance.pitch = parseFloat(pitchSlider.value);
+
+            utterance.onstart = () => updateUI('speaking');
+            utterance.onend = () => updateUI('idle');
+            utterance.onerror = (e) => {
+                if (e.error !== 'canceled') {
+                    updateUI('idle');
+                    showError('An error occurred during speech playback.');
+                }
+            };
+
+            window.speechSynthesis.speak(utterance);
+        });
+
+        // ========== PAUSE / RESUME ==========
+        btnPauseResume.addEventListener('click', () => {
+            if (isPaused) {
+                window.speechSynthesis.resume();
+                updateUI('speaking');
+            } else {
+                window.speechSynthesis.pause();
+                updateUI('paused');
+            }
+        });
+
+        // ========== STOP ==========
+        btnStop.addEventListener('click', () => {
+            window.speechSynthesis.cancel();
+            updateUI('idle');
+        });
+
+        // ========== START OVER ==========
+        btnStartOver.addEventListener('click', () => {
+            window.speechSynthesis.cancel();
+            textInput.value = '';
+            charCount.textContent = '0 characters';
+            rateSlider.value = 1;
+            pitchSlider.value = 1;
+            rateValue.textContent = '1.0x';
+            pitchValue.textContent = '1.0';
+            updateUI('idle');
+            textInput.focus();
+        });
+
+        // ========== SAFETY: Cancel speech on page unload ==========
+        window.addEventListener('beforeunload', () => {
+            window.speechSynthesis.cancel();
+        });
+
+        // Init UI
+        updateUI('idle');
+    </script>
+</body>
+</html>
