@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Picker from Image - PassionTools</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --red: #ef4444;
+            --purple: #a855f7;
+            --blue: #3b82f6;
+            --blue-dark: #2563eb;
+            --green: #22c55e;
+            --bg-color: #f9fafb;
+            --card-bg: #ffffff;
+            --text-primary: #000000;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --hover-gray: #f3f4f6;
+            --btn-action-bg: #fef2f2;
+            --error-bg: #fee2e2;
+            --error-text: #991b1b;
+            --footer-bg: #111827;
+        }
+
+        html.dark {
+            --bg-color: #020617;
+            --card-bg: #111827;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --border-color: #1e293b;
+            --hover-gray: #1e293b;
+            --btn-action-bg: #450a0a;
+            --error-bg: #7f1d1d;
+            --error-text: #f87171;
+            --footer-bg: #020617;
+        }
+
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            line-height: 1.6;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.75);
+            border-bottom: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        html.dark .header {
+            background: rgba(2, 6, 23, 0.75);
+        }
+
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            text-decoration: none;
+            font-size: 1.35rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            letter-spacing: -0.02em;
+        }
+
+        .logo-passion {
+            color: var(--text-primary);
+            transition: color 0.3s ease;
+        }
+
+        .logo-tools {
+            background: linear-gradient(135deg, var(--red), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .back-link {
+            text-decoration: none;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: var(--red);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.25rem;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+            line-height: 1;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.15);
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            flex: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 24px 60px;
+            width: 100%;
+        }
+
+        /* ===== TOOL HEADER ===== */
+        .tool-header {
+            text-align: center;
+            margin-bottom: 36px;
+        }
+
+        .tool-title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+            letter-spacing: -0.03em;
+            transition: color 0.3s ease;
+        }
+
+        .tool-subtitle {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+            font-weight: 400;
+            line-height: 1.6;
+            transition: color 0.3s ease;
+        }
+
+        /* ===== UPLOAD AREA (State 1) ===== */
+        .upload-area {
+            background: var(--card-bg);
+            border: 2.5px dashed var(--border-color);
+            border-radius: 16px;
+            padding: 80px 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .upload-area:hover,
+        .upload-area.drag-over {
+            border-color: var(--blue);
+            background: var(--hover-gray);
+        }
+
+        .upload-area.drag-over {
+            transform: scale(1.005);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: var(--blue);
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .upload-area:hover .upload-icon {
+            transform: translateY(-4px);
+        }
+
+        .upload-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            transition: color 0.3s ease;
+        }
+
+        .upload-subtitle {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            transition: color 0.3s ease;
+        }
+
+        .upload-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 28px;
+            background: var(--blue);
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upload-btn:hover {
+            background: var(--blue-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.35);
+        }
+
+        .upload-formats {
+            margin-top: 16px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            transition: color 0.3s ease;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        /* ===== WORKSPACE (State 2) ===== */
+        .workspace {
+            display: none;
+        }
+
+        .workspace.active {
+            display: block;
+        }
+
+        .workspace-grid {
+            display: grid;
+            grid-template-columns: 1fr 360px;
+            gap: 24px;
+            align-items: start;
+        }
+
+        /* Canvas Container */
+        .canvas-container {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow: hidden;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .canvas-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--border-color);
+            transition: border-color 0.3s ease;
+        }
+
+        .canvas-header-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: color 0.3s ease;
+        }
+
+        .canvas-filename {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            transition: color 0.3s ease;
+        }
+
+        .canvas-wrap {
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 300px;
+            background: var(--hover-gray);
+            transition: background-color 0.3s ease;
+        }
+
+        #imageCanvas {
+            max-width: 100%;
+            max-height: 520px;
+            cursor: crosshair;
+            border-radius: 8px;
+            display: block;
+        }
+
+        /* Right Column */
+        .color-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Live Preview */
+        .live-preview {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .panel-header {
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .panel-header i {
+            font-size: 0.75rem;
+        }
+
+        .preview-body {
+            padding: 20px;
+        }
+
+        .preview-swatch {
+            width: 100%;
+            height: 100px;
+            border-radius: 12px;
+            background: #d1d5db;
+            margin-bottom: 16px;
+            transition: background-color 0.1s ease;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .preview-swatch-placeholder {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .preview-values {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .preview-value-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: var(--hover-gray);
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+        }
+
+        .preview-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            transition: color 0.3s ease;
+        }
+
+        .preview-code {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            transition: color 0.3s ease;
+        }
+
+        .click-hint {
+            text-align: center;
+            padding: 10px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .click-hint i {
+            margin-right: 4px;
+        }
+
+        /* Saved Palette */
+        .saved-palette {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .palette-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .palette-count {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            background: var(--hover-gray);
+            padding: 2px 10px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .palette-body {
+            padding: 16px 20px;
+            max-height: 280px;
+            overflow-y: auto;
+        }
+
+        .palette-body::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .palette-body::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .palette-body::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        .palette-empty {
+            text-align: center;
+            padding: 24px 0;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-weight: 400;
+            transition: color 0.3s ease;
+        }
+
+        .palette-empty i {
+            display: block;
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            opacity: 0.5;
+        }
+
+        .palette-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .palette-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 10px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            animation: fadeSlideIn 0.3s ease forwards;
+        }
+
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .palette-item:hover {
+            background: var(--hover-gray);
+        }
+
+        .palette-swatch {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            flex-shrink: 0;
+            transition: border-color 0.3s ease;
+        }
+
+        .palette-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .palette-hex {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            transition: color 0.3s ease;
+        }
+
+        .palette-rgb {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            transition: color 0.3s ease;
+        }
+
+        .palette-copy-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .palette-copy-btn:hover {
+            border-color: var(--blue);
+            color: var(--blue);
+            background: var(--hover-gray);
+        }
+
+        .palette-copy-btn.copied {
+            border-color: var(--green);
+            color: var(--green);
+        }
+
+        .palette-remove-btn {
+            background: none;
+            border: none;
+            padding: 5px 7px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            opacity: 0;
+        }
+
+        .palette-item:hover .palette-remove-btn {
+            opacity: 1;
+        }
+
+        .palette-remove-btn:hover {
+            color: var(--red);
+            background: var(--btn-action-bg);
+        }
+
+        /* ===== ACTION BAR ===== */
+        .action-bar {
+            display: none;
+            margin-top: 24px;
+            padding: 20px 24px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .action-bar.active {
+            display: flex;
+        }
+
+        .action-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-export {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 22px;
+            background: var(--blue);
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-export:hover {
+            background: var(--blue-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-export:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-start-over {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 22px;
+            background: transparent;
+            color: var(--red);
+            border: 1.5px solid var(--red);
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-start-over:hover {
+            background: var(--btn-action-bg);
+            transform: translateY(-1px);
+        }
+
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            z-index: 9999;
+            transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast i {
+            color: var(--green);
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            background: var(--footer-bg);
+            text-align: center;
+            padding: 30px 20px;
+            font-size: 14px;
+            color: #94a3b8;
+            margin-top: auto;
+            transition: background-color 0.3s ease;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 900px) {
+            .workspace-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .color-panel {
+                order: 2;
+            }
+
+            .canvas-container {
+                order: 1;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .main-content {
+                padding: 24px 16px 40px;
+            }
+
+            .tool-title {
+                font-size: 1.5rem;
+            }
+
+            .tool-subtitle {
+                font-size: 0.875rem;
+            }
+
+            .upload-area {
+                padding: 50px 24px;
+            }
+
+            .upload-icon {
+                font-size: 2.5rem;
+            }
+
+            .action-bar.active {
+                flex-direction: column;
+            }
+
+            .action-left {
+                width: 100%;
+            }
+
+            .btn-export, .btn-start-over {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .header-inner {
+                padding: 0 16px;
+            }
+
+            .back-link span {
+                display: none;
+            }
+
+            #imageCanvas {
+                max-height: 350px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-inner">
+            <a href="#" class="logo" onclick="event.preventDefault();">
+                <span class="logo-passion">Passion</span><span class="logo-tools">Tools</span>
+            </a>
+            <div class="header-actions">
+                <a href="index.html" class="back-link">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Back to Tools</span>
+                </a>
+                <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">☀️</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN -->
+    <main class="main-content">
+        <!-- Tool Header -->
+        <div class="tool-header">
+            <h1 class="tool-title">Color Picker from Image</h1>
+            <p class="tool-subtitle">Upload an image to inspect pixels and extract exact color codes. 100% private in-browser processing.</p>
+        </div>
+
+        <!-- State 1: Upload Area -->
+        <div class="upload-area" id="uploadArea">
+            <div class="upload-icon">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+            </div>
+            <div class="upload-title">Drop your image here</div>
+            <div class="upload-subtitle">or click to browse from your device</div>
+            <button class="upload-btn" onclick="document.getElementById('fileInput').click();">
+                <i class="fa-solid fa-folder-open"></i>
+                Choose File
+            </button>
+            <div class="upload-formats">Supports JPG, PNG, WEBP</div>
+            <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+        </div>
+
+        <!-- State 2: Workspace -->
+        <div class="workspace" id="workspace">
+            <div class="workspace-grid">
+                <!-- Left: Canvas -->
+                <div class="canvas-container">
+                    <div class="canvas-header">
+                        <span class="canvas-header-title"><i class="fa-solid fa-image" style="margin-right:6px;"></i>Image Preview</span>
+                        <span class="canvas-filename" id="fileName">image.png</span>
+                    </div>
+                    <div class="canvas-wrap">
+                        <canvas id="imageCanvas"></canvas>
+                    </div>
+                </div>
+
+                <!-- Right: Color Panel -->
+                <div class="color-panel">
+                    <!-- Live Preview -->
+                    <div class="live-preview">
+                        <div class="panel-header">
+                            <i class="fa-solid fa-eye-dropper"></i>
+                            Live Preview
+                        </div>
+                        <div class="preview-body">
+                            <div class="preview-swatch" id="previewSwatch">
+                                <div class="preview-swatch-placeholder" id="swatchPlaceholder">Hover over the image</div>
+                            </div>
+                            <div class="preview-values">
+                                <div class="preview-value-row">
+                                    <span class="preview-label">HEX</span>
+                                    <span class="preview-code" id="previewHex">#------</span>
+                                </div>
+                                <div class="preview-value-row">
+                                    <span class="preview-label">RGB</span>
+                                    <span class="preview-code" id="previewRgb">rgb(-, -, -)</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="click-hint">
+                            <i class="fa-solid fa-hand-pointer"></i>
+                            Click on the image to save a color
+                        </div>
+                    </div>
+
+                    <!-- Saved Palette -->
+                    <div class="saved-palette">
+                        <div class="panel-header palette-header">
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <i class="fa-solid fa-palette"></i>
+                                Saved Palette
+                            </div>
+                            <span class="palette-count" id="paletteCount">0 colors</span>
+                        </div>
+                        <div class="palette-body" id="paletteBody">
+                            <div class="palette-empty" id="paletteEmpty">
+                                <i class="fa-regular fa-circle-dot"></i>
+                                No colors saved yet
+                            </div>
+                            <div class="palette-list" id="paletteList"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Bar -->
+        <div class="action-bar" id="actionBar">
+            <div class="action-left">
+                <button class="btn-export" id="btnExport" onclick="exportPalette()" disabled>
+                    <i class="fa-solid fa-download"></i>
+                    Export Palette
+                </button>
+            </div>
+            <button class="btn-start-over" onclick="startOver()">
+                <i class="fa-solid fa-arrow-rotate-left"></i>
+                Start Over
+            </button>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        © 2026 Passion Tools. Secure client-side processing.
+    </footer>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast">
+        <i class="fa-solid fa-check-circle"></i>
+        <span id="toastMsg">Copied!</span>
+    </div>
+
+    <script>
+        // ===== THEME MANAGEMENT =====
+        const html = document.documentElement;
+        const themeBtn = document.querySelector('.theme-toggle');
+
+        function applyTheme(theme) {
+            if (theme === 'dark') {
+                html.classList.add('dark');
+                themeBtn.textContent = '🌙';
+            } else {
+                html.classList.remove('dark');
+                themeBtn.textContent = '☀️';
+            }
+        }
+
+        function toggleTheme() {
+            const isDark = html.classList.contains('dark');
+            const newTheme = isDark ? 'light' : 'dark';
+            localStorage.setItem('pt-theme', newTheme);
+            applyTheme(newTheme);
+        }
+
+        // Init theme
+        (function() {
+            const saved = localStorage.getItem('pt-theme');
+            if (saved) {
+                applyTheme(saved);
+            } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                applyTheme('dark');
+            }
+        })();
+
+        // ===== ELEMENTS =====
+        const uploadArea = document.getElementById('uploadArea');
+        const workspace = document.getElementById('workspace');
+        const actionBar = document.getElementById('actionBar');
+        const fileInput = document.getElementById('fileInput');
+        const canvas = document.getElementById('imageCanvas');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        const fileNameEl = document.getElementById('fileName');
+        const previewSwatch = document.getElementById('previewSwatch');
+        const swatchPlaceholder = document.getElementById('swatchPlaceholder');
+        const previewHex = document.getElementById('previewHex');
+        const previewRgb = document.getElementById('previewRgb');
+        const paletteList = document.getElementById('paletteList');
+        const paletteEmpty = document.getElementById('paletteEmpty');
+        const paletteCount = document.getElementById('paletteCount');
+        const btnExport = document.getElementById('btnExport');
+        const toast = document.getElementById('toast');
+        const toastMsg = document.getElementById('toastMsg');
+
+        let savedColors = [];
+        let currentColor = null;
+        let displayScale = 1;
+
+        // ===== DRAG & DROP =====
+        uploadArea.addEventListener('click', (e) => {
+            if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'I') {
+                fileInput.click();
+            }
+        });
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('drag-over');
+        });
+
+        uploadArea.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
+            const file = e.dataTransfer.files[0];
+            if (file && isValidImage(file)) {
+                loadImage(file);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file && isValidImage(file)) {
+                loadImage(file);
+            }
+        });
+
+        function isValidImage(file) {
+            const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+            return validTypes.includes(file.type);
+        }
+
+        // ===== IMAGE LOADING =====
+        function loadImage(file) {
+            fileNameEl.textContent = file.name;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    drawImageToCanvas(img);
+                    showWorkspace();
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function drawImageToCanvas(img) {
+            const container = document.querySelector('.canvas-wrap');
+            const maxW = container.clientWidth - 32;
+            const maxH = 520;
+
+            let w = img.naturalWidth;
+            let h = img.naturalHeight;
+
+            // Scale down to fit
+            const ratio = Math.min(maxW / w, maxH / h, 1);
+            const displayW = Math.floor(w * ratio);
+            const displayH = Math.floor(h * ratio);
+
+            canvas.width = img.naturalWidth;
+            canvas.height = img.naturalHeight;
+            canvas.style.width = displayW + 'px';
+            canvas.style.height = displayH + 'px';
+
+            displayScale = img.naturalWidth / displayW;
+
+            ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight);
+        }
+
+        function showWorkspace() {
+            uploadArea.style.display = 'none';
+            workspace.classList.add('active');
+            actionBar.classList.add('active');
+        }
+
+        // ===== CANVAS INTERACTION =====
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = Math.floor((e.clientX - rect.left) * (canvas.width / rect.width));
+            const y = Math.floor((e.clientY - rect.top) * (canvas.height / rect.height));
+
+            if (x < 0 || y < 0 || x >= canvas.width || y >= canvas.height) return;
+
+            const pixel = ctx.getImageData(x, y, 1, 1).data;
+            const r = pixel[0], g = pixel[1], b = pixel[2];
+            const hex = rgbToHex(r, g, b);
+
+            currentColor = { r, g, b, hex };
+
+            previewSwatch.style.backgroundColor = hex;
+            swatchPlaceholder.style.display = 'none';
+            previewHex.textContent = hex.toUpperCase();
+            previewRgb.textContent = `rgb(${r}, ${g}, ${b})`;
+        });
+
+        canvas.addEventListener('mouseleave', () => {
+            // Keep the last color visible
+        });
+
+        canvas.addEventListener('click', (e) => {
+            if (!currentColor) return;
+
+            // Check for duplicate
+            const exists = savedColors.some(c => c.hex === currentColor.hex);
+            if (exists) {
+                showToast('Color already in palette');
+                return;
+            }
+
+            savedColors.push({ ...currentColor });
+            renderPalette();
+            showToast('Color added to palette!');
+        });
+
+        // ===== COLOR UTILITIES =====
+        function rgbToHex(r, g, b) {
+            return '#' + [r, g, b].map(v => v.toString(16).padStart(2, '0')).join('');
+        }
+
+        // ===== PALETTE RENDERING =====
+        function renderPalette() {
+            if (savedColors.length === 0) {
+                paletteEmpty.style.display = 'block';
+                paletteList.innerHTML = '';
+                paletteCount.textContent = '0 colors';
+                btnExport.disabled = true;
+                return;
+            }
+
+            paletteEmpty.style.display = 'none';
+            btnExport.disabled = false;
+            paletteCount.textContent = savedColors.length + (savedColors.length === 1 ? ' color' : ' colors');
+
+            paletteList.innerHTML = '';
+            savedColors.forEach((color, index) => {
+                const item = document.createElement('div');
+                item.className = 'palette-item';
+                item.innerHTML = `
+                    <div class="palette-swatch" style="background-color: ${color.hex};"></div>
+                    <div class="palette-info">
+                        <div class="palette-hex">${color.hex.toUpperCase()}</div>
+                        <div class="palette-rgb">rgb(${color.r}, ${color.g}, ${color.b})</div>
+                    </div>
+                    <button class="palette-copy-btn" onclick="copyColor('${color.hex.toUpperCase()}', this)">
+                        <i class="fa-regular fa-copy"></i> Copy
+                    </button>
+                    <button class="palette-remove-btn" onclick="removeColor(${index})" title="Remove">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                `;
+                paletteList.appendChild(item);
+            });
+        }
+
+        // ===== ACTIONS =====
+        function copyColor(hex, btn) {
+            navigator.clipboard.writeText(hex).then(() => {
+                if (btn) {
+                    btn.innerHTML = '<i class="fa-solid fa-check"></i> Copied';
+                    btn.classList.add('copied');
+                    setTimeout(() => {
+                        btn.innerHTML = '<i class="fa-regular fa-copy"></i> Copy';
+                        btn.classList.remove('copied');
+                    }, 1500);
+                }
+                showToast('Copied ' + hex);
+            });
+        }
+
+        function removeColor(index) {
+            savedColors.splice(index, 1);
+            renderPalette();
+        }
+
+        function exportPalette() {
+            if (savedColors.length === 0) return;
+            const hexList = savedColors.map(c => c.hex.toUpperCase()).join('\n');
+            navigator.clipboard.writeText(hexList).then(() => {
+                showToast('All ' + savedColors.length + ' colors copied!');
+            });
+        }
+
+        function startOver() {
+            // Reset everything
+            savedColors = [];
+            currentColor = null;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            canvas.width = 0;
+            canvas.height = 0;
+
+            previewSwatch.style.backgroundColor = '#d1d5db';
+            swatchPlaceholder.style.display = 'flex';
+            previewHex.textContent = '#------';
+            previewRgb.textContent = 'rgb(-, -, -)';
+
+            renderPalette();
+
+            workspace.classList.remove('active');
+            actionBar.classList.remove('active');
+            uploadArea.style.display = '';
+
+            fileInput.value = '';
+        }
+
+        // ===== TOAST =====
+        let toastTimeout;
+        function showToast(message) {
+            toastMsg.textContent = message;
+            toast.classList.add('show');
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2200);
+        }
+    </script>
+</body>
+</html>
