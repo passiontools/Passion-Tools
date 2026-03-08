@@ -1,0 +1,2134 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS Gradient Generator - PassionTools</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --red: #ef4444;
+            --purple: #a855f7;
+            --blue: #3b82f6;
+            --blue-dark: #2563eb;
+            --green: #22c55e;
+            --bg-color: #f9fafb;
+            --card-bg: #ffffff;
+            --text-primary: #000000;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --hover-gray: #f3f4f6;
+            --btn-action-bg: #fef2f2;
+            --error-bg: #fee2e2;
+            --error-text: #991b1b;
+            --footer-bg: #111827;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #020617;
+            --card-bg: #111827;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --border-color: #1e293b;
+            --hover-gray: #1e293b;
+            --btn-action-bg: #450a0a;
+            --error-bg: #7f1d1d;
+            --error-text: #f87171;
+            --footer-bg: #020617;
+        }
+
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ====== HEADER ====== */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.72);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        [data-theme="dark"] .header {
+            background: rgba(2, 6, 23, 0.72);
+        }
+
+        .header-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            text-decoration: none;
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .logo-passion { color: var(--text-primary); transition: color 0.3s ease; }
+
+        .logo-tools {
+            background: linear-gradient(135deg, var(--red), var(--purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .back-link {
+            text-decoration: none;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.3s ease;
+        }
+
+        .back-link:hover { color: var(--red); }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            line-height: 1;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+        }
+
+        .theme-toggle:hover { transform: scale(1.15); }
+
+        /* ====== MAIN ====== */
+        .main-content {
+            flex: 1;
+            max-width: 1280px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 40px 24px 60px;
+        }
+
+        .tool-header {
+            text-align: center;
+            margin-bottom: 36px;
+        }
+
+        .tool-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+            margin-bottom: 10px;
+            transition: color 0.3s ease;
+        }
+
+        .tool-subtitle {
+            font-size: 15px;
+            color: var(--text-secondary);
+            max-width: 580px;
+            margin: 0 auto;
+            line-height: 1.6;
+            font-weight: 400;
+            transition: color 0.3s ease;
+        }
+
+        /* ====== QUICK ACTIONS BAR ====== */
+        .quick-actions {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+        }
+
+        .qa-btn {
+            padding: 9px 18px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            background: var(--card-bg);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            transition: all 0.3s ease;
+        }
+
+        .qa-btn:hover {
+            border-color: var(--blue);
+            color: var(--blue);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59,130,246,0.1);
+        }
+
+        .qa-btn.active-toggle {
+            background: var(--blue);
+            color: #fff;
+            border-color: var(--blue);
+        }
+
+        .qa-btn.danger { color: var(--red); border-color: var(--red); }
+        .qa-btn.danger:hover { background: var(--btn-action-bg); }
+
+        /* ====== WORKSPACE ====== */
+        .workspace {
+            display: grid;
+            grid-template-columns: 1fr 1.15fr;
+            gap: 28px;
+            align-items: start;
+        }
+
+        /* ====== CARD ====== */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 28px;
+            transition: all 0.3s ease;
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.3s ease;
+        }
+
+        .card-title i { color: var(--text-secondary); font-size: 14px; }
+
+        /* ====== CONTROLS ====== */
+        .control-group { margin-bottom: 22px; }
+        .control-group:last-child { margin-bottom: 0; }
+
+        .control-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.3s ease;
+        }
+
+        .control-label .badge {
+            font-size: 10px;
+            padding: 2px 7px;
+            border-radius: 6px;
+            background: linear-gradient(135deg, var(--blue), var(--purple));
+            color: #fff;
+            font-weight: 700;
+            letter-spacing: 0;
+            text-transform: uppercase;
+        }
+
+        /* TYPE TOGGLE */
+        .type-toggle {
+            display: flex;
+            background: var(--hover-gray);
+            border-radius: 10px;
+            padding: 4px;
+            gap: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        .type-btn {
+            flex: 1;
+            padding: 10px 14px;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            background: transparent;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+        }
+
+        .type-btn.active {
+            background: var(--card-bg);
+            color: var(--text-primary);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        .type-btn:not(.active):hover { color: var(--text-primary); }
+
+        /* ANGLE CONTROL */
+        .angle-control { transition: all 0.3s ease; }
+        .angle-control.hidden { display: none; }
+
+        .angle-top-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 18px;
+            margin-bottom: 12px;
+        }
+
+        /* ANGLE WHEEL */
+        .angle-wheel-container {
+            width: 90px;
+            height: 90px;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .angle-wheel {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            border: 3px solid var(--border-color);
+            background: var(--hover-gray);
+            position: relative;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+
+        .angle-wheel:hover { border-color: var(--blue); }
+
+        .angle-wheel-pointer {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 34px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--blue), var(--purple));
+            transform-origin: left center;
+            border-radius: 2px;
+            pointer-events: none;
+        }
+
+        .angle-wheel-dot {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--blue);
+            border: 2px solid var(--card-bg);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+        }
+
+        .angle-wheel-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--text-secondary);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        .angle-right-col { flex: 1; }
+
+        .angle-display {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .angle-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+            font-family: 'Roboto Mono', monospace;
+            transition: color 0.3s ease;
+        }
+
+        .angle-slider {
+            width: 100%;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 6px;
+            border-radius: 3px;
+            background: linear-gradient(90deg, var(--red), var(--purple), var(--blue), var(--green), var(--red));
+            outline: none;
+            cursor: pointer;
+        }
+
+        .angle-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--card-bg);
+            border: 3px solid var(--blue);
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            transition: all 0.2s ease;
+        }
+
+        .angle-slider::-webkit-slider-thumb:hover { transform: scale(1.15); border-color: var(--blue-dark); }
+
+        .angle-slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--card-bg);
+            border: 3px solid var(--blue);
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+
+        /* DIRECTION PRESETS */
+        .direction-presets {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            margin-top: 12px;
+        }
+
+        .dir-btn {
+            padding: 7px 4px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .dir-btn:hover { border-color: var(--blue); color: var(--blue); background: rgba(59,130,246,0.05); }
+        .dir-btn.active { border-color: var(--blue); color: var(--blue); background: rgba(59,130,246,0.08); }
+
+        /* RADIAL CONTROL */
+        .radial-control { display: none; }
+        .radial-control.visible { display: block; }
+
+        /* RADIAL POSITION */
+        .radial-position-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            margin-top: 12px;
+        }
+
+        .radial-pos-btn {
+            padding: 8px 4px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 11px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .radial-pos-btn:hover { border-color: var(--purple); color: var(--purple); }
+        .radial-pos-btn.active { border-color: var(--purple); color: var(--purple); background: rgba(168,85,247,0.08); }
+
+        /* ====== VISUAL GRADIENT BAR ====== */
+        .gradient-bar-container {
+            position: relative;
+            margin-bottom: 18px;
+        }
+
+        .gradient-bar {
+            width: 100%;
+            height: 28px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            cursor: crosshair;
+            position: relative;
+        }
+
+        .gradient-bar-handle {
+            position: absolute;
+            top: -4px;
+            width: 14px;
+            height: 36px;
+            border-radius: 4px;
+            border: 2px solid #fff;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+            cursor: grab;
+            transform: translateX(-50%);
+            transition: box-shadow 0.2s ease;
+            z-index: 2;
+        }
+
+        .gradient-bar-handle:hover, .gradient-bar-handle.dragging {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            z-index: 3;
+        }
+
+        .gradient-bar-handle.active-handle {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 2px rgba(59,130,246,0.3), 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        /* COLOR STOPS LIST */
+        .color-stops-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .color-stop {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            background: var(--hover-gray);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .color-stop:hover { background: var(--border-color); }
+
+        .color-stop.active-stop {
+            outline: 2px solid var(--blue);
+            outline-offset: -2px;
+        }
+
+        .color-picker-wrapper {
+            position: relative;
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            overflow: hidden;
+            flex-shrink: 0;
+            border: 2px solid var(--border-color);
+            transition: border-color 0.3s ease;
+        }
+
+        .color-picker-wrapper:hover { border-color: var(--blue); }
+
+        .color-picker {
+            position: absolute;
+            top: -6px;
+            left: -6px;
+            width: 48px;
+            height: 48px;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .color-hex-input {
+            flex: 1;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 12.5px;
+            font-weight: 500;
+            padding: 7px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--card-bg);
+            color: var(--text-primary);
+            outline: none;
+            transition: all 0.3s ease;
+            min-width: 0;
+        }
+
+        .color-hex-input:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
+        }
+
+        .color-position {
+            width: 54px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 12.5px;
+            font-weight: 500;
+            padding: 7px 6px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--card-bg);
+            color: var(--text-primary);
+            outline: none;
+            text-align: center;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .color-position:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
+        }
+
+        .opacity-slider-mini {
+            width: 50px;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 4px;
+            border-radius: 2px;
+            background: linear-gradient(90deg, transparent, var(--text-primary));
+            outline: none;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .opacity-slider-mini::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--card-bg);
+            border: 2px solid var(--blue);
+            cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+        }
+
+        .opacity-slider-mini::-moz-range-thumb {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--card-bg);
+            border: 2px solid var(--blue);
+            cursor: pointer;
+        }
+
+        .remove-stop-btn {
+            width: 30px;
+            height: 30px;
+            border: none;
+            border-radius: 8px;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+
+        .remove-stop-btn:hover { background: var(--btn-action-bg); color: var(--red); }
+        .remove-stop-btn:disabled { opacity: 0.25; cursor: not-allowed; }
+        .remove-stop-btn:disabled:hover { background: transparent; color: var(--text-secondary); }
+
+        .add-color-btn {
+            width: 100%;
+            padding: 9px 16px;
+            border: 2px dashed var(--border-color);
+            border-radius: 10px;
+            background: transparent;
+            color: var(--text-secondary);
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .add-color-btn:hover { border-color: var(--blue); color: var(--blue); background: rgba(59,130,246,0.04); }
+        .add-color-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .add-color-btn:disabled:hover { border-color: var(--border-color); color: var(--text-secondary); background: transparent; }
+
+        /* ====== PRESETS GALLERY ====== */
+        .presets-section {
+            margin-bottom: 22px;
+        }
+
+        .presets-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .preset-swatch {
+            height: 44px;
+            border-radius: 10px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .preset-swatch:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+            border-color: var(--blue);
+        }
+
+        .preset-swatch::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 8px;
+            opacity: 0;
+            background: rgba(255,255,255,0.2);
+            transition: opacity 0.3s ease;
+        }
+
+        .preset-swatch:hover::after { opacity: 1; }
+
+        /* ====== PREVIEW ====== */
+        .preview-box-wrapper {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .preview-box {
+            width: 100%;
+            height: 260px;
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+            transition: border-color 0.3s ease, height 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .preview-box.animated {
+            animation: gradientShift 4s ease infinite alternate;
+            background-size: 200% 200% !important;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .preview-overlay-btns {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            display: flex;
+            gap: 6px;
+            z-index: 5;
+        }
+
+        .preview-mini-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            border: none;
+            background: rgba(0,0,0,0.45);
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+            transition: all 0.3s ease;
+        }
+
+        .preview-mini-btn:hover { background: rgba(0,0,0,0.7); transform: scale(1.08); }
+        .preview-mini-btn.active-mini { background: var(--blue); }
+
+        .preview-size-label {
+            position: absolute;
+            bottom: 10px;
+            left: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.7);
+            background: rgba(0,0,0,0.35);
+            padding: 3px 8px;
+            border-radius: 6px;
+            backdrop-filter: blur(8px);
+            pointer-events: none;
+        }
+
+        /* ====== CSS OUTPUT ====== */
+        .output-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .output-format-toggle {
+            display: flex;
+            gap: 4px;
+        }
+
+        .format-btn {
+            padding: 4px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: transparent;
+            color: var(--text-secondary);
+            font-family: 'Roboto Mono', monospace;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .format-btn.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+        .format-btn:hover:not(.active) { border-color: var(--blue); color: var(--blue); }
+
+        .css-output-wrapper {
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .css-output {
+            width: 100%;
+            min-height: 110px;
+            padding: 16px 18px;
+            background: #0f172a;
+            color: #e2e8f0;
+            border: 1px solid #1e293b;
+            border-radius: 12px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 12px;
+            line-height: 1.7;
+            resize: none;
+            outline: none;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        [data-theme="dark"] .css-output { background: #020617; border-color: #1e293b; }
+
+        /* ====== ACTION BAR ====== */
+        .action-bar {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-copy {
+            flex: 1;
+            padding: 11px 18px;
+            background: var(--blue);
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13.5px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-copy:hover { background: var(--blue-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(59,130,246,0.35); }
+        .btn-copy:active { transform: translateY(0); }
+        .btn-copy.copied { background: var(--green); }
+
+        .btn-reset {
+            padding: 11px 18px;
+            background: transparent;
+            color: var(--red);
+            border: 1.5px solid var(--red);
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13.5px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-reset:hover { background: var(--btn-action-bg); transform: translateY(-1px); }
+        .btn-reset:active { transform: translateY(0); }
+
+        .btn-export {
+            padding: 11px 18px;
+            background: transparent;
+            color: var(--purple);
+            border: 1.5px solid var(--purple);
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13.5px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-export:hover { background: rgba(168,85,247,0.08); transform: translateY(-1px); }
+        .btn-export:active { transform: translateY(0); }
+
+        /* ====== HISTORY ====== */
+        .history-section {
+            margin-top: 24px;
+        }
+
+        .history-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .history-swatch {
+            height: 44px;
+            border-radius: 10px;
+            cursor: pointer;
+            border: 2px solid var(--border-color);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .history-swatch:hover { transform: scale(1.05); border-color: var(--blue); }
+
+        .history-swatch .history-delete {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: none;
+            background: var(--red);
+            color: #fff;
+            font-size: 9px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .history-swatch:hover .history-delete { display: flex; }
+
+        .history-empty {
+            grid-column: 1/-1;
+            text-align: center;
+            padding: 20px;
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        /* ====== FULLSCREEN ====== */
+        .fullscreen-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: #000;
+        }
+
+        .fullscreen-overlay.show { display: flex; }
+
+        .fullscreen-close {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            border: none;
+            background: rgba(255,255,255,0.15);
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .fullscreen-close:hover { background: rgba(255,255,255,0.3); transform: scale(1.08); }
+
+        .fullscreen-gradient {
+            width: 100%;
+            height: 100%;
+        }
+
+        .fullscreen-info {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(10px);
+            padding: 10px 22px;
+            border-radius: 12px;
+            color: #fff;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 12px;
+            max-width: 90vw;
+            text-align: center;
+            z-index: 10000;
+        }
+
+        /* ====== TOAST ====== */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--card-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 14px 20px;
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 10001;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast i { color: var(--green); font-size: 16px; }
+
+        /* ====== FOOTER ====== */
+        .footer {
+            background: var(--footer-bg);
+            text-align: center;
+            padding: 30px 20px;
+        }
+
+        .footer-text { font-size: 14px; color: #94a3b8; font-weight: 400; }
+
+        /* ====== RESPONSIVE ====== */
+        @media (max-width: 900px) {
+            .workspace { grid-template-columns: 1fr; }
+            .presets-grid { grid-template-columns: repeat(4, 1fr); }
+            .history-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+            .tool-title { font-size: 26px; }
+            .tool-subtitle { font-size: 14px; }
+            .main-content { padding: 28px 16px 40px; }
+            .card { padding: 20px; }
+            .header-inner { padding: 0 16px; }
+            .color-stop { flex-wrap: wrap; gap: 6px; }
+            .color-position { width: 48px; }
+            .action-bar { flex-direction: column; }
+            .presets-grid { grid-template-columns: repeat(3, 1fr); }
+            .history-grid { grid-template-columns: repeat(3, 1fr); }
+            .direction-presets { grid-template-columns: repeat(4, 1fr); }
+            .quick-actions { gap: 8px; }
+            .qa-btn { padding: 8px 12px; font-size: 12px; }
+        }
+
+        @media (max-width: 480px) {
+            .back-link span { display: none; }
+            .tool-title { font-size: 22px; }
+            .presets-grid { grid-template-columns: repeat(3, 1fr); }
+            .direction-presets { grid-template-columns: repeat(4, 1fr); }
+            .angle-top-row { flex-direction: column; align-items: center; }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
+
+        /* Checkerboard */
+        .preview-box {
+            background-image:
+                linear-gradient(45deg, #ccc 25%, transparent 25%),
+                linear-gradient(-45deg, #ccc 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #ccc 75%),
+                linear-gradient(-45deg, transparent 75%, #ccc 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        }
+
+        /* Disable text selection during drag */
+        body.dragging { user-select: none; -webkit-user-select: none; cursor: grabbing !important; }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-inner">
+            <a href="#" onclick="event.preventDefault();" class="logo">
+                <span class="logo-passion">Passion</span><span class="logo-tools">Tools</span>
+            </a>
+            <div class="header-actions">
+                <a href="index.html" class="back-link">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Back to Tools</span>
+                </a>
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">☀️</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="tool-header">
+            <h1 class="tool-title">CSS Gradient Generator</h1>
+            <p class="tool-subtitle">Create beautiful, custom CSS gradients and copy the code instantly. 100% private in-browser processing.</p>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <button class="qa-btn" id="qaRandom"><i class="fas fa-shuffle"></i> Random</button>
+            <button class="qa-btn" id="qaRepeating"><i class="fas fa-repeat"></i> Repeating</button>
+            <button class="qa-btn" id="qaAnimate"><i class="fas fa-play"></i> Animate</button>
+            <button class="qa-btn" id="qaFullscreen"><i class="fas fa-expand"></i> Fullscreen</button>
+            <button class="qa-btn" id="qaExportPNG"><i class="fas fa-image"></i> Export PNG</button>
+        </div>
+
+        <!-- Workspace -->
+        <div class="workspace">
+            <!-- Left Column: Controls -->
+            <div>
+                <!-- Presets -->
+                <div class="card presets-section">
+                    <h2 class="card-title"><i class="fas fa-palette"></i> Presets</h2>
+                    <div class="presets-grid" id="presetsGrid"></div>
+                </div>
+
+                <!-- Controls -->
+                <div class="card">
+                    <h2 class="card-title"><i class="fas fa-sliders"></i> Controls</h2>
+
+                    <!-- Gradient Type -->
+                    <div class="control-group">
+                        <label class="control-label">Gradient Type</label>
+                        <div class="type-toggle">
+                            <button class="type-btn active" data-type="linear" id="btnLinear">
+                                <i class="fas fa-arrow-right-long"></i>&nbsp; Linear
+                            </button>
+                            <button class="type-btn" data-type="radial" id="btnRadial">
+                                <i class="fas fa-circle-dot"></i>&nbsp; Radial
+                            </button>
+                            <button class="type-btn" data-type="conic" id="btnConic">
+                                <i class="fas fa-compact-disc"></i>&nbsp; Conic
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Angle -->
+                    <div class="control-group angle-control" id="angleControl">
+                        <label class="control-label">Direction / Angle</label>
+                        <div class="angle-top-row">
+                            <div class="angle-wheel-container">
+                                <div class="angle-wheel" id="angleWheel">
+                                    <div class="angle-wheel-center"></div>
+                                    <div class="angle-wheel-pointer" id="angleWheelPointer"></div>
+                                    <div class="angle-wheel-dot" id="angleWheelDot"></div>
+                                </div>
+                            </div>
+                            <div class="angle-right-col">
+                                <div class="angle-display">
+                                    <span style="font-size:12px;color:var(--text-secondary);">Angle</span>
+                                    <span class="angle-value" id="angleValue">90°</span>
+                                </div>
+                                <input type="range" min="0" max="360" value="90" class="angle-slider" id="angleSlider">
+                                <div class="direction-presets" id="directionPresets"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Radial Shape -->
+                    <div class="control-group radial-control" id="radialControl">
+                        <label class="control-label">Shape</label>
+                        <div class="type-toggle">
+                            <button class="type-btn active" data-shape="circle" id="btnCircle">Circle</button>
+                            <button class="type-btn" data-shape="ellipse" id="btnEllipse">Ellipse</button>
+                        </div>
+                        <label class="control-label" style="margin-top:14px;">Position</label>
+                        <div class="radial-position-grid" id="radialPositionGrid"></div>
+                    </div>
+
+                    <!-- Color Stops -->
+                    <div class="control-group">
+                        <label class="control-label">Color Stops <span class="badge">ALPHA</span></label>
+                        <div class="gradient-bar-container">
+                            <div class="gradient-bar" id="gradientBar"></div>
+                        </div>
+                        <div class="color-stops-list" id="colorStopsList"></div>
+                        <button class="add-color-btn" id="addColorBtn">
+                            <i class="fas fa-plus"></i> Add Color Stop
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Preview & Export -->
+            <div>
+                <div class="card">
+                    <h2 class="card-title"><i class="fas fa-eye"></i> Live Preview</h2>
+
+                    <div class="preview-box-wrapper">
+                        <div class="preview-box" id="previewBox"></div>
+                        <div class="preview-overlay-btns">
+                            <button class="preview-mini-btn" id="previewAnimBtn" title="Toggle Animation"><i class="fas fa-play"></i></button>
+                            <button class="preview-mini-btn" id="previewFullBtn" title="Fullscreen"><i class="fas fa-expand"></i></button>
+                        </div>
+                        <div class="preview-size-label" id="previewSizeLabel">100% × 260px</div>
+                    </div>
+
+                    <!-- Output Format -->
+                    <div class="output-header">
+                        <span class="control-label" style="margin:0;">CSS Output</span>
+                        <div class="output-format-toggle">
+                            <button class="format-btn active" data-format="hex" id="fmtHex">HEX</button>
+                            <button class="format-btn" data-format="rgb" id="fmtRgb">RGB</button>
+                            <button class="format-btn" data-format="hsl" id="fmtHsl">HSL</button>
+                        </div>
+                    </div>
+
+                    <div class="css-output-wrapper">
+                        <textarea class="css-output" id="cssOutput" readonly></textarea>
+                    </div>
+
+                    <div class="action-bar">
+                        <button class="btn-copy" id="copyBtn">
+                            <i class="fas fa-copy"></i> Copy CSS
+                        </button>
+                        <button class="btn-export" id="exportPngBtn2">
+                            <i class="fas fa-image"></i> PNG
+                        </button>
+                        <button class="btn-reset" id="resetBtn">
+                            <i class="fas fa-rotate-left"></i> Reset
+                        </button>
+                    </div>
+                </div>
+
+                <!-- History -->
+                <div class="card history-section" style="margin-top:28px;">
+                    <h2 class="card-title"><i class="fas fa-clock-rotate-left"></i> History</h2>
+                    <div class="history-grid" id="historyGrid"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Fullscreen Overlay -->
+    <div class="fullscreen-overlay" id="fullscreenOverlay">
+        <div class="fullscreen-gradient" id="fullscreenGradient"></div>
+        <button class="fullscreen-close" id="fullscreenClose"><i class="fas fa-xmark"></i></button>
+        <div class="fullscreen-info" id="fullscreenInfo"></div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"><i class="fas fa-check-circle"></i> <span id="toastText">Copied!</span></div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p class="footer-text">&copy; 2026 Passion Tools. Secure client-side processing.</p>
+    </footer>
+
+    <script>
+        // ===== THEME =====
+        const themeToggle = document.getElementById('themeToggle');
+        const htmlEl = document.documentElement;
+
+        function setTheme(theme) {
+            htmlEl.setAttribute('data-theme', theme);
+            themeToggle.textContent = theme === 'dark' ? '🌙' : '☀️';
+            localStorage.setItem('pt-theme', theme);
+        }
+
+        (function initTheme() {
+            const saved = localStorage.getItem('pt-theme');
+            if (saved) setTheme(saved);
+            else if (window.matchMedia('(prefers-color-scheme: dark)').matches) setTheme('dark');
+        })();
+
+        themeToggle.addEventListener('click', () => {
+            setTheme(htmlEl.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+        });
+
+        // ===== PRESETS =====
+        const PRESETS = [
+            { name: 'Sunset', stops: [{ color: '#f97316', position: 0, opacity: 1 },{ color: '#ef4444', position: 50, opacity: 1 },{ color: '#ec4899', position: 100, opacity: 1 }], type: 'linear', angle: 135 },
+            { name: 'Ocean', stops: [{ color: '#06b6d4', position: 0, opacity: 1 },{ color: '#3b82f6', position: 50, opacity: 1 },{ color: '#6366f1', position: 100, opacity: 1 }], type: 'linear', angle: 135 },
+            { name: 'Forest', stops: [{ color: '#22c55e', position: 0, opacity: 1 },{ color: '#16a34a', position: 50, opacity: 1 },{ color: '#15803d', position: 100, opacity: 1 }], type: 'linear', angle: 180 },
+            { name: 'Lavender', stops: [{ color: '#c084fc', position: 0, opacity: 1 },{ color: '#a855f7', position: 50, opacity: 1 },{ color: '#7c3aed', position: 100, opacity: 1 }], type: 'linear', angle: 135 },
+            { name: 'Fire', stops: [{ color: '#fbbf24', position: 0, opacity: 1 },{ color: '#f97316', position: 40, opacity: 1 },{ color: '#ef4444', position: 100, opacity: 1 }], type: 'linear', angle: 45 },
+            { name: 'Midnight', stops: [{ color: '#1e293b', position: 0, opacity: 1 },{ color: '#312e81', position: 50, opacity: 1 },{ color: '#0f172a', position: 100, opacity: 1 }], type: 'linear', angle: 135 },
+            { name: 'Cotton Candy', stops: [{ color: '#f9a8d4', position: 0, opacity: 1 },{ color: '#c4b5fd', position: 50, opacity: 1 },{ color: '#93c5fd', position: 100, opacity: 1 }], type: 'linear', angle: 120 },
+            { name: 'Aurora', stops: [{ color: '#06b6d4', position: 0, opacity: 1 },{ color: '#22c55e', position: 33, opacity: 1 },{ color: '#a855f7', position: 66, opacity: 1 },{ color: '#ec4899', position: 100, opacity: 1 }], type: 'linear', angle: 135 },
+            { name: 'Peach', stops: [{ color: '#fecaca', position: 0, opacity: 1 },{ color: '#fdba74', position: 100, opacity: 1 }], type: 'linear', angle: 135 },
+            { name: 'Neon', stops: [{ color: '#00ff87', position: 0, opacity: 1 },{ color: '#60efff', position: 100, opacity: 1 }], type: 'linear', angle: 90 },
+            { name: 'Cosmic', stops: [{ color: '#667eea', position: 0, opacity: 1 },{ color: '#764ba2', position: 100, opacity: 1 }], type: 'linear', angle: 135 },
+            { name: 'Solar', stops: [{ color: '#f093fb', position: 0, opacity: 1 },{ color: '#f5576c', position: 50, opacity: 1 },{ color: '#ffd200', position: 100, opacity: 1 }], type: 'linear', angle: 45 },
+            { name: 'Ice', stops: [{ color: '#e0f2fe', position: 0, opacity: 1 },{ color: '#bae6fd', position: 40, opacity: 1 },{ color: '#38bdf8', position: 100, opacity: 1 }], type: 'radial', angle: 0, shape: 'circle' },
+            { name: 'Gold', stops: [{ color: '#fef3c7', position: 0, opacity: 1 },{ color: '#fbbf24', position: 50, opacity: 1 },{ color: '#d97706', position: 100, opacity: 1 }], type: 'linear', angle: 135 },
+            { name: 'Emerald Ring', stops: [{ color: '#6ee7b7', position: 0, opacity: 1 },{ color: '#059669', position: 50, opacity: 1 },{ color: '#064e3b', position: 100, opacity: 1 }], type: 'conic', angle: 0 },
+            { name: 'Rainbow', stops: [{ color: '#ef4444', position: 0, opacity: 1 },{ color: '#f97316', position: 17, opacity: 1 },{ color: '#eab308', position: 33, opacity: 1 },{ color: '#22c55e', position: 50, opacity: 1 },{ color: '#3b82f6', position: 67, opacity: 1 },{ color: '#a855f7', position: 83, opacity: 1 },{ color: '#ec4899', position: 100, opacity: 1 }], type: 'conic', angle: 0 },
+        ];
+
+        const DIRECTIONS = [
+            { label: '→', angle: 90 },
+            { label: '↗', angle: 45 },
+            { label: '↑', angle: 0 },
+            { label: '↖', angle: 315 },
+            { label: '←', angle: 270 },
+            { label: '↙', angle: 225 },
+            { label: '↓', angle: 180 },
+            { label: '↘', angle: 135 },
+        ];
+
+        const RADIAL_POSITIONS = [
+            { label: 'Top Left', value: 'at top left' },
+            { label: 'Top', value: 'at top' },
+            { label: 'Top Right', value: 'at top right' },
+            { label: 'Left', value: 'at left' },
+            { label: 'Center', value: 'at center' },
+            { label: 'Right', value: 'at right' },
+            { label: 'Bottom Left', value: 'at bottom left' },
+            { label: 'Bottom', value: 'at bottom' },
+            { label: 'Bottom Right', value: 'at bottom right' },
+        ];
+
+        // ===== STATE =====
+        const DEFAULT_STOPS = [
+            { color: '#ef4444', position: 0, opacity: 1 },
+            { color: '#a855f7', position: 100, opacity: 1 }
+        ];
+
+        let state = {
+            type: 'linear',
+            angle: 90,
+            shape: 'circle',
+            radialPosition: 'at center',
+            repeating: false,
+            animated: false,
+            colorFormat: 'hex',
+            stops: JSON.parse(JSON.stringify(DEFAULT_STOPS)),
+            activeStopIndex: 0
+        };
+
+        let history = JSON.parse(localStorage.getItem('pt-gradient-history') || '[]');
+
+        const RANDOM_COLORS = ['#f59e0b','#22c55e','#3b82f6','#ec4899','#06b6d4','#8b5cf6','#f97316','#14b8a6','#e11d48','#84cc16'];
+
+        // ===== DOM =====
+        const btnLinear = document.getElementById('btnLinear');
+        const btnRadial = document.getElementById('btnRadial');
+        const btnConic = document.getElementById('btnConic');
+        const angleControl = document.getElementById('angleControl');
+        const radialControl = document.getElementById('radialControl');
+        const angleSlider = document.getElementById('angleSlider');
+        const angleValueEl = document.getElementById('angleValue');
+        const angleWheel = document.getElementById('angleWheel');
+        const angleWheelPointer = document.getElementById('angleWheelPointer');
+        const angleWheelDot = document.getElementById('angleWheelDot');
+        const colorStopsList = document.getElementById('colorStopsList');
+        const addColorBtn = document.getElementById('addColorBtn');
+        const previewBox = document.getElementById('previewBox');
+        const cssOutput = document.getElementById('cssOutput');
+        const copyBtn = document.getElementById('copyBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const btnCircle = document.getElementById('btnCircle');
+        const btnEllipse = document.getElementById('btnEllipse');
+        const gradientBar = document.getElementById('gradientBar');
+        const presetsGrid = document.getElementById('presetsGrid');
+        const historyGrid = document.getElementById('historyGrid');
+        const fullscreenOverlay = document.getElementById('fullscreenOverlay');
+        const fullscreenGradient = document.getElementById('fullscreenGradient');
+        const fullscreenClose = document.getElementById('fullscreenClose');
+        const fullscreenInfo = document.getElementById('fullscreenInfo');
+        const toast = document.getElementById('toast');
+        const toastText = document.getElementById('toastText');
+        const directionPresets = document.getElementById('directionPresets');
+        const radialPositionGrid = document.getElementById('radialPositionGrid');
+
+        // ===== TOAST =====
+        let toastTimer;
+        function showToast(msg) {
+            toastText.textContent = msg;
+            toast.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
+        }
+
+        // ===== RENDER PRESETS =====
+        function renderPresets() {
+            presetsGrid.innerHTML = '';
+            PRESETS.forEach((p, i) => {
+                const div = document.createElement('div');
+                div.className = 'preset-swatch';
+                div.title = p.name;
+                const colorStr = p.stops.map(s => `${s.color} ${s.position}%`).join(', ');
+                if (p.type === 'linear') {
+                    div.style.background = `linear-gradient(${p.angle || 135}deg, ${colorStr})`;
+                } else if (p.type === 'radial') {
+                    div.style.background = `radial-gradient(${p.shape || 'circle'}, ${colorStr})`;
+                } else {
+                    div.style.background = `conic-gradient(from ${p.angle || 0}deg, ${colorStr})`;
+                }
+                div.addEventListener('click', () => applyPreset(p));
+                presetsGrid.appendChild(div);
+            });
+        }
+
+        function applyPreset(p) {
+            state.type = p.type || 'linear';
+            state.angle = p.angle || 90;
+            state.shape = p.shape || 'circle';
+            state.radialPosition = 'at center';
+            state.stops = JSON.parse(JSON.stringify(p.stops));
+            state.stops.forEach(s => { if (s.opacity === undefined) s.opacity = 1; });
+            state.activeStopIndex = 0;
+            syncTypeButtons();
+            syncAngleUI();
+            renderColorStops();
+            updateGradient();
+        }
+
+        // ===== RENDER DIRECTION PRESETS =====
+        function renderDirectionPresets() {
+            directionPresets.innerHTML = '';
+            DIRECTIONS.forEach(d => {
+                const btn = document.createElement('button');
+                btn.className = 'dir-btn' + (state.angle === d.angle ? ' active' : '');
+                btn.textContent = d.label;
+                btn.title = d.angle + '°';
+                btn.addEventListener('click', () => {
+                    state.angle = d.angle;
+                    syncAngleUI();
+                    updateGradient();
+                });
+                directionPresets.appendChild(btn);
+            });
+        }
+
+        // ===== RENDER RADIAL POSITIONS =====
+        function renderRadialPositions() {
+            radialPositionGrid.innerHTML = '';
+            RADIAL_POSITIONS.forEach(p => {
+                const btn = document.createElement('button');
+                btn.className = 'radial-pos-btn' + (state.radialPosition === p.value ? ' active' : '');
+                btn.textContent = p.label;
+                btn.addEventListener('click', () => {
+                    state.radialPosition = p.value;
+                    renderRadialPositions();
+                    updateGradient();
+                });
+                radialPositionGrid.appendChild(btn);
+            });
+        }
+
+        // ===== TYPE TOGGLE =====
+        function syncTypeButtons() {
+            [btnLinear, btnRadial, btnConic].forEach(b => b.classList.remove('active'));
+            if (state.type === 'linear') btnLinear.classList.add('active');
+            else if (state.type === 'radial') btnRadial.classList.add('active');
+            else btnConic.classList.add('active');
+
+            angleControl.classList.toggle('hidden', state.type === 'radial');
+            radialControl.classList.toggle('visible', state.type === 'radial');
+        }
+
+        btnLinear.addEventListener('click', () => { state.type = 'linear'; syncTypeButtons(); updateGradient(); });
+        btnRadial.addEventListener('click', () => { state.type = 'radial'; syncTypeButtons(); updateGradient(); });
+        btnConic.addEventListener('click', () => { state.type = 'conic'; syncTypeButtons(); updateGradient(); });
+
+        // ===== RADIAL SHAPE =====
+        btnCircle.addEventListener('click', () => {
+            state.shape = 'circle';
+            btnCircle.classList.add('active');
+            btnEllipse.classList.remove('active');
+            updateGradient();
+        });
+
+        btnEllipse.addEventListener('click', () => {
+            state.shape = 'ellipse';
+            btnEllipse.classList.add('active');
+            btnCircle.classList.remove('active');
+            updateGradient();
+        });
+
+        // ===== ANGLE SLIDER =====
+        angleSlider.addEventListener('input', () => {
+            state.angle = parseInt(angleSlider.value);
+            syncAngleUI();
+            updateGradient();
+        });
+
+        function syncAngleUI() {
+            angleSlider.value = state.angle;
+            angleValueEl.textContent = state.angle + '°';
+            updateAngleWheel();
+            renderDirectionPresets();
+        }
+
+        // ===== ANGLE WHEEL =====
+        function updateAngleWheel() {
+            const cssAngle = state.angle - 90; // CSS 0° is up, we rotate pointer
+            angleWheelPointer.style.transform = `rotate(${cssAngle}deg)`;
+            const rad = (state.angle - 90) * Math.PI / 180;
+            const r = 38;
+            const cx = 45, cy = 45;
+            const dx = cx + r * Math.cos(rad);
+            const dy = cy + r * Math.sin(rad);
+            angleWheelDot.style.left = dx + 'px';
+            angleWheelDot.style.top = dy + 'px';
+        }
+
+        let wheelDragging = false;
+
+        function getWheelAngle(e) {
+            const rect = angleWheel.getBoundingClientRect();
+            const cx = rect.left + rect.width / 2;
+            const cy = rect.top + rect.height / 2;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            let angle = Math.atan2(clientY - cy, clientX - cx) * 180 / Math.PI + 90;
+            if (angle < 0) angle += 360;
+            return Math.round(angle) % 360;
+        }
+
+        angleWheel.addEventListener('mousedown', (e) => {
+            wheelDragging = true;
+            state.angle = getWheelAngle(e);
+            syncAngleUI();
+            updateGradient();
+            document.body.classList.add('dragging');
+        });
+
+        angleWheel.addEventListener('touchstart', (e) => {
+            wheelDragging = true;
+            state.angle = getWheelAngle(e);
+            syncAngleUI();
+            updateGradient();
+        }, { passive: true });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!wheelDragging) return;
+            state.angle = getWheelAngle(e);
+            syncAngleUI();
+            updateGradient();
+        });
+
+        document.addEventListener('touchmove', (e) => {
+            if (!wheelDragging) return;
+            state.angle = getWheelAngle(e);
+            syncAngleUI();
+            updateGradient();
+        }, { passive: true });
+
+        document.addEventListener('mouseup', () => {
+            if (wheelDragging) { wheelDragging = false; document.body.classList.remove('dragging'); }
+        });
+
+        document.addEventListener('touchend', () => { wheelDragging = false; });
+
+        // ===== GRADIENT BAR (Draggable stops) =====
+        let barDragging = null;
+
+        function renderGradientBar() {
+            // Set bar background
+            const sortedStops = [...state.stops].sort((a, b) => a.position - b.position);
+            const colorStr = sortedStops.map(s => `${formatColorWithOpacity(s)} ${s.position}%`).join(', ');
+            gradientBar.style.background = `linear-gradient(90deg, ${colorStr})`;
+
+            // Remove old handles
+            gradientBar.querySelectorAll('.gradient-bar-handle').forEach(h => h.remove());
+
+            // Create handles
+            state.stops.forEach((stop, i) => {
+                const handle = document.createElement('div');
+                handle.className = 'gradient-bar-handle' + (i === state.activeStopIndex ? ' active-handle' : '');
+                handle.style.left = stop.position + '%';
+                handle.style.background = stop.color;
+                handle.dataset.index = i;
+
+                handle.addEventListener('mousedown', (e) => {
+                    e.preventDefault();
+                    barDragging = i;
+                    state.activeStopIndex = i;
+                    document.body.classList.add('dragging');
+                    renderColorStops();
+                    renderGradientBar();
+                });
+
+                handle.addEventListener('touchstart', (e) => {
+                    barDragging = i;
+                    state.activeStopIndex = i;
+                    renderColorStops();
+                    renderGradientBar();
+                }, { passive: true });
+
+                gradientBar.appendChild(handle);
+            });
+        }
+
+        document.addEventListener('mousemove', (e) => {
+            if (barDragging === null) return;
+            const rect = gradientBar.getBoundingClientRect();
+            let pct = ((e.clientX - rect.left) / rect.width) * 100;
+            pct = Math.max(0, Math.min(100, Math.round(pct)));
+            state.stops[barDragging].position = pct;
+            renderGradientBar();
+            updateGradient();
+            // Update position input
+            const posInput = colorStopsList.querySelector(`.color-position[data-index="${barDragging}"]`);
+            if (posInput) posInput.value = pct + '%';
+        });
+
+        document.addEventListener('touchmove', (e) => {
+            if (barDragging === null) return;
+            const rect = gradientBar.getBoundingClientRect();
+            let pct = ((e.touches[0].clientX - rect.left) / rect.width) * 100;
+            pct = Math.max(0, Math.min(100, Math.round(pct)));
+            state.stops[barDragging].position = pct;
+            renderGradientBar();
+            updateGradient();
+        }, { passive: true });
+
+        document.addEventListener('mouseup', () => {
+            if (barDragging !== null) { barDragging = null; document.body.classList.remove('dragging'); }
+        });
+
+        document.addEventListener('touchend', () => { barDragging = null; });
+
+        // ===== RENDER COLOR STOPS =====
+        function renderColorStops() {
+            colorStopsList.innerHTML = '';
+            const canRemove = state.stops.length > 2;
+
+            state.stops.forEach((stop, index) => {
+                if (stop.opacity === undefined) stop.opacity = 1;
+                const row = document.createElement('div');
+                row.className = 'color-stop' + (index === state.activeStopIndex ? ' active-stop' : '');
+
+                row.innerHTML = `
+                    <div class="color-picker-wrapper">
+                        <input type="color" class="color-picker" value="${stop.color}" data-index="${index}">
+                    </div>
+                    <input type="text" class="color-hex-input" value="${stop.color}" data-index="${index}" maxlength="7" spellcheck="false">
+                    <input type="text" class="color-position" value="${stop.position}%" data-index="${index}" maxlength="4">
+                    <input type="range" class="opacity-slider-mini" min="0" max="100" value="${Math.round(stop.opacity * 100)}" data-index="${index}" title="Opacity ${Math.round(stop.opacity * 100)}%">
+                    <button class="remove-stop-btn" data-index="${index}" ${!canRemove ? 'disabled' : ''} title="Remove">
+                        <i class="fas fa-trash-can"></i>
+                    </button>
+                `;
+
+                row.addEventListener('click', (e) => {
+                    if (e.target.closest('.remove-stop-btn')) return;
+                    state.activeStopIndex = index;
+                    renderColorStops();
+                    renderGradientBar();
+                });
+
+                colorStopsList.appendChild(row);
+            });
+
+            // Bind events
+            colorStopsList.querySelectorAll('.color-picker').forEach(p => {
+                p.addEventListener('input', (e) => {
+                    const i = +e.target.dataset.index;
+                    state.stops[i].color = e.target.value;
+                    renderColorStops();
+                    renderGradientBar();
+                    updateGradient();
+                });
+            });
+
+            colorStopsList.querySelectorAll('.color-hex-input').forEach(input => {
+                input.addEventListener('input', (e) => {
+                    const i = +e.target.dataset.index;
+                    let val = e.target.value.trim();
+                    if (!val.startsWith('#')) val = '#' + val;
+                    if (/^#[0-9a-fA-F]{6}$/.test(val)) {
+                        state.stops[i].color = val;
+                        renderColorStops();
+                        renderGradientBar();
+                        updateGradient();
+                    }
+                });
+                input.addEventListener('blur', (e) => {
+                    e.target.value = state.stops[+e.target.dataset.index].color;
+                });
+            });
+
+            colorStopsList.querySelectorAll('.color-position').forEach(input => {
+                input.addEventListener('input', (e) => {
+                    const i = +e.target.dataset.index;
+                    let val = parseInt(e.target.value.replace('%', ''));
+                    if (!isNaN(val)) {
+                        state.stops[i].position = Math.max(0, Math.min(100, val));
+                        renderGradientBar();
+                        updateGradient();
+                    }
+                });
+                input.addEventListener('blur', (e) => {
+                    e.target.value = state.stops[+e.target.dataset.index].position + '%';
+                });
+            });
+
+            colorStopsList.querySelectorAll('.opacity-slider-mini').forEach(slider => {
+                slider.addEventListener('input', (e) => {
+                    const i = +e.target.dataset.index;
+                    state.stops[i].opacity = parseInt(e.target.value) / 100;
+                    e.target.title = 'Opacity ' + e.target.value + '%';
+                    renderGradientBar();
+                    updateGradient();
+                });
+            });
+
+            colorStopsList.querySelectorAll('.remove-stop-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const i = +e.currentTarget.dataset.index;
+                    if (state.stops.length > 2) {
+                        state.stops.splice(i, 1);
+                        if (state.activeStopIndex >= state.stops.length) state.activeStopIndex = state.stops.length - 1;
+                        renderColorStops();
+                        renderGradientBar();
+                        updateGradient();
+                    }
+                });
+            });
+
+            addColorBtn.disabled = state.stops.length >= 8;
+        }
+
+        // ===== ADD COLOR =====
+        addColorBtn.addEventListener('click', () => {
+            if (state.stops.length >= 8) return;
+            const ci = (state.stops.length - 2) % RANDOM_COLORS.length;
+            state.stops.push({ color: RANDOM_COLORS[ci], position: 100, opacity: 1 });
+            const total = state.stops.length;
+            state.stops.forEach((s, i) => { s.position = Math.round((i / (total - 1)) * 100); });
+            state.activeStopIndex = state.stops.length - 1;
+            renderColorStops();
+            renderGradientBar();
+            updateGradient();
+        });
+
+        // ===== COLOR UTILS =====
+        function hexToRgb(hex) {
+            const r = parseInt(hex.slice(1, 3), 16);
+            const g = parseInt(hex.slice(3, 5), 16);
+            const b = parseInt(hex.slice(5, 7), 16);
+            return { r, g, b };
+        }
+
+        function rgbToHsl(r, g, b) {
+            r /= 255; g /= 255; b /= 255;
+            const max = Math.max(r, g, b), min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+            if (max === min) { h = s = 0; }
+            else {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                    case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+                    case g: h = ((b - r) / d + 2) / 6; break;
+                    case b: h = ((r - g) / d + 4) / 6; break;
+                }
+            }
+            return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
+        }
+
+        function formatColor(hex, format, opacity) {
+            const { r, g, b } = hexToRgb(hex);
+            const alpha = opacity !== undefined ? opacity : 1;
+            if (format === 'rgb') {
+                return alpha < 1 ? `rgba(${r}, ${g}, ${b}, ${alpha.toFixed(2)})` : `rgb(${r}, ${g}, ${b})`;
+            } else if (format === 'hsl') {
+                const { h, s, l } = rgbToHsl(r, g, b);
+                return alpha < 1 ? `hsla(${h}, ${s}%, ${l}%, ${alpha.toFixed(2)})` : `hsl(${h}, ${s}%, ${l}%)`;
+            } else {
+                if (alpha < 1) {
+                    const a = Math.round(alpha * 255).toString(16).padStart(2, '0');
+                    return hex + a;
+                }
+                return hex;
+            }
+        }
+
+        function formatColorWithOpacity(stop) {
+            return formatColor(stop.color, 'rgb', stop.opacity);
+        }
+
+        function formatColorForCSS(stop, fmt) {
+            return formatColor(stop.color, fmt, stop.opacity);
+        }
+
+        // ===== GRADIENT ENGINE =====
+        function buildGradientString(forCSS) {
+            const fmt = forCSS ? state.colorFormat : 'rgb';
+            const sortedStops = [...state.stops].sort((a, b) => a.position - b.position);
+            const colorStr = sortedStops.map(s => `${formatColorForCSS(s, fmt)} ${s.position}%`).join(', ');
+            const prefix = state.repeating ? 'repeating-' : '';
+
+            if (state.type === 'linear') {
+                return `${prefix}linear-gradient(${state.angle}deg, ${colorStr})`;
+            } else if (state.type === 'radial') {
+                return `${prefix}radial-gradient(${state.shape} ${state.radialPosition}, ${colorStr})`;
+            } else {
+                return `${prefix}conic-gradient(from ${state.angle}deg ${state.radialPosition}, ${colorStr})`;
+            }
+        }
+
+        function buildCSSOutput() {
+            const grad = buildGradientString(true);
+            const lines = [];
+            lines.push(`background: -webkit-${grad};`);
+            lines.push(`background: -moz-${grad};`);
+            lines.push(`background: ${grad};`);
+            return lines.join('\n');
+        }
+
+        function updateGradient() {
+            const gradient = buildGradientString(false);
+            previewBox.style.backgroundImage = gradient;
+            cssOutput.value = buildCSSOutput();
+            renderGradientBar();
+
+            // Fullscreen sync
+            if (fullscreenOverlay.classList.contains('show')) {
+                fullscreenGradient.style.background = gradient;
+                fullscreenInfo.textContent = buildGradientString(true);
+            }
+        }
+
+        // ===== COPY =====
+        copyBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(cssOutput.value).then(() => {
+                copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                copyBtn.classList.add('copied');
+                showToast('CSS code copied to clipboard!');
+                saveToHistory();
+                setTimeout(() => {
+                    copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copy CSS';
+                    copyBtn.classList.remove('copied');
+                }, 2000);
+            }).catch(() => {
+                cssOutput.select();
+                document.execCommand('copy');
+                copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                copyBtn.classList.add('copied');
+                showToast('CSS code copied to clipboard!');
+                saveToHistory();
+                setTimeout(() => {
+                    copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copy CSS';
+                    copyBtn.classList.remove('copied');
+                }, 2000);
+            });
+        });
+
+        // ===== RESET =====
+        resetBtn.addEventListener('click', () => {
+            state.type = 'linear';
+            state.angle = 90;
+            state.shape = 'circle';
+            state.radialPosition = 'at center';
+            state.repeating = false;
+            state.animated = false;
+            state.stops = JSON.parse(JSON.stringify(DEFAULT_STOPS));
+            state.activeStopIndex = 0;
+
+            syncTypeButtons();
+            syncAngleUI();
+            btnCircle.classList.add('active');
+            btnEllipse.classList.remove('active');
+            previewBox.classList.remove('animated');
+            document.getElementById('qaRepeating').classList.remove('active-toggle');
+            document.getElementById('qaAnimate').classList.remove('active-toggle');
+            document.getElementById('previewAnimBtn').classList.remove('active-mini');
+
+            renderColorStops();
+            renderRadialPositions();
+            updateGradient();
+            showToast('Reset to default gradient');
+        });
+
+        // ===== RANDOM =====
+        function generateRandom() {
+            const count = 2 + Math.floor(Math.random() * 3); // 2-4 stops
+            const types = ['linear', 'radial', 'conic'];
+            state.type = types[Math.floor(Math.random() * 2)]; // mostly linear/radial
+            state.angle = Math.floor(Math.random() * 360);
+            state.shape = Math.random() > 0.5 ? 'circle' : 'ellipse';
+            state.stops = [];
+            for (let i = 0; i < count; i++) {
+                const hue = Math.floor(Math.random() * 360);
+                const sat = 60 + Math.floor(Math.random() * 40);
+                const lit = 40 + Math.floor(Math.random() * 35);
+                const hex = hslToHex(hue, sat, lit);
+                state.stops.push({
+                    color: hex,
+                    position: Math.round((i / (count - 1)) * 100),
+                    opacity: 1
+                });
+            }
+            state.activeStopIndex = 0;
+            syncTypeButtons();
+            syncAngleUI();
+            renderColorStops();
+            renderRadialPositions();
+            updateGradient();
+            showToast('Random gradient generated!');
+        }
+
+        function hslToHex(h, s, l) {
+            s /= 100; l /= 100;
+            const a = s * Math.min(l, 1 - l);
+            const f = (n) => {
+                const k = (n + h / 30) % 12;
+                const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+                return Math.round(255 * color).toString(16).padStart(2, '0');
+            };
+            return `#${f(0)}${f(8)}${f(4)}`;
+        }
+
+        document.getElementById('qaRandom').addEventListener('click', generateRandom);
+
+        // ===== REPEATING =====
+        document.getElementById('qaRepeating').addEventListener('click', function () {
+            state.repeating = !state.repeating;
+            this.classList.toggle('active-toggle', state.repeating);
+            updateGradient();
+            showToast(state.repeating ? 'Repeating gradient enabled' : 'Repeating gradient disabled');
+        });
+
+        // ===== ANIMATE =====
+        function toggleAnimate() {
+            state.animated = !state.animated;
+            previewBox.classList.toggle('animated', state.animated);
+            document.getElementById('qaAnimate').classList.toggle('active-toggle', state.animated);
+            document.getElementById('previewAnimBtn').classList.toggle('active-mini', state.animated);
+            document.getElementById('previewAnimBtn').innerHTML = state.animated ? '<i class="fas fa-pause"></i>' : '<i class="fas fa-play"></i>';
+        }
+
+        document.getElementById('qaAnimate').addEventListener('click', toggleAnimate);
+        document.getElementById('previewAnimBtn').addEventListener('click', toggleAnimate);
+
+        // ===== FULLSCREEN =====
+        function openFullscreen() {
+            fullscreenGradient.style.background = buildGradientString(false);
+            fullscreenInfo.textContent = buildGradientString(true);
+            fullscreenOverlay.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeFullscreen() {
+            fullscreenOverlay.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        document.getElementById('qaFullscreen').addEventListener('click', openFullscreen);
+        document.getElementById('previewFullBtn').addEventListener('click', openFullscreen);
+        fullscreenClose.addEventListener('click', closeFullscreen);
+        fullscreenOverlay.addEventListener('click', (e) => { if (e.target === fullscreenOverlay || e.target === fullscreenGradient) closeFullscreen(); });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeFullscreen(); });
+
+        // ===== EXPORT PNG =====
+        function exportPNG() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 1920;
+            canvas.height = 1080;
+            const ctx = canvas.getContext('2d');
+
+            const sortedStops = [...state.stops].sort((a, b) => a.position - b.position);
+            let grad;
+
+            if (state.type === 'linear') {
+                const rad = (state.angle - 90) * Math.PI / 180;
+                const cx = 960, cy = 540, len = 1200;
+                grad = ctx.createLinearGradient(
+                    cx - len * Math.cos(rad), cy - len * Math.sin(rad),
+                    cx + len * Math.cos(rad), cy + len * Math.sin(rad)
+                );
+            } else if (state.type === 'radial') {
+                grad = ctx.createRadialGradient(960, 540, 0, 960, 540, 700);
+            } else {
+                // Conic → fallback to linear for canvas
+                const rad = (state.angle - 90) * Math.PI / 180;
+                const cx = 960, cy = 540, len = 1200;
+                grad = ctx.createLinearGradient(
+                    cx - len * Math.cos(rad), cy - len * Math.sin(rad),
+                    cx + len * Math.cos(rad), cy + len * Math.sin(rad)
+                );
+            }
+
+            sortedStops.forEach(s => {
+                const { r, g, b } = hexToRgb(s.color);
+                const alpha = s.opacity !== undefined ? s.opacity : 1;
+                grad.addColorStop(s.position / 100, `rgba(${r},${g},${b},${alpha})`);
+            });
+
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, 1920, 1080);
+
+            canvas.toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'gradient-passiontools.png';
+                a.click();
+                URL.revokeObjectURL(url);
+                showToast('PNG exported (1920×1080)');
+            });
+        }
+
+        document.getElementById('qaExportPNG').addEventListener('click', exportPNG);
+        document.getElementById('exportPngBtn2').addEventListener('click', exportPNG);
+
+        // ===== COLOR FORMAT =====
+        document.querySelectorAll('.format-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.format-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                state.colorFormat = btn.dataset.format;
+                updateGradient();
+            });
+        });
+
+        // ===== HISTORY =====
+        function saveToHistory() {
+            const entry = {
+                type: state.type,
+                angle: state.angle,
+                shape: state.shape,
+                radialPosition: state.radialPosition,
+                repeating: state.repeating,
+                stops: JSON.parse(JSON.stringify(state.stops)),
+                timestamp: Date.now()
+            };
+            // Avoid duplicates (simple check)
+            history = history.filter(h => JSON.stringify(h.stops) !== JSON.stringify(entry.stops) || h.type !== entry.type || h.angle !== entry.angle);
+            history.unshift(entry);
+            if (history.length > 12) history = history.slice(0, 12);
+            localStorage.setItem('pt-gradient-history', JSON.stringify(history));
+            renderHistory();
+        }
+
+        function renderHistory() {
+            historyGrid.innerHTML = '';
+            if (history.length === 0) {
+                historyGrid.innerHTML = '<div class="history-empty"><i class="fas fa-clock-rotate-left" style="margin-right:6px;"></i>Your gradient history will appear here</div>';
+                return;
+            }
+            history.forEach((h, i) => {
+                const div = document.createElement('div');
+                div.className = 'history-swatch';
+                const sortedStops = [...h.stops].sort((a, b) => a.position - b.position);
+                const colorStr = sortedStops.map(s => `${s.color} ${s.position}%`).join(', ');
+                if (h.type === 'linear') div.style.background = `linear-gradient(${h.angle}deg, ${colorStr})`;
+                else if (h.type === 'radial') div.style.background = `radial-gradient(${h.shape || 'circle'}, ${colorStr})`;
+                else div.style.background = `conic-gradient(from ${h.angle}deg, ${colorStr})`;
+
+                const delBtn = document.createElement('button');
+                delBtn.className = 'history-delete';
+                delBtn.innerHTML = '<i class="fas fa-xmark"></i>';
+                delBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    history.splice(i, 1);
+                    localStorage.setItem('pt-gradient-history', JSON.stringify(history));
+                    renderHistory();
+                });
+                div.appendChild(delBtn);
+
+                div.addEventListener('click', () => {
+                    state.type = h.type;
+                    state.angle = h.angle;
+                    state.shape = h.shape || 'circle';
+                    state.radialPosition = h.radialPosition || 'at center';
+                    state.repeating = h.repeating || false;
+                    state.stops = JSON.parse(JSON.stringify(h.stops));
+                    state.stops.forEach(s => { if (s.opacity === undefined) s.opacity = 1; });
+                    state.activeStopIndex = 0;
+                    syncTypeButtons();
+                    syncAngleUI();
+                    renderColorStops();
+                    renderRadialPositions();
+                    updateGradient();
+                    showToast('Gradient restored from history');
+                });
+
+                historyGrid.appendChild(div);
+            });
+        }
+
+        // ===== KEYBOARD SHORTCUTS =====
+        document.addEventListener('keydown', (e) => {
+            // Ctrl+C → copy when not in input
+            if ((e.ctrlKey || e.metaKey) && e.key === 'c' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+                // Don't override normal copy
+            }
+            // R for random (when not focused on input)
+            if (e.key === 'r' && !e.ctrlKey && !e.metaKey && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+                generateRandom();
+            }
+            // F for fullscreen
+            if (e.key === 'f' && !e.ctrlKey && !e.metaKey && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+                if (fullscreenOverlay.classList.contains('show')) closeFullscreen();
+                else openFullscreen();
+            }
+        });
+
+        // ===== INIT =====
+        renderPresets();
+        renderDirectionPresets();
+        renderRadialPositions();
+        renderColorStops();
+        updateAngleWheel();
+        updateGradient();
+        renderHistory();
+    </script>
+</body>
+</html>
