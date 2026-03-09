@@ -5,23 +5,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Passion Tools - Free Online Tools for Professionals</title>
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
+        /* ==========================================================================
+           CSS VARIABLES & COLOR PALETTE
+           ========================================================================== */
         :root {
-            /* Primary Colors */
+            /* Primary Brand Colors */
             --red: #ef4444;
             --purple: #a855f7;
 
-            /* Secondary Colors */
+            /* Secondary Brand Colors */
             --dark-purple: #a855f7;
             --light-red: #ef4444;
             --red-400: #f87171;
 
-            /* UI Colors */
+            /* UI Background and Text Colors */
             --bg-color: #f9fafb;
             --card-bg: #ffffff;
             --text-primary: #1f2937;
@@ -29,7 +35,7 @@
             --border-color: #e5e7eb;
             --hover-gray: #f3f4f6;
 
-            /* Status Colors */
+            /* Status & Category Colors */
             --blue: #3b82f6;
             --green: #10b981;
             --yellow: #f59e0b;
@@ -38,16 +44,19 @@
             --orange: #f97316;
             --teal: #14b8a6;
 
-            /* Shadows */
+            /* Box Shadows for Depth and Elevation */
             --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
             --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
             --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
 
-            /* Transitions */
+            /* Global Transition Timings */
             --transition: all 0.3s ease;
         }
 
+        /* ==========================================================================
+           GLOBAL RESETS & TYPOGRAPHY
+           ========================================================================== */
         * {
             margin: 0;
             padding: 0;
@@ -65,7 +74,7 @@
             flex-direction: column;
         }
 
-        /* UPDATED: Wider Container for "Full Size" feel */
+        /* Main Container for sizing content bounds */
         .container {
             width: 100%;
             max-width: 1440px;
@@ -73,7 +82,9 @@
             padding: 0 24px;
         }
 
-        /* Header */
+        /* ==========================================================================
+           HEADER & NAVIGATION BAR
+           ========================================================================== */
         header {
             background-color: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
@@ -91,11 +102,13 @@
             align-items: center;
         }
 
+        /* Logo Styling - Converted to div per instructions (unclickable & stable) */
         .logo {
             display: flex;
             align-items: center;
             gap: 10px;
             text-decoration: none;
+            user-select: none; /* Prevents text highlighting */
         }
 
         .logo-text {
@@ -115,6 +128,7 @@
             background-clip: text;
         }
 
+        /* Desktop Navigation Links */
         .nav-links {
             display: flex;
             gap: 40px;
@@ -150,6 +164,7 @@
             border-radius: 2px;
         }
 
+        /* Contact Button Styling */
         .contact-link {
             color: var(--purple);
             text-decoration: none;
@@ -168,6 +183,7 @@
             color: var(--purple);
         }
 
+        /* Mobile Menu Hamburger Button */
         .mobile-menu-btn {
             display: none;
             background: none;
@@ -185,7 +201,7 @@
             background-color: var(--hover-gray);
         }
 
-        /* Mobile Menu */
+        /* Mobile Menu Dropdown Container */
         .mobile-menu {
             display: none;
             position: fixed;
@@ -202,12 +218,12 @@
             animation: slideDown 0.3s ease;
         }
 
+        /* Keyframes for mobile menu opening */
         @keyframes slideDown {
             from {
                 opacity: 0;
                 transform: translateY(-10px);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -225,7 +241,9 @@
             border-bottom: 1px solid var(--border-color);
         }
 
-        /* UPDATED: Full Screen Hero Section */
+        /* ==========================================================================
+           HERO SECTION
+           ========================================================================== */
         .hero {
             min-height: 90vh;
             display: flex;
@@ -236,6 +254,7 @@
             overflow: hidden;
         }
 
+        /* Decorative background elements */
         .hero::before {
             content: '';
             position: absolute;
@@ -270,6 +289,7 @@
             width: 100%;
         }
 
+        /* Hero Typography */
         .hero-text h1 {
             font-size: 64px;
             font-weight: 800;
@@ -293,6 +313,7 @@
             line-height: 1.6;
         }
 
+        /* Call to Action Button */
         .cta-button {
             display: inline-flex;
             align-items: center;
@@ -315,6 +336,7 @@
             box-shadow: var(--shadow-lg);
         }
 
+        /* Hero Right-Side Visual Grid */
         .hero-visual {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -347,6 +369,7 @@
             font-size: 32px;
         }
 
+        /* Hero Card Icon Colors */
         .visual-icon.image {
             background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.2) 100%);
             color: var(--red);
@@ -378,7 +401,9 @@
             color: var(--text-primary);
         }
 
-        /* Search Section */
+        /* ==========================================================================
+           SEARCH COMPONENT
+           ========================================================================== */
         .search-section {
             padding: 50px 0;
             background-color: white;
@@ -438,7 +463,9 @@
             gap: 8px;
         }
 
-        /* 🧰 All Tools Section Header */
+        /* ==========================================================================
+           TOOLS DIRECTORY HEADER
+           ========================================================================== */
         .all-tools-header {
             padding: 60px 0 30px;
             background-color: var(--bg-color);
@@ -460,7 +487,9 @@
             max-width: 700px;
         }
 
-        /* 🏷 Category Filter Chips */
+        /* ==========================================================================
+           CATEGORY FILTER CHIPS
+           ========================================================================== */
         .category-filter {
             padding: 30px 0 50px;
             background-color: var(--bg-color);
@@ -471,6 +500,7 @@
             transition: border-color 0.3s;
         }
 
+        /* Styling applied when sticky state is triggered via JS */
         .category-filter.stuck {
             border-bottom-color: var(--border-color);
             background-color: rgba(249, 250, 251, 0.95);
@@ -536,10 +566,6 @@
             box-shadow: 0 4px 6px -1px rgba(168, 85, 247, 0.3);
         }
 
-        .filter-chip.active .chip-icon {
-            color: white;
-        }
-
         .chip-icon {
             color: #1f2937;
             font-size: 15px;
@@ -550,7 +576,9 @@
             color: white;
         }
 
-        /* Tools Sections */
+        /* ==========================================================================
+           DYNAMIC TOOL SECTIONS (GENERATED BY JS)
+           ========================================================================== */
         .tools-section {
             padding: 50px 0 90px;
         }
@@ -581,6 +609,7 @@
             margin-bottom: 60px;
         }
 
+        /* Individual Tool Cards */
         .tool-card {
             background-color: var(--card-bg);
             border-radius: 20px;
@@ -600,6 +629,7 @@
             border-color: var(--purple);
         }
 
+        /* Badges for individual tools */
         .tool-badge {
             position: absolute;
             top: 20px;
@@ -632,6 +662,7 @@
             color: var(--purple);
         }
 
+        /* Icons mapped specifically to the JS tool object colors */
         .tool-icon {
             width: 72px;
             height: 72px;
@@ -643,97 +674,28 @@
             font-size: 32px;
         }
 
-        /* Icon Colors */
-        .tool-icon.image {
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.2) 100%);
-            color: var(--red);
-        }
+        /* Tool Icon Background Combinations */
+        .tool-icon.image { background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.2) 100%); color: var(--red); }
+        .tool-icon.pdf { background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.2) 100%); color: var(--blue); }
+        .tool-icon.security { background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.2) 100%); color: var(--green); }
+        .tool-icon.calculator { background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.2) 100%); color: var(--yellow); }
+        .tool-icon.text { background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.2) 100%); color: var(--yellow); }
+        .tool-icon.code { background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(168, 85, 247, 0.2) 100%); color: var(--purple); }
+        .tool-icon.color { background: linear-gradient(135deg, rgba(219, 39, 119, 0.1) 0%, rgba(219, 39, 119, 0.2) 100%); color: var(--pink); }
+        .tool-icon.seo { background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.2) 100%); color: var(--blue); }
+        .tool-icon.utility { background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(168, 85, 247, 0.2) 100%); color: var(--purple); }
+        .tool-icon.network { background: linear-gradient(135deg, rgba(14, 165, 233, 0.1) 0%, rgba(14, 165, 233, 0.2) 100%); color: #0ea5e9; }
+        .tool-icon.video { background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.2) 100%); color: var(--red); }
 
-        .tool-icon.pdf {
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.2) 100%);
-            color: var(--blue);
-        }
-
-        .tool-icon.security {
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.2) 100%);
-            color: var(--green);
-        }
-
-        .tool-icon.calculator {
-            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.2) 100%);
-            color: var(--yellow);
-        }
-
-        .tool-icon.text {
-            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.2) 100%);
-            color: var(--yellow);
-        }
-
-        .tool-icon.code {
-            background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(168, 85, 247, 0.2) 100%);
-            color: var(--purple);
-        }
-
-        .tool-icon.color {
-            background: linear-gradient(135deg, rgba(219, 39, 119, 0.1) 0%, rgba(219, 39, 119, 0.2) 100%);
-            color: var(--pink);
-        }
-
-        .tool-icon.seo {
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.2) 100%);
-            color: var(--blue);
-        }
-
-        .tool-icon.utility {
-            background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(168, 85, 247, 0.2) 100%);
-            color: var(--purple);
-        }
-
-        .tool-icon.video {
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.2) 100%);
-            color: var(--red);
-        }
-
-        /* Brand Colors */
-        .tool-icon.youtube {
-            background: linear-gradient(135deg, rgba(255, 0, 0, 0.1) 0%, rgba(255, 0, 0, 0.2) 100%);
-            color: #FF0000;
-        }
-
-        .tool-icon.instagram {
-            background: linear-gradient(135deg, rgba(225, 48, 108, 0.1) 0%, rgba(225, 48, 108, 0.2) 100%);
-            color: #E1306C;
-        }
-
-        .tool-icon.facebook {
-            background: linear-gradient(135deg, rgba(66, 103, 178, 0.1) 0%, rgba(66, 103, 178, 0.2) 100%);
-            color: #4267B2;
-        }
-
-        .tool-icon.twitter {
-            background: linear-gradient(135deg, rgba(29, 161, 242, 0.1) 0%, rgba(29, 161, 242, 0.2) 100%);
-            color: #1DA1F2;
-        }
-
-        .tool-icon.tiktok {
-            background: linear-gradient(135deg, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.2) 100%);
-            color: #000000;
-        }
-
-        .tool-icon.excel {
-            background: linear-gradient(135deg, rgba(33, 115, 70, 0.1) 0%, rgba(33, 115, 70, 0.2) 100%);
-            color: #217346;
-        }
-
-        .tool-icon.word {
-            background: linear-gradient(135deg, rgba(43, 87, 154, 0.1) 0%, rgba(43, 87, 154, 0.2) 100%);
-            color: #2B579A;
-        }
-
-        .tool-icon.ppt {
-            background: linear-gradient(135deg, rgba(209, 68, 59, 0.1) 0%, rgba(209, 68, 59, 0.2) 100%);
-            color: #D24726;
-        }
+        /* Specific Brand Colors for converters */
+        .tool-icon.youtube { background: linear-gradient(135deg, rgba(255, 0, 0, 0.1) 0%, rgba(255, 0, 0, 0.2) 100%); color: #FF0000; }
+        .tool-icon.instagram { background: linear-gradient(135deg, rgba(225, 48, 108, 0.1) 0%, rgba(225, 48, 108, 0.2) 100%); color: #E1306C; }
+        .tool-icon.facebook { background: linear-gradient(135deg, rgba(66, 103, 178, 0.1) 0%, rgba(66, 103, 178, 0.2) 100%); color: #4267B2; }
+        .tool-icon.twitter { background: linear-gradient(135deg, rgba(29, 161, 242, 0.1) 0%, rgba(29, 161, 242, 0.2) 100%); color: #1DA1F2; }
+        .tool-icon.tiktok { background: linear-gradient(135deg, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.2) 100%); color: #000000; }
+        .tool-icon.excel { background: linear-gradient(135deg, rgba(33, 115, 70, 0.1) 0%, rgba(33, 115, 70, 0.2) 100%); color: #217346; }
+        .tool-icon.word { background: linear-gradient(135deg, rgba(43, 87, 154, 0.1) 0%, rgba(43, 87, 154, 0.2) 100%); color: #2B579A; }
+        .tool-icon.ppt { background: linear-gradient(135deg, rgba(209, 68, 59, 0.1) 0%, rgba(209, 68, 59, 0.2) 100%); color: #D24726; }
 
         .tool-title {
             font-size: 22px;
@@ -747,7 +709,7 @@
             font-size: 16px;
             margin-bottom: 24px;
             line-height: 1.5;
-            flex-grow: 1;
+            flex-grow: 1; /* Pushes the button to the bottom */
         }
 
         .tool-button {
@@ -774,6 +736,10 @@
             box-shadow: var(--shadow-md);
         }
 
+        /* ==========================================================================
+           INFORMATIONAL SECTIONS (Security, Features, Stats)
+           ========================================================================== */
+        
         /* Information Stats Bar */
         .stats-bar {
             background-color: #ffffff;
@@ -894,7 +860,7 @@
             line-height: 1.6;
         }
 
-        /* Security Features */
+        /* Security Features Banner */
         .security-features {
             background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(59, 130, 246, 0.05) 100%);
             border-radius: 30px;
@@ -930,7 +896,9 @@
             font-size: 32px;
         }
 
-        /* Footer */
+        /* ==========================================================================
+           FOOTER SECTION
+           ========================================================================== */
         footer {
             background-color: #111827;
             color: white;
@@ -1027,7 +995,9 @@
             text-decoration: underline;
         }
 
-        /* Responsive Styles */
+        /* ==========================================================================
+           MEDIA QUERIES FOR RESPONSIVE DESIGN
+           ========================================================================== */
         @media (max-width: 1200px) {
             .hero-text h1 {
                 font-size: 56px;
@@ -1201,11 +1171,12 @@
     <header>
         <div class="container">
             <div class="header-content">
-                <a href="#" class="logo">
+                
+                <div class="logo">
                     <div class="logo-text">
                         <span class="logo-passion">Passion</span><span class="logo-tools">Tools</span>
                     </div>
-                </a>
+                </div>
 
                 <div class="nav-links">
                     <a href="#home" class="nav-link active">Home</a>
@@ -1223,7 +1194,6 @@
             </div>
         </div>
 
-        <!-- Mobile Menu -->
         <div class="mobile-menu" id="mobileMenu">
             <a href="#home" class="nav-link active">Home</a>
             <a href="#all-tools-section" class="nav-link">Tools</a>
@@ -1301,12 +1271,12 @@
                 <div class="search-box">
                     <i class="fas fa-search search-icon"></i>
                     <input type="text" class="search-input"
-                        placeholder="Search a tool... (e.g., 'PDF Compressor', 'YouTube Downloader', 'Image Converter')"
+                        placeholder="Search a tool... (e.g., 'PDF Compressor', 'Background Remover', 'Image Converter')"
                         id="searchInput">
                 </div>
                 <div class="search-hint">
                     <i class="fas fa-lightbulb"></i>
-                    Try searching for "HD Background Remover", "File Scanner", or "PDF to Word"
+                    Try searching for "Rotate PDF", "File Scanner", or "PDF to Word"
                 </div>
             </div>
         </div>
@@ -1318,7 +1288,7 @@
                 <i class="fas fa-tools"></i>
                 All Tools
             </h2>
-            <p class="all-tools-subtitle">Browse our complete collection of 100+ free online tools. Filter by category
+            <p class="all-tools-subtitle">Browse our complete collection of 73 free online tools. Filter by category
                 to find exactly what you need.</p>
         </div>
     </section>
@@ -1331,45 +1301,33 @@
                         <i class="fas fa-th chip-icon"></i>
                         All Tools
                     </button>
-                    <button class="filter-chip" data-category="image">
-                        <i class="fas fa-image chip-icon"></i>
-                        Image Tools
-                    </button>
                     <button class="filter-chip" data-category="pdf">
                         <i class="fas fa-file-pdf chip-icon"></i>
                         PDF Tools
                     </button>
-                    <button class="filter-chip" data-category="security">
-                        <i class="fas fa-shield-alt chip-icon"></i>
-                        Security & Privacy
-                    </button>
-                    <button class="filter-chip" data-category="video">
-                        <i class="fas fa-video chip-icon"></i>
-                        Video Download Tools
-                    </button>
-                    <button class="filter-chip" data-category="calculator">
-                        <i class="fas fa-calculator chip-icon"></i>
-                        Calculator Tools
-                    </button>
-                    <button class="filter-chip" data-category="text">
-                        <i class="fas fa-font chip-icon"></i>
-                        Text Tools
+                    <button class="filter-chip" data-category="image">
+                        <i class="fas fa-image chip-icon"></i>
+                        Image Tools
                     </button>
                     <button class="filter-chip" data-category="developer">
                         <i class="fas fa-code chip-icon"></i>
-                        Web Developer Tools
+                        Developer Tools
                     </button>
-                    <button class="filter-chip" data-category="color">
-                        <i class="fas fa-palette chip-icon"></i>
-                        Color & Design Tools
+                    <button class="filter-chip" data-category="calculator">
+                        <i class="fas fa-calculator chip-icon"></i>
+                        Calculators
                     </button>
-                    <button class="filter-chip" data-category="seo">
-                        <i class="fas fa-chart-line chip-icon"></i>
-                        SEO & Marketing Tools
+                    <button class="filter-chip" data-category="security">
+                        <i class="fas fa-shield-alt chip-icon"></i>
+                        Security & Privacy Tools
+                    </button>
+                    <button class="filter-chip" data-category="network">
+                        <i class="fas fa-wifi chip-icon"></i>
+                        Internet & Network Tools
                     </button>
                     <button class="filter-chip" data-category="utility">
                         <i class="fas fa-tools chip-icon"></i>
-                        Utility & Daily Tools
+                        Utility & Productivity Tools
                     </button>
                 </div>
             </div>
@@ -1377,8 +1335,7 @@
     </section>
 
     <main id="tools">
-        <!-- Tool sections will be populated by JavaScript -->
-    </main>
+        </main>
 
     <section class="security-features">
         <div class="container">
@@ -1423,11 +1380,11 @@
         <div class="container">
             <div class="stats-grid">
                 <div class="stat-card">
-                    <div class="stat-number">100+</div>
+                    <div class="stat-number">73</div>
                     <div class="stat-label">Free Tools</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number">10</div>
+                    <div class="stat-number">7</div>
                     <div class="stat-label">Tool Categories</div>
                 </div>
                 <div class="stat-card">
@@ -1512,7 +1469,7 @@
                 <div class="footer-links">
                     <h3>Popular Tools</h3>
                     <ul>
-                        <li><a href="#"><i class="fas fa-chevron-right"></i> HD Background Remover</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Merge PDF</a></li>
                         <li><a href="#"><i class="fas fa-chevron-right"></i> File Scanner</a></li>
                         <li><a href="#"><i class="fas fa-chevron-right"></i> PDF to Word</a></li>
                         <li><a href="#"><i class="fas fa-chevron-right"></i> QR Code Generator</a></li>
@@ -1530,131 +1487,570 @@
     </footer>
 
     <script>
-        // Comprehensive tool data - ALL 100 TOOLS INCLUDED WITH BRAND LOGOS
+        // ==========================================================================
+        // COMPREHENSIVE TOOLS DATA CONFIGURATION (EXACT MATCH TO PROVIDED LIST)
+        // Highly verbose formatting ensures clean mapping and robust structure.
+        // ==========================================================================
         const toolsData = {
-            image: [
-                { name: "Image Converter", desc: "Convert between JPG, PNG, WebP, and more formats", icon: "fa-images", color: "image", badge: "FREE" },
-                { name: "Image Compressor", desc: "Reduce image size without losing visual quality", icon: "fa-compress", color: "image", badge: "FREE" },
-                { name: "Image Resizer", desc: "Resize images to exact dimensions with precision", icon: "fa-expand", color: "image", badge: "FREE" },
-                { name: "Image Cropper", desc: "Crop images to your desired aspect ratio", icon: "fa-crop-simple", color: "image", badge: "FREE" },
-                { name: "Image Rotator", desc: "Rotate images to any angle", icon: "fa-rotate-right", color: "image", badge: "FREE" },
-                { name: "Image Flipper", desc: "Flip images horizontally or vertically", icon: "fa-left-right", color: "image", badge: "FREE" },
-                { name: "Image to Text (OCR)", desc: "Extract text from images with high accuracy", icon: "fa-file-lines", color: "image", badge: "FREE" },
-                { name: "Background Remover", desc: "Remove background from images automatically", icon: "fa-eraser", color: "image", badge: "FREE" },
-                { name: "HD Image Background Remover", desc: "AI-powered background removal with edge preservation", icon: "fa-wand-magic-sparkles", color: "image", badge: "HD" },
-                { name: "Object Remover", desc: "Remove unwanted objects from photos", icon: "fa-stamp", color: "image", badge: "FREE" },
-                { name: "Image Enhancer", desc: "Enhance image quality and sharpness", icon: "fa-sliders", color: "image", badge: "FREE" }
-            ],
+            
+            // ---------------------------------------------------------
+            // CATEGORY 1: PDF TOOLS (27 Tools Total)
+            // ---------------------------------------------------------
             pdf: [
-                { name: "Merge PDF", desc: "Combine multiple PDFs into one document", icon: "fa-object-group", color: "pdf", badge: "FREE" },
-                { name: "Split PDF", desc: "Split PDF into multiple documents", icon: "fa-object-ungroup", color: "pdf", badge: "FREE" },
-                { name: "Remove PDF Pages", desc: "Delete specific pages from PDF files", icon: "fa-trash-can", color: "pdf", badge: "FREE" },
-                { name: "Extract PDF Pages", desc: "Extract specific pages from PDF files", icon: "fa-file-export", color: "pdf", badge: "FREE" },
-                { name: "Organize PDF", desc: "Rearrange pages in PDF documents", icon: "fa-arrow-down-up-across-line", color: "pdf", badge: "FREE" },
-                { name: "Scan to PDF", desc: "Convert scanned documents to PDF", icon: "fa-print", color: "pdf", badge: "FREE" },
-                { name: "Compress PDF", desc: "Reduce PDF file size for easy sharing", icon: "fa-file-zipper", color: "pdf", badge: "FREE" },
-                { name: "Repair PDF", desc: "Fix corrupted or damaged PDF files", icon: "fa-screwdriver-wrench", color: "pdf", badge: "FREE" },
-                { name: "OCR PDF", desc: "Convert scanned PDFs to searchable text", icon: "fa-glasses", color: "pdf", badge: "FREE" },
-                { name: "JPG to PDF", desc: "Convert images to PDF format", icon: "fa-image", color: "pdf", badge: "FREE" },
-                { name: "Word to PDF", desc: "Convert Word documents to PDF format", icon: "fa-file-word", color: "word", badge: "FREE" },
-                { name: "PowerPoint to PDF", desc: "Convert PowerPoint presentations to PDF", icon: "fa-file-powerpoint", color: "ppt", badge: "FREE" },
-                { name: "Excel to PDF", desc: "Convert Excel spreadsheets to PDF", icon: "fa-file-excel", color: "excel", badge: "FREE" },
-                { name: "HTML to PDF", desc: "Convert web pages to PDF documents", icon: "fab fa-html5", color: "pdf", badge: "FREE" },
-                { name: "PDF to JPG", desc: "Convert PDF pages to images", icon: "fa-images", color: "pdf", badge: "FREE" },
-                { name: "PDF to Word", desc: "Convert PDF to editable Word document", icon: "fa-file-word", color: "word", badge: "FREE" },
-                { name: "PDF to PowerPoint", desc: "Convert PDF to PowerPoint presentation", icon: "fa-file-powerpoint", color: "ppt", badge: "FREE" },
-                { name: "PDF to Excel", desc: "Convert PDF to Excel spreadsheet", icon: "fa-file-excel", color: "excel", badge: "FREE" },
-                { name: "PDF to PDF/A", desc: "Convert PDF to archival PDF/A format", icon: "fa-box-archive", color: "pdf", badge: "FREE" },
-                { name: "Rotate PDF", desc: "Rotate PDF pages to correct orientation", icon: "fa-rotate", color: "pdf", badge: "FREE" },
-                { name: "Crop PDF", desc: "Crop PDF pages to remove margins", icon: "fa-crop", color: "pdf", badge: "FREE" },
-                { name: "Add Page Numbers", desc: "Add page numbers to PDF documents", icon: "fa-list-ol", color: "pdf", badge: "FREE" },
-                { name: "Add Watermark", desc: "Add text or image watermarks to PDF", icon: "fa-copyright", color: "pdf", badge: "FREE" },
-                { name: "Edit PDF", desc: "Edit text and images in PDF files", icon: "fa-pen-to-square", color: "pdf", badge: "FREE" },
-                { name: "PDF Annotation", desc: "Add comments and annotations to PDF", icon: "fa-message", color: "pdf", badge: "FREE" },
-                { name: "PDF Form Filler", desc: "Fill out PDF forms electronically", icon: "fa-file-pen", color: "pdf", badge: "FREE" },
-                { name: "Unlock PDF", desc: "Remove password protection from PDFs", icon: "fa-unlock-keyhole", color: "pdf", badge: "SECURE" },
-                { name: "Protect PDF", desc: "Add password protection to PDF files", icon: "fa-user-shield", color: "pdf", badge: "SECURE" },
-                { name: "Sign PDF", desc: "Add electronic signatures to documents", icon: "fa-signature", color: "pdf", badge: "SECURE" },
-                { name: "Redact PDF", desc: "Permanently remove sensitive information", icon: "fa-eye-slash", color: "pdf", badge: "SECURE" },
-                { name: "Compare PDF", desc: "Compare two PDF files and highlight differences", icon: "fa-code-compare", color: "pdf", badge: "FREE" }
+                { 
+                    name: "Merge PDF", 
+                    desc: "Combine multiple PDFs into one document", 
+                    icon: "fa-layer-group", 
+                    color: "pdf", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "Split PDF", 
+                    desc: "Split PDF into multiple separate documents", 
+                    icon: "fa-arrows-split-up-and-left", 
+                    color: "pdf", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "Remove PDF Pages", 
+                    desc: "Delete specific pages from PDF files", 
+                    icon: "fa-file-circle-minus", 
+                    color: "pdf", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "Extract PDF Pages", 
+                    desc: "Extract specific pages from PDF files", 
+                    icon: "fa-file-export", 
+                    color: "pdf", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "Organize PDF", 
+                    desc: "Rearrange pages in PDF documents", 
+                    icon: "fa-arrow-down-short-wide", 
+                    color: "pdf", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "Repair PDF", 
+                    desc: "Fix corrupted or damaged PDF files", 
+                    icon: "fa-briefcase-medical", 
+                    color: "pdf", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "Word to PDF", 
+                    desc: "Convert Word documents to PDF format", 
+                    icon: "fa-file-word", 
+                    color: "word", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "PDF to Word", 
+                    desc: "Convert PDF to editable Word document", 
+                    icon: "fa-file-word", 
+                    color: "word", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "PowerPoint to PDF", 
+                    desc: "Convert PowerPoint presentations to PDF", 
+                    icon: "fa-file-powerpoint", 
+                    color: "ppt", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "PDF to PowerPoint", 
+                    desc: "Convert PDF to PowerPoint presentation", 
+                    icon: "fa-file-powerpoint", 
+                    color: "ppt", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "Excel to PDF", 
+                    desc: "Convert Excel spreadsheets to PDF", 
+                    icon: "fa-file-excel", 
+                    color: "excel", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "PDF to Excel", 
+                    desc: "Convert PDF to Excel spreadsheet", 
+                    icon: "fa-file-excel", 
+                    color: "excel", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "JPG to PDF", 
+                    desc: "Convert images to PDF format", 
+                    icon: "fa-file-image", 
+                    color: "pdf", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "PDF to JPG", 
+                    desc: "Convert PDF pages to image files", 
+                    icon: "fa-images", 
+                    color: "pdf", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "PDF to PDF/A", 
+                    desc: "Convert PDF to archival PDF/A format", 
+                    icon: "fa-file-shield", 
+                    color: "pdf", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "E-Sign PDF", 
+                    desc: "Add electronic signatures to documents", 
+                    icon: "fa-file-signature", 
+                    color: "pdf", 
+                    badge: "SECURE" 
+                },
+                { 
+                    name: "Rotate PDF", 
+                    desc: "Rotate specific PDF pages to correct orientation", 
+                    icon: "fa-rotate-right", 
+                    color: "pdf", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "Edit PDF", 
+                    desc: "Edit text, shapes, and images in PDF files", 
+                    icon: "fa-file-pen", 
+                    color: "pdf", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "Compare PDF", 
+                    desc: "Compare two PDF files and highlight differences", 
+                    icon: "fa-code-compare", 
+                    color: "pdf", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "Add Page Numbers", 
+                    desc: "Add automatic page numbers to PDF documents", 
+                    icon: "fa-list-ol", 
+                    color: "pdf", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "Add Watermark", 
+                    desc: "Add text or image watermarks to protect PDFs", 
+                    icon: "fa-stamp", 
+                    color: "pdf", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "Protect PDF", 
+                    desc: "Add password protection to sensitive PDF files", 
+                    icon: "fa-lock", 
+                    color: "pdf", 
+                    badge: "SECURE" 
+                },
+                { 
+                    name: "Unlock PDF", 
+                    desc: "Remove password protection from secured PDFs", 
+                    icon: "fa-lock-open", 
+                    color: "pdf", 
+                    badge: "SECURE" 
+                },
+                { 
+                    name: "Translate PDF", 
+                    desc: "Translate PDF documents into another language", 
+                    icon: "fa-language", 
+                    color: "pdf", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "Rotate pdf", 
+                    desc: "Quick rotate of entire document pages", 
+                    icon: "fa-rotate", 
+                    color: "pdf", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "Compress pdf", 
+                    desc: "Reduce PDF file size for easy email sharing", 
+                    icon: "fa-file-zipper", 
+                    color: "pdf", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "Crop pdf", 
+                    desc: "Crop PDF document pages to remove white margins", 
+                    icon: "fa-crop-simple", 
+                    color: "pdf", 
+                    badge: "FREE" 
+                }
             ],
-            security: [
-                { name: "File Scanner & Safety Checker", desc: "Scan files for malware and security threats", icon: "fa-virus-slash", color: "security", badge: "NEW" },
-                { name: "URL Safety Checker", desc: "Check if URLs are safe to visit", icon: "fa-globe", color: "security", badge: "SECURE" },
-                { name: "Phishing Link Detector", desc: "Detect phishing and malicious links", icon: "fa-fish-fins", color: "security", badge: "SECURE" },
-                { name: "File Hash Generator", desc: "Generate hash values for file verification", icon: "fa-hashtag", color: "security", badge: "SECURE" },
-                { name: "Password Strength Checker", desc: "Check password security strength", icon: "fa-shield-halved", color: "security", badge: "SECURE" }
+
+            // ---------------------------------------------------------
+            // CATEGORY 2: IMAGE TOOLS (9 Tools Total)
+            // ---------------------------------------------------------
+            image: [
+                { 
+                    name: "Image Converter", 
+                    desc: "Convert between JPG, PNG, WebP, and more", 
+                    icon: "fa-images", 
+                    color: "image", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "Image Compressor", 
+                    desc: "Reduce image size without losing visual quality", 
+                    icon: "fa-compress", 
+                    color: "image", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "Image Resizer", 
+                    desc: "Resize images to exact pixel dimensions", 
+                    icon: "fa-down-left-and-up-right-to-center", 
+                    color: "image", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "Image Cropper", 
+                    desc: "Crop images to your desired aspect ratio", 
+                    icon: "fa-crop", 
+                    color: "image", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "Image to Text (OCR)", 
+                    desc: "Extract text directly from images accurately", 
+                    icon: "fa-file-lines", 
+                    color: "image", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "AI Background Remover", 
+                    desc: "Remove background from images automatically", 
+                    icon: "fa-wand-magic-sparkles", 
+                    color: "image", 
+                    badge: "HD" 
+                },
+                { 
+                    name: "Image Enhancer", 
+                    desc: "Enhance image quality, colors, and sharpness", 
+                    icon: "fa-wand-magic", 
+                    color: "image", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "SVG to PNG Converter", 
+                    desc: "Convert scalable SVG vector files to PNG images", 
+                    icon: "fa-vector-square", 
+                    color: "image", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "Color Picker from Image", 
+                    desc: "Extract precise HEX/RGB colors from photos", 
+                    icon: "fa-eye-dropper", 
+                    color: "image", 
+                    badge: "FREE" 
+                }
             ],
-            video: [
-                { name: "YouTube Video Downloader", desc: "Download videos from YouTube", icon: "fab fa-youtube", color: "youtube", badge: "FREE" },
-                { name: "Instagram Video & Reel Downloader", desc: "Download videos and reels from Instagram", icon: "fab fa-instagram", color: "instagram", badge: "FREE" },
-                { name: "Facebook Video Downloader", desc: "Download videos from Facebook", icon: "fab fa-facebook", color: "facebook", badge: "FREE" },
-                { name: "TikTok Video Downloader", desc: "Download videos from TikTok", icon: "fab fa-tiktok", color: "tiktok", badge: "FREE" },
-                { name: "Twitter / X Video Downloader", desc: "Download videos from Twitter/X", icon: "fab fa-twitter", color: "twitter", badge: "FREE" }
-            ],
-            calculator: [
-                { name: "Scientific Calculator", desc: "Advanced calculator with math functions", icon: "fa-calculator", color: "calculator", badge: "FREE" },
-                { name: "Age Calculator", desc: "Calculate age from birth date", icon: "fa-cake-candles", color: "calculator", badge: "FREE" },
-                { name: "BMI Calculator", desc: "Calculate Body Mass Index", icon: "fa-weight-scale", color: "calculator", badge: "FREE" },
-                { name: "Loan EMI Calculator", desc: "Calculate loan Equated Monthly Installments", icon: "fa-landmark", color: "calculator", badge: "FREE" },
-                { name: "GST Calculator", desc: "Calculate Goods and Services Tax", icon: "fa-percent", color: "calculator", badge: "FREE" },
-                { name: "Currency Converter", desc: "Convert between world currencies", icon: "fa-money-bill-transfer", color: "calculator", badge: "FREE" }
-            ],
-            text: [
-                { name: "Text Case Converter", desc: "Convert between uppercase, lowercase, title case", icon: "fa-font", color: "text", badge: "FREE" },
-                { name: "Word Counter", desc: "Count words in text", icon: "fa-list-ol", color: "text", badge: "FREE" },
-                { name: "Character Counter", desc: "Count characters in text", icon: "fa-arrow-down-1-9", color: "text", badge: "FREE" },
-                { name: "Remove Duplicate Lines", desc: "Remove duplicate lines from text", icon: "fa-copy", color: "text", badge: "FREE" },
-                { name: "Text Sorter", desc: "Sort text lines alphabetically", icon: "fa-arrow-down-a-z", color: "text", badge: "FREE" },
-                { name: "Text Reverse", desc: "Reverse text or character order", icon: "fa-repeat", color: "text", badge: "FREE" },
-                { name: "Text Encryptor / Decryptor", desc: "Encrypt and decrypt text securely", icon: "fa-file-shield", color: "text", badge: "SECURE" },
-                { name: "Whitespace Cleaner", desc: "Remove extra spaces and line breaks", icon: "fa-eraser", color: "text", badge: "FREE" }
-            ],
+
+            // ---------------------------------------------------------
+            // CATEGORY 3: DEVELOPER TOOLS (7 Tools Total)
+            // ---------------------------------------------------------
             developer: [
-                { name: "HTML/CSS/JS Minifier", desc: "Minify and compress code files", icon: "fa-file-code", color: "code", badge: "FREE" },
-                { name: "HTML/CSS/JS Beautifier", desc: "Format and beautify code", icon: "fa-indent", color: "code", badge: "FREE" },
-                { name: "JSON Formatter & Validator", desc: "Format and validate JSON data", icon: "fa-code-branch", color: "code", badge: "FREE" },
-                { name: "Base64 Encoder/Decoder", desc: "Encode and decode Base64 strings", icon: "fa-shield", color: "code", badge: "FREE" },
-                { name: "URL Encoder/Decoder", desc: "Encode and decode URL strings", icon: "fa-link", color: "code", badge: "FREE" },
-                { name: "Regex Tester", desc: "Test and debug regular expressions", icon: "fa-terminal", color: "code", badge: "FREE" },
-                { name: "API Response Viewer", desc: "View and format API responses", icon: "fa-server", color: "code", badge: "FREE" }
+                { 
+                    name: "JSON Formatter", 
+                    desc: "Format, validate, and parse JSON data strings", 
+                    icon: "fa-code", 
+                    color: "code", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "HTML CSS JS Minifier", 
+                    desc: "Minify and compress your web code for speed", 
+                    icon: "fa-minimize", 
+                    color: "code", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "HTML CSS JS Beautifier", 
+                    desc: "Format and beautify your raw code structure", 
+                    icon: "fa-indent", 
+                    color: "code", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "UUID Generator", 
+                    desc: "Generate secure unique identifiers instantly", 
+                    icon: "fa-fingerprint", 
+                    color: "code", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "HEX to RGB", 
+                    desc: "Convert HEX color codes into RGB format", 
+                    icon: "fa-palette", 
+                    color: "code", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "RGB to HEX", 
+                    desc: "Convert RGB values back into standard HEX", 
+                    icon: "fa-paint-roller", 
+                    color: "code", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "CSS Gradient Generator", 
+                    desc: "Create and export beautiful CSS web gradients", 
+                    icon: "fa-swatchbook", 
+                    color: "code", 
+                    badge: "FREE" 
+                }
             ],
-            color: [
-                { name: "Color Picker from Image", desc: "Extract colors from uploaded images", icon: "fa-eye-dropper", color: "color", badge: "FREE" },
-                { name: "HEX to RGB Converter", desc: "Convert HEX colors to RGB format", icon: "fa-hashtag", color: "color", badge: "FREE" },
-                { name: "RGB to HEX Converter", desc: "Convert RGB colors to HEX format", icon: "fa-palette", color: "color", badge: "FREE" },
-                { name: "Gradient Generator", desc: "Create beautiful CSS gradients", icon: "fa-swatchbook", color: "color", badge: "FREE" },
-                { name: "Contrast Checker", desc: "Check color contrast for accessibility", icon: "fa-circle-half-stroke", color: "color", badge: "FREE" },
-                { name: "Palette Generator", desc: "Generate harmonious color palettes", icon: "fa-layer-group", color: "color", badge: "FREE" },
-                { name: "Color Blindness Simulator", desc: "Simulate different types of color blindness", icon: "fa-eye-low-vision", color: "color", badge: "FREE" },
-                { name: "Shadow Generator", desc: "Generate CSS box shadows", icon: "fa-cloud-moon", color: "color", badge: "FREE" }
+
+            // ---------------------------------------------------------
+            // CATEGORY 4: CALCULATORS (8 Tools Total)
+            // ---------------------------------------------------------
+            calculator: [
+                { 
+                    name: "Scientific calculator", 
+                    desc: "Advanced calculator with complex math functions", 
+                    icon: "fa-calculator", 
+                    color: "calculator", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "Percentage Calculator", 
+                    desc: "Calculate percentages and fractions quickly", 
+                    icon: "fa-percent", 
+                    color: "calculator", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "CGPA Calculator", 
+                    desc: "Calculate your academic CGPA/GPA easily", 
+                    icon: "fa-graduation-cap", 
+                    color: "calculator", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "Age Calculator", 
+                    desc: "Calculate exact age from birth date dynamically", 
+                    icon: "fa-cake-candles", 
+                    color: "calculator", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "BMI Calculator", 
+                    desc: "Calculate Body Mass Index for health tracking", 
+                    icon: "fa-weight-scale", 
+                    color: "calculator", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "Loan EMI Calculator", 
+                    desc: "Calculate loan Equated Monthly Installments", 
+                    icon: "fa-building-columns", 
+                    color: "calculator", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "GST Calculator", 
+                    desc: "Calculate Goods and Services Tax values", 
+                    icon: "fa-file-invoice-dollar", 
+                    color: "calculator", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "Currency Converter", 
+                    desc: "Convert world currencies using live exchange rates", 
+                    icon: "fa-money-bill-transfer", 
+                    color: "calculator", 
+                    badge: "FREE" 
+                }
             ],
-            seo: [
-                { name: "Keyword Density Checker", desc: "Analyze keyword density in content", icon: "fa-magnifying-glass-chart", color: "seo", badge: "FREE" },
-                { name: "Meta Tag Analyzer", desc: "Check and optimize meta tags", icon: "fa-tags", color: "seo", badge: "FREE" },
-                { name: "SEO Word Counter", desc: "Word count tool optimized for SEO", icon: "fa-file-lines", color: "seo", badge: "FREE" },
-                { name: "SERP Preview Tool", desc: "Preview how your site appears in search results", icon: "fab fa-google", color: "seo", badge: "FREE" },
-                { name: "Open Graph Preview Tool", desc: "Preview Open Graph social media cards", icon: "fa-share-nodes", color: "seo", badge: "FREE" },
-                { name: "Image SEO Analyzer", desc: "Analyze images for SEO optimization", icon: "fa-images", color: "seo", badge: "FREE" }
+
+            // ---------------------------------------------------------
+            // CATEGORY 5: SECURITY & PRIVACY TOOLS (5 Tools Total)
+            // ---------------------------------------------------------
+            security: [
+                { 
+                    name: "Text Encryptor / Decryptor", 
+                    desc: "Encrypt and decrypt raw text strings securely", 
+                    icon: "fa-user-secret", 
+                    color: "security", 
+                    badge: "SECURE" 
+                },
+                { 
+                    name: "File Scanner & Safety Checker", 
+                    desc: "Scan files for malware and security threats", 
+                    icon: "fa-shield-virus", 
+                    color: "security", 
+                    badge: "NEW" 
+                },
+                { 
+                    name: "URL Safety Checker", 
+                    desc: "Check if external URLs are malicious or safe", 
+                    icon: "fa-link", 
+                    color: "security", 
+                    badge: "SECURE" 
+                },
+                { 
+                    name: "Email Breach Checker", 
+                    desc: "Check if your email was compromised in leaks", 
+                    icon: "fa-envelope-circle-check", 
+                    color: "security", 
+                    badge: "SECURE" 
+                },
+                { 
+                    name: "Password Manager Tools", 
+                    desc: "Generate and evaluate strong passwords securely", 
+                    icon: "fa-key", 
+                    color: "security", 
+                    badge: "SECURE" 
+                }
             ],
+
+            // ---------------------------------------------------------
+            // CATEGORY 6: INTERNET & NETWORK TOOLS (8 Tools Total)
+            // ---------------------------------------------------------
+            network: [
+                { 
+                    name: "Internet Speed Test", 
+                    desc: "Test your live internet ping and connection speed", 
+                    icon: "fa-gauge-high", 
+                    color: "network", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "IP Address Checker", 
+                    desc: "Check your public IP address and geo-location", 
+                    icon: "fa-network-wired", 
+                    color: "network", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "Website Down Checker", 
+                    desc: "Check if a website is offline for everyone", 
+                    icon: "fa-server", 
+                    color: "network", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "QR Code Generator", 
+                    desc: "Generate high-quality QR codes for links & text", 
+                    icon: "fa-qrcode", 
+                    color: "network", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "QR Code Scanner", 
+                    desc: "Scan QR codes directly from image uploads", 
+                    icon: "fa-expand", 
+                    color: "network", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "Barcode Generator", 
+                    desc: "Create product barcodes in various line formats", 
+                    icon: "fa-barcode", 
+                    color: "network", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "AQI & Air Quality Checker", 
+                    desc: "Check real-time local air quality metrics", 
+                    icon: "fa-smog", 
+                    color: "network", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "UV Index Checker", 
+                    desc: "Check current live UV index for your location", 
+                    icon: "fa-sun", 
+                    color: "network", 
+                    badge: "FREE" 
+                }
+            ],
+
+            // ---------------------------------------------------------
+            // CATEGORY 7: UTILITY & PRODUCTIVITY TOOLS (9 Tools Total)
+            // ---------------------------------------------------------
             utility: [
-                { name: "QR Code Generator", desc: "Generate QR codes for URLs and text", icon: "fa-qrcode", color: "utility", badge: "FREE" },
-                { name: "QR Code Scanner", desc: "Scan QR codes from images", icon: "fa-expand", color: "utility", badge: "FREE" },
-                { name: "Barcode Generator", desc: "Create barcodes in various formats", icon: "fa-barcode", color: "utility", badge: "FREE" },
-                { name: "UUID Generator", desc: "Generate unique identifiers", icon: "fa-fingerprint", color: "utility", badge: "FREE" },
-                { name: "Unit Converter", desc: "Convert between measurement units", icon: "fa-scale-balanced", color: "utility", badge: "FREE" },
-                { name: "Time Zone Converter", desc: "Convert time between time zones", icon: "fa-earth-americas", color: "utility", badge: "FREE" },
-                { name: "Countdown Timer", desc: "Set and manage countdown timers", icon: "fa-hourglass-start", color: "utility", badge: "FREE" },
-                { name: "Stopwatch", desc: "Precision stopwatch with lap times", icon: "fa-stopwatch", color: "utility", badge: "FREE" },
-                { name: "Random Number Generator", desc: "Generate random numbers within ranges", icon: "fa-dice", color: "utility", badge: "FREE" },
-                { name: "Password Generator", desc: "Create strong, secure passwords", icon: "fa-key", color: "utility", badge: "SECURE" },
-                { name: "Internet Speed Test", desc: "Test your internet connection speed", icon: "fa-wifi", color: "utility", badge: "FREE" },
-                { name: "IP Address Checker", desc: "Check your IP address and location", icon: "fa-location-dot", color: "utility", badge: "FREE" },
-                { name: "Border Radius Generator", desc: "Generate CSS border-radius values", icon: "fa-border-all", color: "utility", badge: "FREE" }
+                { 
+                    name: "Word Counter", 
+                    desc: "Count total words, characters, and sentences", 
+                    icon: "fa-keyboard", 
+                    color: "utility", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "Unit Converter", 
+                    desc: "Convert length, mass, and other measurement units", 
+                    icon: "fa-scale-balanced", 
+                    color: "utility", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "Time Zone Converter", 
+                    desc: "Convert local time between global time zones", 
+                    icon: "fa-clock", 
+                    color: "utility", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "Countdown Timer", 
+                    desc: "Set and manage visual event countdown timers", 
+                    icon: "fa-hourglass-half", 
+                    color: "utility", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "Stop Watch", 
+                    desc: "Precision stopwatch tracker with split lap times", 
+                    icon: "fa-stopwatch", 
+                    color: "utility", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "Universal Archive Converter", 
+                    desc: "Convert archive formats (ZIP, RAR, etc.)", 
+                    icon: "fa-box-archive", 
+                    color: "utility", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "Color Contrast Checker", 
+                    desc: "Check color contrast ratios for accessibility", 
+                    icon: "fa-circle-half-stroke", 
+                    color: "utility", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "Color Blindness Simulator", 
+                    desc: "Simulate different types of human color blindness", 
+                    icon: "fa-eye", 
+                    color: "utility", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "Text to Speech", 
+                    desc: "Convert typed text to natural-sounding audio", 
+                    icon: "fa-volume-high", 
+                    color: "utility", 
+                    badge: "FREE" 
+                }
             ]
         };
 
-        // Badge color mapping
+        // ==========================================================================
+        // BADGE COLOR MAPPING UTILITY
+        // Used to assign CSS classes to badge text dynamically.
+        // ==========================================================================
         const badgeColors = {
             "FREE": "badge-free",
             "HD": "badge-hd",
@@ -1662,101 +2058,136 @@
             "NEW": "badge-new"
         };
 
-        // Current filter category
+        // State tracker for active filtering
         let currentCategory = 'all';
 
-        // Create tool sections in the DOM
+        /**
+         * INITIALIZATION FUNCTION: createToolSections
+         * Iterates over the top-level keys of `toolsData` and generates the wrapper
+         * `<section>` HTML blocks for each category. It then triggers `renderTools`
+         * to populate the grids inside these wrappers.
+         */
         function createToolSections() {
             const mainElement = document.getElementById('tools');
             const categories = Object.keys(toolsData);
 
             categories.forEach(category => {
+                
+                // Create section wrapper
                 const section = document.createElement('section');
                 section.className = 'tools-section';
                 section.id = `${category}-section`;
                 section.setAttribute('data-category', category);
 
-                // Capitalize first letter for title
-                const categoryName = category.charAt(0).toUpperCase() + category.slice(1);
+                let categoryName = '';
                 let iconClass = 'fas fa-';
-
-                // Set appropriate icon for each category
-                switch (category) {
-                    case 'image': iconClass += 'image'; break;
-                    case 'pdf': iconClass += 'file-pdf'; break;
-                    case 'security': iconClass += 'shield-alt'; break;
-                    case 'video': iconClass += 'video'; break;
-                    case 'calculator': iconClass += 'calculator'; break;
-                    case 'text': iconClass += 'font'; break;
-                    case 'developer': iconClass += 'code'; break;
-                    case 'color': iconClass += 'palette'; break;
-                    case 'seo': iconClass += 'chart-line'; break;
-                    case 'utility': iconClass += 'tools'; break;
-                }
-
-                // Create subtitle based on category
                 let subtitle = '';
+
+                // Category Title, Subtitle, and Icon Mappings based on the 7 defined categories
                 switch (category) {
-                    case 'image': subtitle = 'High-quality image processing with AI-powered features'; break;
-                    case 'pdf': subtitle = 'Complete PDF suite for professionals'; break;
-                    case 'security': subtitle = 'Upload files for instant safety verification'; break;
-                    case 'video': subtitle = 'Download videos from popular platforms'; break;
-                    case 'calculator': subtitle = 'Smart calculators for every need'; break;
-                    case 'text': subtitle = 'Powerful text manipulation utilities'; break;
-                    case 'developer': subtitle = 'Essential tools for developers'; break;
-                    case 'color': subtitle = 'Professional color utilities'; break;
-                    case 'seo': subtitle = 'Boost your online presence'; break;
-                    case 'utility': subtitle = 'Essential everyday utilities'; break;
+                    case 'pdf': 
+                        categoryName = 'PDF Tools'; 
+                        iconClass += 'file-pdf'; 
+                        subtitle = 'Complete PDF management suite for professionals.'; 
+                        break;
+                    case 'image': 
+                        categoryName = 'Image Tools'; 
+                        iconClass += 'image'; 
+                        subtitle = 'High-quality image processing and AI enhancements.'; 
+                        break;
+                    case 'developer': 
+                        categoryName = 'Developer Tools'; 
+                        iconClass += 'code'; 
+                        subtitle = 'Essential fast tools for programmers and coders.'; 
+                        break;
+                    case 'calculator': 
+                        categoryName = 'Calculators'; 
+                        iconClass += 'calculator'; 
+                        subtitle = 'Smart calculators for everyday math and finance.'; 
+                        break;
+                    case 'security': 
+                        categoryName = 'Security & Privacy Tools'; 
+                        iconClass += 'shield-alt'; 
+                        subtitle = 'Keep your digital footprint safe with security utilities.'; 
+                        break;
+                    case 'network': 
+                        categoryName = 'Internet & Network Tools'; 
+                        iconClass += 'wifi'; 
+                        subtitle = 'Monitor and test network vitals instantly.'; 
+                        break;
+                    case 'utility': 
+                        categoryName = 'Utility & Productivity Tools'; 
+                        iconClass += 'tools'; 
+                        subtitle = 'Essential everyday utilities to boost productivity.'; 
+                        break;
                 }
 
+                // Inject inner HTML structure for the section
                 section.innerHTML = `
                     <div class="container">
                         <div class="section-header">
-                            <h2 class="section-title"><i class="${iconClass}"></i> ${category === 'pdf' ? 'Document & PDF Tools' : categoryName + ' Tools'}</h2>
+                            <h2 class="section-title"><i class="${iconClass}"></i> ${categoryName}</h2>
                             <p class="section-subtitle">${subtitle}</p>
                         </div>
                         <div class="tools-grid" id="${category}Tools"></div>
                     </div>
                 `;
 
+                // Append the entire section to the DOM
                 mainElement.appendChild(section);
             });
         }
 
-        // Function to render tools for a category
+        /**
+         * POPULATION FUNCTION: renderTools
+         * Takes a specific category ID and a list of tool objects, formats them 
+         * into standardized HTML cards, and appends them to the DOM.
+         * * @param {string} categoryId - The specific grid element ID to render into.
+         * @param {Array} tools - The array of tool objects to render.
+         */
         function renderTools(categoryId, tools) {
             const container = document.getElementById(categoryId);
             if (!container) return;
 
+            // Clear any existing content for a fresh render
             container.innerHTML = '';
 
             tools.forEach(tool => {
                 const badgeClass = badgeColors[tool.badge] || 'badge-free';
 
-                // Smart Icon Logic: Detect if it's a brand (fab) or standard (fas) icon
+                // =========================================================
+                // Smart FontAwesome Icon Parsing Logic
+                // Handles base strings (like "fa-image"), specific prefix 
+                // strings (like "fas fa-image"), and brand strings.
+                // =========================================================
                 let iconClass = tool.icon;
+                
+                // If the user forgot 'fa-', prefix it
                 if (!iconClass.includes('fa-')) {
                     iconClass = `fa-${iconClass}`;
                 }
 
-                // If it already contains 'fab' or 'fas' or 'far', leave it alone.
-                // Otherwise, default to 'fas'.
+                // Ensure it has a style prefix (fas, fab, far). Default is 'fas'
                 if (!iconClass.includes(' ') && !iconClass.startsWith('fab') && !iconClass.startsWith('fas') && !iconClass.startsWith('far')) {
                     iconClass = `fas ${iconClass}`;
                 }
 
+                // Create the physical card wrapper
                 const toolCard = document.createElement('div');
                 toolCard.className = 'tool-card';
+                
+                // Apply data attributes to empower the live search function
                 toolCard.setAttribute('data-tool-name', tool.name.toLowerCase());
                 toolCard.setAttribute('data-tool-desc', tool.desc.toLowerCase());
                 toolCard.setAttribute('data-tool-category', categoryId.replace('Tools', '').toLowerCase());
 
-                // Generate filename from tool name (e.g., "Image Converter" -> "image-converter.html")
+                // Generate SEO friendly URLs natively from the tool name string
                 const toolFileName = tool.name.toLowerCase()
-                    .replace(/[^a-z0-9\s]/g, '') // Remove special chars
-                    .replace(/\s+/g, '-') // Replace spaces with hyphens
+                    .replace(/[^a-z0-9\s]/g, '') // Regex cleans special characters
+                    .replace(/\s+/g, '-')        // Regex maps spacing to hyphens
                     + '.html';
 
+                // Assign raw HTML mapping for the inner card UI
                 toolCard.innerHTML = `
                     ${tool.badge ? `<span class="tool-badge ${badgeClass}">${tool.badge}</span>` : ''}
                     <div class="tool-icon ${tool.color}">
@@ -1774,11 +2205,16 @@
             });
         }
 
-        // Function to filter tools by category
+        /**
+         * FILTERING FUNCTION: filterToolsByCategory
+         * Activates a specific category chip and hides/shows entire category DOM sections.
+         * Maintains search parameters dynamically even when flipping categories.
+         * * @param {string} category - The exact key of the category (or 'all')
+         */
         function filterToolsByCategory(category) {
             currentCategory = category;
 
-            // Update active chip
+            // Iterate chips to update the active visual state
             document.querySelectorAll('.filter-chip').forEach(chip => {
                 if (chip.getAttribute('data-category') === category) {
                     chip.classList.add('active');
@@ -1787,91 +2223,112 @@
                 }
             });
 
-            // Show/hide sections based on category
+            // Grab all previously generated DOM sections
             const allSections = document.querySelectorAll('.tools-section');
 
             if (category === 'all') {
-                // Show all sections
+                
+                // Show absolutely everything if 'all' is selected
                 allSections.forEach(section => {
                     section.style.display = 'block';
                 });
+                
             } else {
-                // Hide all sections, then show only matching category
+                
+                // Iteratively hide all sections first, then specifically show target
                 allSections.forEach(section => {
                     section.style.display = 'none';
                 });
 
                 const targetSection = document.getElementById(`${category}-section`);
                 if (targetSection) {
+                    
                     targetSection.style.display = 'block';
 
-                    // Scroll to the section smoothly
+                    // Timeout added to ensure display:block triggers prior to bounding check
                     setTimeout(() => {
-                        // Offset by header height
-                        const headerOffset = 150;
+                        const headerOffset = 150; // Compensates for sticky headers
                         const elementPosition = targetSection.getBoundingClientRect().top;
                         const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
 
+                        // Smoothly ease users into the category view they clicked
                         window.scrollTo({
                             top: offsetPosition,
                             behavior: "smooth"
                         });
                     }, 50);
+                    
                 }
             }
 
-            // Also apply search filter if there's a search term
+            // Immediately re-process the string search if the user left terms in the input box
             const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
             if (searchTerm) {
                 applySearchFilter(searchTerm);
             }
         }
 
-        // Function to apply search filter
+        /**
+         * SEARCH FUNCTION: applySearchFilter
+         * Dynamically iterates over every card on the page to hide/show them based 
+         * on matching string characters against `data-tool-name` and `data-tool-desc`.
+         * Generates custom error states if no tools are found.
+         * * @param {string} searchTerm - Lowercase, trimmed text from user input
+         */
         function applySearchFilter(searchTerm) {
+            
+            // Map entire arrays of nodes for rapid DOM iteration
             const allToolCards = Array.from(document.querySelectorAll('.tool-card'));
             const allToolSections = Array.from(document.querySelectorAll('.tools-section'));
 
-            // Count matches per section
+            // State dictionary mapping active matches against parent sections
             const sectionMatches = {};
             let hasMatches = false;
 
-            // Check each tool card
+            // Pass 1: Card Iteration
             allToolCards.forEach(card => {
+                
+                // Local state mapping
                 const toolName = card.getAttribute('data-tool-name');
                 const toolDesc = card.getAttribute('data-tool-desc');
                 const toolCategory = card.getAttribute('data-tool-category');
 
-                // Check if card matches current category filter
+                // Truth evaluations
                 const matchesCategory = currentCategory === 'all' || toolCategory === currentCategory;
-
-                // Check if card matches search term
                 const matchesSearch = searchTerm === '' || toolName.includes(searchTerm) || toolDesc.includes(searchTerm);
 
                 if (matchesCategory && matchesSearch) {
+                    
+                    // Activate match displays
                     card.style.display = 'flex';
                     hasMatches = true;
+                    
+                    // Increment section match counter for Section Pass logic
                     const section = card.closest('.tools-section');
                     if (section) {
                         const sectionId = section.id || 'unknown';
                         sectionMatches[sectionId] = (sectionMatches[sectionId] || 0) + 1;
                     }
+                    
                 } else {
+                    
+                    // Deactivate failure displays
                     card.style.display = 'none';
+                    
                 }
             });
 
-            // Show/hide sections based on matches and current category filter
+            // Pass 2: Section Optimization (Hiding entire sections if empty)
             allToolSections.forEach(section => {
+                
+                // Map state logic
                 const sectionId = section.id || 'unknown';
                 const sectionCategory = section.getAttribute('data-category');
 
-                // Check if section should be shown based on category filter
                 const shouldShowByCategory = currentCategory === 'all' || sectionCategory === currentCategory;
-
-                // Check if section has matching cards
                 const sectionHasMatches = sectionMatches[sectionId] > 0;
 
+                // Handle complex visibility truths based on combinations of string match / filter match
                 if (shouldShowByCategory && (searchTerm === '' || sectionHasMatches)) {
                     section.style.display = 'block';
                 } else if (currentCategory === 'all' && !sectionHasMatches && searchTerm !== '') {
@@ -1879,62 +2336,67 @@
                 } else if (currentCategory !== 'all' && sectionCategory !== currentCategory) {
                     section.style.display = 'none';
                 }
+                
             });
 
-            // If no matches and search term is not empty, show "Tool not available" message
+            // Pass 3: Missing State Generator ("Tool not available" prompt)
             if (searchTerm !== '' && !hasMatches) {
-                // Remove any existing no-results message
+                
+                // Clean existing messages prior to injection
                 document.querySelectorAll('.no-results-message').forEach(el => el.remove());
 
+                // Find a viable section wrapper to attach the missing message explicitly into
                 const firstVisibleSection = document.querySelector('.tools-section[style="display: block"]');
+                
                 if (firstVisibleSection) {
                     const toolsGrid = firstVisibleSection.querySelector('.tools-grid');
+                    
                     if (toolsGrid) {
+                        
+                        // Construct missing state wrapper
                         const noResultsDiv = document.createElement('div');
                         noResultsDiv.className = 'no-results-message';
+                        
+                        // Apply quick CSS strings for missing states specifically
                         noResultsDiv.style.cssText = 'grid-column: 1 / -1; text-align: center; padding: 60px;';
                         noResultsDiv.innerHTML = `
                             <i class="fas fa-search" style="font-size: 64px; color: #9ca3af; margin-bottom: 24px;"></i>
                             <h3 style="color: var(--text-primary); margin-bottom: 12px; font-size: 24px;">"${searchTerm}" tool is not available</h3>
-                            <p style="color: var(--text-secondary); font-size: 16px;">Try searching for "HD Background Remover", "File Scanner", or "PDF to Word"</p>
+                            <p style="color: var(--text-secondary); font-size: 16px;">Try searching for "Rotate PDF", "File Scanner", or "PDF to Word"</p>
                         `;
+                        
                         toolsGrid.appendChild(noResultsDiv);
+                        
                     }
                 }
+                
             } else {
-                // Remove no-results message if it exists
+                
+                // Remove no-results message if the user cleared input or matched items
                 document.querySelectorAll('.no-results-message').forEach(el => el.remove());
+                
             }
         }
 
-        // Sticky filter bar logic
-        window.addEventListener('scroll', function () {
-            const filterBar = document.querySelector('.category-filter');
-            if (window.scrollY > 400) {
-                filterBar.classList.add('stuck');
-            } else {
-                filterBar.classList.remove('stuck');
-            }
-        });
-
-        // Initialize all tool sections
+        // ==========================================================================
+        // MAIN BROWSER INITIALIZATION BLOCK
+        // Boots up immediately when the browser's DOM is completely constructed.
+        // ==========================================================================
         document.addEventListener('DOMContentLoaded', function () {
-            // Create tool sections in DOM
+            
+            // 1. Initial execution to build raw `<section>` wrappers for 7 categories
             createToolSections();
 
-            // Render all tool categories
-            renderTools('imageTools', toolsData.image);
+            // 2. Initial execution to populate grid nodes for all 73 tools across 7 categories
             renderTools('pdfTools', toolsData.pdf);
-            renderTools('securityTools', toolsData.security);
-            renderTools('videoTools', toolsData.video);
-            renderTools('calculatorTools', toolsData.calculator);
-            renderTools('textTools', toolsData.text);
+            renderTools('imageTools', toolsData.image);
             renderTools('developerTools', toolsData.developer);
-            renderTools('colorTools', toolsData.color);
-            renderTools('seoTools', toolsData.seo);
+            renderTools('calculatorTools', toolsData.calculator);
+            renderTools('securityTools', toolsData.security);
+            renderTools('networkTools', toolsData.network);
             renderTools('utilityTools', toolsData.utility);
 
-            // Setup category filter chips
+            // 3. Navigation Chip Listeners (Filters category clicks dynamically)
             const filterChips = document.querySelectorAll('.filter-chip');
             filterChips.forEach(chip => {
                 chip.addEventListener('click', function () {
@@ -1943,40 +2405,44 @@
                 });
             });
 
-            // Search functionality
+            // 4. Search Form Keystroke Listening
             const searchInput = document.getElementById('searchInput');
+            if(searchInput) {
+                searchInput.addEventListener('input', function () {
+                    const searchTerm = this.value.toLowerCase().trim();
+                    applySearchFilter(searchTerm);
+                });
+            }
 
-            searchInput.addEventListener('input', function () {
-                const searchTerm = this.value.toLowerCase().trim();
-                applySearchFilter(searchTerm);
-            });
-
-            // Mobile menu functionality
+            // 5. Mobile DOM interaction listeners (Hamburger Menu)
             const mobileMenuBtn = document.getElementById('mobileMenuBtn');
             const mobileMenu = document.getElementById('mobileMenu');
 
             if (mobileMenuBtn && mobileMenu) {
+                
+                // Button Click toggles active states
                 mobileMenuBtn.addEventListener('click', function (e) {
                     e.stopPropagation();
                     mobileMenu.classList.toggle('active');
                 });
 
-                // Close menu when clicking outside
+                // Detect stray clicks on DOM body to retract menu naturally
                 document.addEventListener('click', function (e) {
                     if (!mobileMenu.contains(e.target) && e.target !== mobileMenuBtn) {
                         mobileMenu.classList.remove('active');
                     }
                 });
 
-                // Close menu when clicking on a link
+                // Close menu if links are explicitly pressed inside the mobile drawer
                 mobileMenu.querySelectorAll('a').forEach(link => {
                     link.addEventListener('click', function () {
                         mobileMenu.classList.remove('active');
                     });
                 });
+                
             }
 
-            // Simple anchor link scrolling
+            // 6. Basic smooth anchor jump scrolling for single-page links
             document.querySelectorAll('a[href^="#"]').forEach(anchor => {
                 anchor.addEventListener('click', function (e) {
                     const href = this.getAttribute('href');
@@ -1987,12 +2453,14 @@
 
                     if (target) {
                         e.preventDefault();
+                        
+                        // Easing behavior triggers native browser transitions
                         window.scrollTo({
                             top: target.offsetTop - 100,
                             behavior: 'smooth'
                         });
 
-                        // Update active nav link
+                        // Ensure UI link active states match the jump positions
                         if (this.classList.contains('nav-link')) {
                             document.querySelectorAll('.nav-link').forEach(link => {
                                 link.classList.remove('active');
@@ -2003,18 +2471,34 @@
                 });
             });
 
-            // Focus search input on '/' key press
-            document.addEventListener('keydown', function (e) {
-                if (e.key === '/' && !e.target.matches('input, textarea')) {
-                    e.preventDefault();
-                    searchInput.focus();
-                }
-
-                // Close mobile menu on Escape key
-                if (e.key === 'Escape' && mobileMenu.classList.contains('active')) {
-                    mobileMenu.classList.remove('active');
+            // 7. Sticky category bar scroll detection logic
+            window.addEventListener('scroll', function () {
+                const filterBar = document.querySelector('.category-filter');
+                if (filterBar) {
+                    if (window.scrollY > 400) {
+                        filterBar.classList.add('stuck');
+                    } else {
+                        filterBar.classList.remove('stuck');
+                    }
                 }
             });
+
+            // 8. Quality of Life Hotkeys (Advanced UX)
+            document.addEventListener('keydown', function (e) {
+                
+                // Allow user to press `/` to instantly snap focus to search queries
+                if (e.key === '/' && !e.target.matches('input, textarea')) {
+                    e.preventDefault();
+                    if(searchInput) searchInput.focus();
+                }
+
+                // Allow user to escape key out of mobile interactions seamlessly
+                if (e.key === 'Escape' && mobileMenu && mobileMenu.classList.contains('active')) {
+                    mobileMenu.classList.remove('active');
+                }
+                
+            });
+            
         });
     </script>
 </body>
