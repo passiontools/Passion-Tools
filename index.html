@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- always match viewport width for responsive scaling, even in desktop-mobile mode -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Passion Tools - Free Online Tools for Professionals</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -63,12 +64,17 @@
             box-sizing: border-box;
         }
 
+        html,
+        body {
+            width: 100%;
+            overflow-x: hidden; /* prevents horizontal scroll when device emulates wide desktop */
+        }
+
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-primary);
             line-height: 1.6;
-            overflow-x: hidden;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -77,9 +83,9 @@
         /* Main Container for sizing content bounds */
         .container {
             width: 100%;
-            max-width: 1440px;
+            max-width: 100vw;          /* never exceed viewport width */
             margin: 0 auto;
-            padding: 0 24px;
+            padding: 0 1.5rem;         /* responsive padding */
         }
 
         /* ==========================================================================
@@ -109,6 +115,7 @@
             gap: 10px;
             text-decoration: none;
             user-select: none; /* Prevents text highlighting */
+            cursor: pointer; /* makes logo feel clickable without navigation */
         }
 
         .logo-text {
@@ -196,6 +203,28 @@
             border-radius: 8px;
             transition: var(--transition);
         }
+
+        .mobile-menu-btn:hover {
+        }
+
+        /* responsive breakpoints */
+        @media (max-width: 600px) {
+            .container { padding: 0 1rem; }
+            .nav-links { gap: 20px; }
+            .logo-text { font-size: 22px; }
+            .hero, .grid, .cards { width: 100%; }
+        }
+
+        @media (min-width: 601px) and (max-width: 992px) {
+            .container { max-width: 90vw; }
+        }
+
+        @media (min-width: 993px) {
+            .container { max-width: 1200px; }
+        }
+
+        .full-width { width: 100% !important; }
+        .flex-grow  { flex: 1 1 auto; }
 
         .mobile-menu-btn:hover {
             background-color: var(--hover-gray);
@@ -1182,10 +1211,11 @@
                     <a href="#home" class="nav-link active">Home</a>
                     <a href="#all-tools-section" class="nav-link">Tools</a>
                     <a href="#contact" class="nav-link">Contact</a>
-                    <a href="mailto:passiontools2@gmail.com" class="contact-link">
+                    <!-- email shown as non‑navigating element to prevent refresh/mail client -->
+                    <span class="contact-link">
                         <i class="fas fa-envelope"></i>
                         passiontools2@gmail.com
-                    </a>
+                    </span>
                 </div>
 
                 <button class="mobile-menu-btn" id="mobileMenuBtn">
@@ -1288,7 +1318,7 @@
                 <i class="fas fa-tools"></i>
                 All Tools
             </h2>
-            <p class="all-tools-subtitle">Browse our complete collection of 73 free online tools. Filter by category
+            <p class="all-tools-subtitle">Browse our complete collection of 70+ free online tools. Filter by category
                 to find exactly what you need.</p>
         </div>
     </section>
@@ -1358,10 +1388,8 @@
                     <div class="security-icon">
                         <i class="fas fa-server"></i>
                     </div>
-                    <h3 style="font-size: 20px; margin-bottom: 12px; color: var(--text-primary);">Client-Side Processing
-                    </h3>
-                    <p style="color: var(--text-secondary);">Most tools run directly in your browser. Your data never
-                        leaves your device.</p>
+                    <h3 style="font-size: 20px; margin-bottom: 12px; color: var(--text-primary);">Secure Processing</h3>
+                    <p style="color: var(--text-secondary);">Some tools run directly in your browser, while others use secure server-side processing. Your data is always handled safely.</p>
                 </div>
 
                 <div class="security-card">
@@ -1380,7 +1408,7 @@
         <div class="container">
             <div class="stats-grid">
                 <div class="stat-card">
-                    <div class="stat-number">73</div>
+                    <div class="stat-number">70+</div>
                     <div class="stat-label">Free Tools</div>
                 </div>
                 <div class="stat-card">
@@ -1500,55 +1528,48 @@
                 { 
                     name: "Merge PDF", 
                     desc: "Combine multiple PDFs into one document", 
-                    icon: "fa-layer-group", 
+                    icon: "fa-object-group", 
                     color: "pdf", 
                     badge: "FREE" 
                 },
                 { 
                     name: "Split PDF", 
                     desc: "Split PDF into multiple separate documents", 
-                    icon: "fa-arrows-split-up-and-left", 
+                    icon: "fa-scissors", 
                     color: "pdf", 
                     badge: "FREE" 
                 },
                 { 
                     name: "Remove PDF Pages", 
                     desc: "Delete specific pages from PDF files", 
-                    icon: "fa-file-circle-minus", 
+                    icon: "fa-file-circle-xmark", 
                     color: "pdf", 
                     badge: "FREE" 
                 },
                 { 
                     name: "Extract PDF Pages", 
                     desc: "Extract specific pages from PDF files", 
-                    icon: "fa-file-export", 
+                    icon: "fa-clone", 
                     color: "pdf", 
                     badge: "FREE" 
                 },
                 { 
                     name: "Organize PDF", 
                     desc: "Rearrange pages in PDF documents", 
-                    icon: "fa-arrow-down-short-wide", 
+                    icon: "fa-sitemap", 
                     color: "pdf", 
                     badge: "FREE" 
                 },
                 { 
                     name: "Repair PDF", 
                     desc: "Fix corrupted or damaged PDF files", 
-                    icon: "fa-briefcase-medical", 
+                    icon: "fa-screwdriver-wrench", 
                     color: "pdf", 
                     badge: "FREE" 
                 },
                 { 
                     name: "Word to PDF", 
                     desc: "Convert Word documents to PDF format", 
-                    icon: "fa-file-word", 
-                    color: "word", 
-                    badge: "FREE" 
-                },
-                { 
-                    name: "PDF to Word", 
-                    desc: "Convert PDF to editable Word document", 
                     icon: "fa-file-word", 
                     color: "word", 
                     badge: "FREE" 
@@ -1561,17 +1582,66 @@
                     badge: "FREE" 
                 },
                 { 
-                    name: "PDF to PowerPoint", 
-                    desc: "Convert PDF to PowerPoint presentation", 
-                    icon: "fa-file-powerpoint", 
-                    color: "ppt", 
-                    badge: "FREE" 
-                },
-                { 
                     name: "Excel to PDF", 
                     desc: "Convert Excel spreadsheets to PDF", 
                     icon: "fa-file-excel", 
                     color: "excel", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "Protect PDF", 
+                    desc: "Add password protection to sensitive PDF files", 
+                    icon: "fa-lock", 
+                    color: "pdf", 
+                    badge: "SECURE" 
+                },
+                { 
+                    name: "Unlock PDF", 
+                    desc: "Remove password protection from secured PDFs", 
+                    icon: "fa-lock-open", 
+                    color: "pdf", 
+                    badge: "SECURE" 
+                },
+                { 
+                    name: "Translate PDF", 
+                    desc: "Translate PDF documents into another language", 
+                    icon: "fa-language", 
+                    color: "pdf", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "Rotate pdf", 
+                    desc: "Quick rotate of entire document pages", 
+                    icon: "fa-rotate", 
+                    color: "pdf", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "Compress pdf", 
+                    desc: "Reduce PDF file size for easy email sharing", 
+                    icon: "fa-file-zipper", 
+                    color: "pdf", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "Crop pdf", 
+                    desc: "Crop PDF document pages to remove white margins", 
+                    icon: "fa-crop-simple", 
+                    color: "pdf", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "PDF to Word", 
+                    desc: "Convert PDF to editable Word document", 
+                    icon: "fa-file-word", 
+                    color: "word", 
+                    badge: "FREE" 
+                },
+                { 
+                    name: "PDF to PowerPoint", 
+                    desc: "Convert PDF to PowerPoint presentation", 
+                    icon: "fa-file-powerpoint", 
+                    color: "ppt", 
                     badge: "FREE" 
                 },
                 { 
@@ -1643,48 +1713,6 @@
                     icon: "fa-stamp", 
                     color: "pdf", 
                     badge: "FREE" 
-                },
-                { 
-                    name: "Protect PDF", 
-                    desc: "Add password protection to sensitive PDF files", 
-                    icon: "fa-lock", 
-                    color: "pdf", 
-                    badge: "SECURE" 
-                },
-                { 
-                    name: "Unlock PDF", 
-                    desc: "Remove password protection from secured PDFs", 
-                    icon: "fa-lock-open", 
-                    color: "pdf", 
-                    badge: "SECURE" 
-                },
-                { 
-                    name: "Translate PDF", 
-                    desc: "Translate PDF documents into another language", 
-                    icon: "fa-language", 
-                    color: "pdf", 
-                    badge: "FREE" 
-                },
-                { 
-                    name: "Rotate pdf", 
-                    desc: "Quick rotate of entire document pages", 
-                    icon: "fa-rotate", 
-                    color: "pdf", 
-                    badge: "FREE" 
-                },
-                { 
-                    name: "Compress pdf", 
-                    desc: "Reduce PDF file size for easy email sharing", 
-                    icon: "fa-file-zipper", 
-                    color: "pdf", 
-                    badge: "FREE" 
-                },
-                { 
-                    name: "Crop pdf", 
-                    desc: "Crop PDF document pages to remove white margins", 
-                    icon: "fa-crop-simple", 
-                    color: "pdf", 
-                    badge: "FREE" 
                 }
             ],
 
@@ -1730,7 +1758,7 @@
                 { 
                     name: "AI Background Remover", 
                     desc: "Remove background from images automatically", 
-                    icon: "fa-wand-magic-sparkles", 
+                    icon: "fa-eraser", 
                     color: "image", 
                     badge: "HD" 
                 },
@@ -1744,7 +1772,7 @@
                 { 
                     name: "SVG to PNG Converter", 
                     desc: "Convert scalable SVG vector files to PNG images", 
-                    icon: "fa-vector-square", 
+                    icon: "fa-bezier-curve", 
                     color: "image", 
                     badge: "FREE" 
                 },
@@ -1881,7 +1909,7 @@
                 { 
                     name: "Text Encryptor / Decryptor", 
                     desc: "Encrypt and decrypt raw text strings securely", 
-                    icon: "fa-user-secret", 
+                    icon: "fa-user-lock", 
                     color: "security", 
                     badge: "SECURE" 
                 },
@@ -1922,21 +1950,21 @@
                 { 
                     name: "Internet Speed Test", 
                     desc: "Test your live internet ping and connection speed", 
-                    icon: "fa-gauge-high", 
+                    icon: "fa-gauge", 
                     color: "network", 
                     badge: "FREE" 
                 },
                 { 
                     name: "IP Address Checker", 
                     desc: "Check your public IP address and geo-location", 
-                    icon: "fa-network-wired", 
+                    icon: "fa-map-location-dot", 
                     color: "network", 
                     badge: "FREE" 
                 },
                 { 
                     name: "Website Down Checker", 
                     desc: "Check if a website is offline for everyone", 
-                    icon: "fa-server", 
+                    icon: "fa-earth-americas", 
                     color: "network", 
                     badge: "FREE" 
                 },
@@ -1964,14 +1992,14 @@
                 { 
                     name: "AQI & Air Quality Checker", 
                     desc: "Check real-time local air quality metrics", 
-                    icon: "fa-smog", 
+                    icon: "fa-wind", 
                     color: "network", 
                     badge: "FREE" 
                 },
                 { 
                     name: "UV Index Checker", 
                     desc: "Check current live UV index for your location", 
-                    icon: "fa-sun", 
+                    icon: "fa-cloud-sun", 
                     color: "network", 
                     badge: "FREE" 
                 }
@@ -2019,7 +2047,7 @@
                 { 
                     name: "Universal Archive Converter", 
                     desc: "Convert archive formats (ZIP, RAR, etc.)", 
-                    icon: "fa-box-archive", 
+                    icon: "fa-boxes-stacked", 
                     color: "utility", 
                     badge: "FREE" 
                 },
@@ -2387,7 +2415,7 @@
             // 1. Initial execution to build raw `<section>` wrappers for 7 categories
             createToolSections();
 
-            // 2. Initial execution to populate grid nodes for all 73 tools across 7 categories
+            // 2. Initial execution to populate grid nodes for over 70 tools across 7 categories
             renderTools('pdfTools', toolsData.pdf);
             renderTools('imageTools', toolsData.image);
             renderTools('developerTools', toolsData.developer);
